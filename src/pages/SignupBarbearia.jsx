@@ -4,8 +4,8 @@ import SocialLogin from '../components/SocialLogin';
 import { validators } from '../utils/validators';
 import { useAuthContext } from '../contexts/AuthContext';
 
-const Signup = ({ onSwitchToLogin, onSwitchToBarbearia }) => { // Adicionar prop
-  const { signup } = useAuthContext();
+const SignupBarbearia = ({ onSwitchToLogin, onSwitchToCliente }) => {
+  const { signupAdmBarbearia } = useAuthContext(); // Método específico
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -77,13 +77,13 @@ const Signup = ({ onSwitchToLogin, onSwitchToBarbearia }) => { // Adicionar prop
         email: formData.email,
         password: formData.password,
         telefone: formData.telefone
-        // Removido role - o backend define como ROLE_CLIENTE
+        // Role será definida como ROLE_BARBEARIA_ADM no backend
       };
 
-      const result = await signup(userData);
+      const result = await signupAdmBarbearia(userData);
       
       if (result.success) {
-        setSuccess('Cadastro realizado com sucesso! Redirecionando para o login...');
+        setSuccess('Cadastro de Proprietario realizado com sucesso! Redirecionando para o login...');
         setFormData({
           name: '',
           telefone: '',
@@ -99,8 +99,12 @@ const Signup = ({ onSwitchToLogin, onSwitchToBarbearia }) => { // Adicionar prop
         setError(result.error);
       }
     } catch (err) {
-      console.error('Erro no cadastro:', err);
-      setError('Erro ao realizar cadastro. Tente novamente.');
+      console.error('Erro no cadastro de proprietario:', err);
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Erro ao realizar cadastro. Tente novamente.');
+      }
     } finally {
       setLoading(false);
     }
@@ -108,9 +112,9 @@ const Signup = ({ onSwitchToLogin, onSwitchToBarbearia }) => { // Adicionar prop
 
   return (
     <>
-      <h2 className="form-title">Criar Conta - Cliente</h2>
+      <h2 className="form-title">Cadastrar Proprietario</h2>
       <p style={{ textAlign: 'center', marginBottom: '1rem', color: '#666' }}>
-        Cadastre-se para agendar seus cortes
+        Cadastre-se como proprietário de barbearia
       </p>
       
       <SocialLogin />
@@ -132,8 +136,8 @@ const Signup = ({ onSwitchToLogin, onSwitchToBarbearia }) => { // Adicionar prop
       <form onSubmit={handleSubmit} className="login-form">
         <InputFields 
           type="text" 
-          placeholder="Nome completo" 
-          icon="person"
+          placeholder="Nome do Proprietário" 
+          icon="business"
           name="name"
           value={formData.name}
           onChange={handleChange}
@@ -180,12 +184,12 @@ const Signup = ({ onSwitchToLogin, onSwitchToBarbearia }) => { // Adicionar prop
           className="login-button"
           disabled={loading}
         >
-          {loading ? 'Cadastrando...' : 'Cadastrar'}
+          {loading ? 'Cadastrando...' : 'Cadastrar Barbearia'}
         </button>
       </form>
 
       <p className="sugnup-text">
-        Já tem uma conta?
+        Já é proprietário?
         <a href="#" onClick={(e) => {
           e.preventDefault();
           onSwitchToLogin();
@@ -193,14 +197,14 @@ const Signup = ({ onSwitchToLogin, onSwitchToBarbearia }) => { // Adicionar prop
       </p>
       
       <p className="sugnup-text" style={{ marginTop: '0.5rem' }}>
-        É proprietário de barbearia?
+        Quer se cadastrar como cliente?
         <a href="#" onClick={(e) => {
           e.preventDefault();
-          onSwitchToBarbearia();
-        }}>Cadastrar como Proprietario</a>
+          onSwitchToCliente();
+        }}>Cadastrar como Cliente</a>
       </p>
     </>
   )
 }
 
-export default Signup
+export default SignupBarbearia

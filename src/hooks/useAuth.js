@@ -41,6 +41,16 @@ export const useAuth = () => {
     }
   };
 
+  // NOVO: Método para cadastro de barbearia
+  const signupAdmBarbearia = async (userData) => {
+    try {
+      const response = await authService.signup_ADM_BARBEARIA(userData);
+      return { success: true, data: response };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.message || 'Erro no cadastro de barbearia' };
+    }
+  };
+
   const logout = () => {
     authService.logout();
     setUser(null);
@@ -53,6 +63,7 @@ export const useAuth = () => {
     isAuthenticated,
     login,
     signup,
+    signupAdmBarbearia, // Exportar o novo método
     logout
   };
 };
