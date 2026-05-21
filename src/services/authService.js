@@ -8,7 +8,7 @@ class AuthService {
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify({
-          id: response.data.id,
+          id: response.data.userId,
           name: response.data.name,
           role: response.data.role,
           email: email

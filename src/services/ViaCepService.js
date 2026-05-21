@@ -17,7 +17,6 @@ class ViaCepService {
         data: {
           logradouro: d.logradouro || '',
           bairro:     d.bairro     || '',
-          // O back pode retornar localidade (ViaCep original) ou cidade (já mapeado)
           cidade:     d.cidade     || d.localidade || '',
           uf:         d.uf         || '',
           cep:        d.cep        || cepLimpo

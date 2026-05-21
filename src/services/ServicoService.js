@@ -1,4 +1,3 @@
-// src/services/ServicoService.js
 import api from './api';
 
 class ServicoService {

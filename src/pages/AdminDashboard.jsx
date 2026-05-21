@@ -3,9 +3,9 @@ import { useAuthContext } from '../contexts/AuthContext';
 import AdminService from '../services/AdminService';
 import BarbeariaService from '../services/BarbeariaService';
 import Loader from '../components/Loader';
-const IconEdit = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M17 3l4 4-7 7H10v-4l7-7z"/><path d="M4 20h16"/></svg>);
-const IconTrash = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M8 6V4h8v2"/><rect x="10" y="11" width="4" height="8"/></svg>);
-const IconPlus = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>);
+const IconEdit = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M17 3l4 4-7 7H10v-4l7-7z" /><path d="M4 20h16" /></svg>);
+const IconTrash = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><polyline points="3 6 5 6 21 6" /><path d="M8 6V4h8v2" /><rect x="10" y="11" width="4" height="8" /></svg>);
+const IconPlus = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>);
 
 const AdminDashboard = ({ onNavigate }) => {
   const { user } = useAuthContext();
@@ -30,7 +30,8 @@ const AdminDashboard = ({ onNavigate }) => {
     } else {
       const result = await BarbeariaService.listarTodas(0, 100);
       if (result.success) {
-        setBarbearias(result.data?.content || result.data || []);
+        const data = result.data;
+        setBarbearias(data.content || data || []);
       }
     }
     setLoading(false);
@@ -90,7 +91,7 @@ const AdminDashboard = ({ onNavigate }) => {
 
   return (
     <div className="dashboard-admin">
-      
+
       <div className="dashboard-container">
         {message.text && (
           <div className={`message ${message.type === 'success' ? 'success-message' : 'error-message'}`}>
@@ -121,11 +122,11 @@ const AdminDashboard = ({ onNavigate }) => {
                   <div className="modal-content">
                     <h3>Criar Novo Usuário</h3>
                     <form onSubmit={handleCreateUser}>
-                      <input type="text" placeholder="Nome completo" value={userForm.name} onChange={e => setUserForm({...userForm, name: e.target.value})} required />
-                      <input type="email" placeholder="Email" value={userForm.email} onChange={e => setUserForm({...userForm, email: e.target.value})} required />
-                      <input type="password" placeholder="Senha (mínimo 6)" value={userForm.password} onChange={e => setUserForm({...userForm, password: e.target.value})} required />
-                      <input type="tel" placeholder="Telefone" value={userForm.telefone} onChange={e => setUserForm({...userForm, telefone: e.target.value})} />
-                      <select value={userForm.role} onChange={e => setUserForm({...userForm, role: e.target.value})}>
+                      <input type="text" placeholder="Nome completo" value={userForm.name} onChange={e => setUserForm({ ...userForm, name: e.target.value })} required />
+                      <input type="email" placeholder="Email" value={userForm.email} onChange={e => setUserForm({ ...userForm, email: e.target.value })} required />
+                      <input type="password" placeholder="Senha (mínimo 6)" value={userForm.password} onChange={e => setUserForm({ ...userForm, password: e.target.value })} required />
+                      <input type="tel" placeholder="Telefone" value={userForm.telefone} onChange={e => setUserForm({ ...userForm, telefone: e.target.value })} />
+                      <select value={userForm.role} onChange={e => setUserForm({ ...userForm, role: e.target.value })}>
                         <option value="ROLE_CLIENTE">Cliente</option>
                         <option value="ROLE_FUNCIONARIO">Funcionário</option>
                         <option value="ROLE_BARBEARIA_ADM">Proprietário de Barbearia</option>
@@ -188,7 +189,7 @@ const AdminDashboard = ({ onNavigate }) => {
           )}
         </div>
       </div>
-      
+
     </div>
   );
 };

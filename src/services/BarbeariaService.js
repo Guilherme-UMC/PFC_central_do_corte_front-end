@@ -14,13 +14,13 @@ class BarbeariaService {
   }
 
   async listarTodas(page = 0, size = 10) {
-    try {
-      const response = await api.get('/barbearia', { params: { page, size } });
-      return { success: true, data: response.data };
-    } catch (error) {
-      return { success: false, message: 'Erro ao listar barbearias' };
-    }
+  try {
+    const response = await api.get('/barbearia', { params: { page, size } });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return { success: false, message: 'Erro ao listar barbearias' };
   }
+}
 
   async buscarPorId(id) {
     try {
@@ -51,7 +51,6 @@ class BarbeariaService {
     }
   }
 
-  // Endpoint corrigido: /barbearia/minhas (era /barbearia/my-barbearias)
   async minhasBarbearias() {
     try {
       const response = await api.get('/barbearia/minhas');

@@ -39,7 +39,6 @@ const FuncionarioDashboard = ({ onNavigate }) => {
   const carregarAgendamentos = async (barbeariaId) => {
     const result = await AgendamentoService.listarPorBarbearia(barbeariaId);
     if (result.success) {
-      // Filtrar apenas agendamentos do funcionário logado
       const meusAgendamentos = result.data.filter(ag => ag.funcionarioId === user?.id);
       setAgendamentos(meusAgendamentos);
     }

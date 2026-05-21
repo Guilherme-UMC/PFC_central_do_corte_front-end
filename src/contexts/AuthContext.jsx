@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.jsx - VERSÃO REACT ROUTER DOM
 import { createContext, useContext } from 'react';
 import { useAuth } from '../hooks/useAuth';
 

@@ -11,19 +11,19 @@ import CadastroBarbearia from '../components/CadastroBarbearia';
 
 const IconEdit = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-    <path d="M17 3l4 4-7 7H10v-4l7-7z"/><path d="M4 20h16"/>
+    <path d="M17 3l4 4-7 7H10v-4l7-7z" /><path d="M4 20h16" />
   </svg>
 );
 
 const IconTrash = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-    <polyline points="3 6 5 6 21 6"/><path d="M8 6V4h8v2"/><rect x="10" y="11" width="4" height="8"/>
+    <polyline points="3 6 5 6 21 6" /><path d="M8 6V4h8v2" /><rect x="10" y="11" width="4" height="8" />
   </svg>
 );
 
 const IconPlus = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
   </svg>
 );
 
@@ -55,16 +55,17 @@ const BarbeariaDashboard = ({ onNavigate }) => {
   }, []);
 
   const carregarBarbearias = async () => {
-    setLoading(true);
-    const result = await BarbeariaService.minhasBarbearias();
-    if (result.success) {
-      setBarbearias(result.data);
-      if (result.data.length > 0 && !selectedBarbearia) {
-        setSelectedBarbearia(result.data[0]);
-        carregarDadosBarbearia(result.data[0].id);
+    try {
+      setLoading(true);
+      const result = await BarbeariaService.minhasBarbearias(0, 50);
+      if (result.success) {
+        const data = result.data;
+        const lista = data.content || data || [];
+        setBarbearias(lista);
       }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const carregarDadosBarbearia = async (barbeariaId) => {
@@ -115,7 +116,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
   const handleServicoSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    
+
     const servicoData = {
       nome: servicoForm.nome,
       descricao: servicoForm.descricao || null,
@@ -157,9 +158,9 @@ const BarbeariaDashboard = ({ onNavigate }) => {
   const handleFuncionarioSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    
+
     const result = await FuncionarioService.criar(selectedBarbearia.id, funcionarioForm);
-    
+
     if (result.success) {
       showMessage('success', 'Funcionário criado e vinculado com sucesso!');
       setShowFuncionarioForm(false);
@@ -174,9 +175,9 @@ const BarbeariaDashboard = ({ onNavigate }) => {
   const handleVincularFuncionario = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    
+
     const result = await FuncionarioService.vincularExistente(selectedBarbearia.id, vincularEmail);
-    
+
     if (result.success) {
       showMessage('success', 'Funcionário vinculado com sucesso!');
       setVincularEmail('');
@@ -202,9 +203,9 @@ const BarbeariaDashboard = ({ onNavigate }) => {
   const handleHorarioSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    
+
     const result = await HorarioService.criar(selectedBarbearia.id, horarioForm);
-    
+
     if (result.success) {
       showMessage('success', 'Horário criado com sucesso!');
       setShowHorarioForm(false);
@@ -261,7 +262,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
   if (showBarbeariaForm) {
     return (
       <div>
-        <CadastroBarbearia 
+        <CadastroBarbearia
           onSuccess={() => {
             setShowBarbeariaForm(false);
             carregarBarbearias();
@@ -275,7 +276,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
 
   return (
     <div className="dashboard-barbearia">
-      
+
       <div className="dashboard-container">
         {message.text && (
           <div className={`message ${message.type === 'success' ? 'success-message' : 'error-message'}`}>
@@ -310,7 +311,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
         {selectedBarbearia && (
           <>
             <div className="barbearia-info-bar">
-              <button 
+              <button
                 className="btn-secondary small"
                 onClick={() => {
                   setEditingBarbearia(selectedBarbearia);
@@ -370,18 +371,18 @@ const BarbeariaDashboard = ({ onNavigate }) => {
                 <div>
                   <div className="section-header-actions">
                     <h3>Serviços Oferecidos</h3>
-                    <button className="btn-primary small" onClick={() => setShowServicoForm(true)}><IconPlus/>  Novo Serviço</button>
+                    <button className="btn-primary small" onClick={() => setShowServicoForm(true)}><IconPlus />  Novo Serviço</button>
                   </div>
-                  
+
                   {showServicoForm && (
                     <div className="modal-overlay">
                       <div className="modal-content">
                         <h3>{editingServico ? 'Editar Serviço' : 'Novo Serviço'}</h3>
                         <form onSubmit={handleServicoSubmit}>
-                          <input type="text" placeholder="Nome do serviço" value={servicoForm.nome} onChange={e => setServicoForm({...servicoForm, nome: e.target.value})} required />
-                          <textarea placeholder="Descrição" value={servicoForm.descricao} onChange={e => setServicoForm({...servicoForm, descricao: e.target.value})} rows={2} />
-                          <input type="number" step="0.01" placeholder="Preço (R$)" value={servicoForm.preco} onChange={e => setServicoForm({...servicoForm, preco: e.target.value})} required />
-                          <input type="number" placeholder="Duração (minutos)" value={servicoForm.duracaoMinutos} onChange={e => setServicoForm({...servicoForm, duracaoMinutos: e.target.value})} required />
+                          <input type="text" placeholder="Nome do serviço" value={servicoForm.nome} onChange={e => setServicoForm({ ...servicoForm, nome: e.target.value })} required />
+                          <textarea placeholder="Descrição" value={servicoForm.descricao} onChange={e => setServicoForm({ ...servicoForm, descricao: e.target.value })} rows={2} />
+                          <input type="number" step="0.01" placeholder="Preço (R$)" value={servicoForm.preco} onChange={e => setServicoForm({ ...servicoForm, preco: e.target.value })} required />
+                          <input type="number" placeholder="Duração (minutos)" value={servicoForm.duracaoMinutos} onChange={e => setServicoForm({ ...servicoForm, duracaoMinutos: e.target.value })} required />
                           <div className="modal-actions">
                             <button type="button" className="btn-secondary" onClick={() => { setShowServicoForm(false); setEditingServico(null); setServicoForm({ nome: '', descricao: '', preco: '', duracaoMinutos: '' }); }}>Cancelar</button>
                             <button type="submit" className="btn-primary" disabled={submitting}>{submitting ? 'Salvando...' : 'Salvar'}</button>
@@ -427,10 +428,10 @@ const BarbeariaDashboard = ({ onNavigate }) => {
                       <div className="modal-content">
                         <h3>Novo Funcionário</h3>
                         <form onSubmit={handleFuncionarioSubmit}>
-                          <input type="text" placeholder="Nome completo" value={funcionarioForm.name} onChange={e => setFuncionarioForm({...funcionarioForm, name: e.target.value})} required />
-                          <input type="email" placeholder="Email" value={funcionarioForm.email} onChange={e => setFuncionarioForm({...funcionarioForm, email: e.target.value})} required />
-                          <input type="tel" placeholder="Telefone" value={funcionarioForm.telefone} onChange={e => setFuncionarioForm({...funcionarioForm, telefone: e.target.value})} required />
-                          <input type="password" placeholder="Senha (mínimo 6 caracteres)" value={funcionarioForm.password} onChange={e => setFuncionarioForm({...funcionarioForm, password: e.target.value})} required />
+                          <input type="text" placeholder="Nome completo" value={funcionarioForm.name} onChange={e => setFuncionarioForm({ ...funcionarioForm, name: e.target.value })} required />
+                          <input type="email" placeholder="Email" value={funcionarioForm.email} onChange={e => setFuncionarioForm({ ...funcionarioForm, email: e.target.value })} required />
+                          <input type="tel" placeholder="Telefone" value={funcionarioForm.telefone} onChange={e => setFuncionarioForm({ ...funcionarioForm, telefone: e.target.value })} required />
+                          <input type="password" placeholder="Senha (mínimo 6 caracteres)" value={funcionarioForm.password} onChange={e => setFuncionarioForm({ ...funcionarioForm, password: e.target.value })} required />
                           <div className="modal-actions">
                             <button type="button" className="btn-secondary" onClick={() => { setShowFuncionarioForm(false); setFuncionarioForm({ name: '', email: '', telefone: '', password: '' }); }}>Cancelar</button>
                             <button type="submit" className="btn-primary" disabled={submitting}>{submitting ? 'Criando...' : 'Criar'}</button>
@@ -481,11 +482,11 @@ const BarbeariaDashboard = ({ onNavigate }) => {
                       <div className="modal-content">
                         <h3>Novo Horário</h3>
                         <form onSubmit={handleHorarioSubmit}>
-                          <select value={horarioForm.diaSemana} onChange={e => setHorarioForm({...horarioForm, diaSemana: e.target.value})}>
+                          <select value={horarioForm.diaSemana} onChange={e => setHorarioForm({ ...horarioForm, diaSemana: e.target.value })}>
                             {DIAS_SEMANA.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                           </select>
-                          <input type="time" value={horarioForm.horaInicio} onChange={e => setHorarioForm({...horarioForm, horaInicio: e.target.value})} required />
-                          <input type="time" value={horarioForm.horaFim} onChange={e => setHorarioForm({...horarioForm, horaFim: e.target.value})} required />
+                          <input type="time" value={horarioForm.horaInicio} onChange={e => setHorarioForm({ ...horarioForm, horaInicio: e.target.value })} required />
+                          <input type="time" value={horarioForm.horaFim} onChange={e => setHorarioForm({ ...horarioForm, horaFim: e.target.value })} required />
                           <div className="modal-actions">
                             <button type="button" className="btn-secondary" onClick={() => { setShowHorarioForm(false); setHorarioForm({ diaSemana: 'MONDAY', horaInicio: '09:00', horaFim: '18:00' }); }}>Cancelar</button>
                             <button type="submit" className="btn-primary" disabled={submitting}>Salvar</button>
@@ -519,7 +520,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
           </>
         )}
       </div>
-      
+
     </div>
   );
 };
