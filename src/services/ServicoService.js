@@ -15,7 +15,7 @@ class ServicoService {
 
   async listarPorBarbearia(barbeariaId) {
     try {
-      const response = await api.get(`/api/servicos/barbearia/${barbeariaId}`);
+     const response = await api.get(`/api/barbearias/${barbeariaId}/horarios`);
       return { success: true, data: response.data };
     } catch (error) {
       return { success: false, message: 'Erro ao listar serviços' };

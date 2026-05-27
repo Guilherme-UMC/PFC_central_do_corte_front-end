@@ -1,95 +1,76 @@
 import api from './api';
 
-export const DIAS_SEMANA = [
-  { value: 'MONDAY', label: 'Segunda-feira' },
-  { value: 'TUESDAY', label: 'Terça-feira' },
-  { value: 'WEDNESDAY', label: 'Quarta-feira' },
-  { value: 'THURSDAY', label: 'Quinta-feira' },
-  { value: 'FRIDAY', label: 'Sexta-feira' },
-  { value: 'SATURDAY', label: 'Sábado' },
-  { value: 'SUNDAY', label: 'Domingo' }
-];
-
-class HorarioService {
-  async criar(barbeariaId, horarioData) {
+class FuncionarioService {
+  // Criar novo funcionário e vincular à barbearia
+  async criar(barbeariaId, funcionarioData) {
     try {
-      const response = await api.post(`/api/horarios/barbearia/${barbeariaId}`, horarioData);
+      // ✅ URL CORRETA
+      const response = await api.post(`/api/funcionarios/barbearia/${barbeariaId}`, funcionarioData);
       return { success: true, data: response.data };
     } catch (error) {
+      console.error('Erro ao criar funcionário:', error);
       return {
         success: false,
-        message: error.response?.data?.mensagem || error.response?.data?.message || 'Erro ao criar horário'
+        message: error.response?.data?.mensagem || error.response?.data?.message || 'Erro ao criar funcionário'
       };
     }
   }
 
+  // Vincular funcionário existente à barbearia
+  async vincularExistente(barbeariaId, email) {
+    try {
+      // ✅ URL CORRETA
+      const response = await api.post(`/api/funcionarios/barbearia/${barbeariaId}/vincular`, {
+        funcionarioEmail: email
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Erro ao vincular funcionário:', error);
+      return {
+        success: false,
+        message: error.response?.data?.mensagem || error.response?.data?.message || 'Erro ao vincular funcionário'
+      };
+    }
+  }
+
+  // Listar funcionários de uma barbearia
   async listarPorBarbearia(barbeariaId) {
     try {
-      const response = await api.get(`/api/horarios/barbearia/${barbeariaId}`);
+      // ✅ URL CORRETA
+      const response = await api.get(`/api/funcionarios/barbearia/${barbeariaId}`);
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, message: 'Erro ao listar horários' };
+      console.error('Erro ao listar funcionários:', error);
+      return { success: false, message: 'Erro ao listar funcionários' };
     }
   }
 
-  async listarPorDia(barbeariaId, diaSemana) {
+  // Desvincular funcionário da barbearia
+  async desvincular(barbeariaId, funcionarioId) {
     try {
-      const response = await api.get(`/api/horarios/barbearia/${barbeariaId}/dia/${diaSemana}`);
+      // ✅ URL CORRETA
+      const response = await api.delete(`/api/funcionarios/barbearia/${barbeariaId}/desvincular/${funcionarioId}`);
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, message: 'Erro ao listar horários' };
-    }
-  }
-
-  async atualizar(horarioId, horarioData) {
-    try {
-      const response = await api.put(`/api/horarios/${horarioId}`, horarioData);
-      return { success: true, data: response.data };
-    } catch (error) {
+      console.error('Erro ao desvincular funcionário:', error);
       return {
         success: false,
-        message: error.response?.data?.mensagem || error.response?.data?.message || 'Erro ao atualizar horário'
+        message: error.response?.data?.mensagem || error.response?.data?.message || 'Erro ao desvincular funcionário'
       };
     }
   }
 
-  async desativar(horarioId) {
+  // Listar funcionários disponíveis (sem vínculo)
+  async listarDisponiveis() {
     try {
-      await api.delete(`/api/horarios/${horarioId}`);
-      return { success: true };
-    } catch (error) {
-      return { success: false, message: 'Erro ao desativar horário' };
-    }
-  }
 
-  async ativar(horarioId) {
-    try {
-      await api.patch(`/api/horarios/${horarioId}/ativar`);
-      return { success: true };
+      const response = await api.get('/api/funcionarios/disponiveis');
+      return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, message: 'Erro ao ativar horário' };
-    }
-  }
-
-  async removerPermanentemente(horarioId) {
-    try {
-      await api.delete(`/api/horarios/${horarioId}/permanente`);
-      return { success: true };
-    } catch (error) {
-      return { success: false, message: 'Erro ao remover horário' };
-    }
-  }
-
-  async verificarHorario(barbeariaId, diaSemana, hora) {
-    try {
-      const response = await api.get(`/api/horarios/barbearia/${barbeariaId}/verificar`, {
-        params: { diaSemana, hora }
-      });
-      return { success: true, valido: response.data };
-    } catch (error) {
-      return { success: false, message: 'Erro ao verificar horário' };
+      console.error('Erro ao listar funcionários disponíveis:', error);
+      return { success: false, message: 'Erro ao listar funcionários disponíveis' };
     }
   }
 }
 
-export default new HorarioService();
+export default new FuncionarioService();

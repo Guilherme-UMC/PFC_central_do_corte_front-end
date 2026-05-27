@@ -43,13 +43,13 @@ const agruparHorarios = (horarios) => {
   return grupos;
 };
 
+// ✅ Stepper corrigido - adicionadas as keys corretamente
 function Stepper({ currentStep }) {
   return (
     <div className="stepper">
       {STEPS.map((s, i) => (
-        <>
+        <React.Fragment key={s.id}>
           <div
-            key={s.id}
             className={`step ${currentStep === s.id ? 'active' : ''} ${currentStep > s.id ? 'done' : ''}`}
           >
             <div className="step-circle">
@@ -58,9 +58,9 @@ function Stepper({ currentStep }) {
             <span className="step-label">{s.label}</span>
           </div>
           {i < STEPS.length - 1 && (
-            <div key={`line-${s.id}`} className={`step-line ${currentStep > s.id ? 'done' : ''}`} />
+            <div className={`step-line ${currentStep > s.id ? 'done' : ''}`} />
           )}
-        </>
+        </React.Fragment>
       ))}
     </div>
   );
@@ -131,7 +131,6 @@ function StepServicos({ barbearia, servicosSelecionados, onToggleServico, onAvan
 
   return (
     <div className="barbearia-detalhe">
-      {/* Card lateral com info da barbearia */}
       <div className="barbearia-info-card">
         {barbearia.fotoCapa ? (
           <img src={barbearia.fotoCapa} alt={barbearia.nome} className="barbearia-info-img" style={{display:'block'}} />
@@ -166,7 +165,6 @@ function StepServicos({ barbearia, servicosSelecionados, onToggleServico, onAvan
         </div>
       </div>
 
-      {/* Lista de serviços */}
       <div>
         <div className="servicos-secao">
           <h3>Selecione os serviços</h3>
@@ -199,7 +197,6 @@ function StepServicos({ barbearia, servicosSelecionados, onToggleServico, onAvan
           )}
         </div>
 
-        {/* Barra de seleção */}
         <div className="selecao-bar">
           <div className="selecao-resumo">
             {servicosSelecionados.length === 0 ? (
@@ -255,7 +252,6 @@ function StepHorario({ barbearia, servicosSelecionados, horarioSelecionado, onSe
 
   return (
     <div>
-      {/* Seletor de data */}
       <div className="data-picker-row">
         <label style={{ fontSize: 13, color: 'var(--corte-text-muted)' }}>Data desejada:</label>
         <input
@@ -284,7 +280,7 @@ function StepHorario({ barbearia, servicosSelecionados, horarioSelecionado, onSe
                     const ocupado = slot.ocupado || false;
                     return (
                       <button
-                        key={i}
+                        key={`${periodo}-${i}`}
                         className={`horario-btn ${isSelected ? 'selected' : ''} ${ocupado ? 'ocupado' : ''}`}
                         disabled={ocupado}
                         onClick={() => !ocupado && onSelect(slotKey)}
@@ -341,7 +337,6 @@ function StepFuncionario({ barbearia, funcionarioSelecionado, onSelect, onAvanca
       <p className="step-section-subtitle">Prefere algum profissional específico?</p>
 
       <div className="funcionarios-grid">
-        {/* Opção "qualquer" */}
         <div
           className={`funcionario-qualquer ${!funcionarioSelecionado ? 'selected' : ''}`}
           onClick={() => onSelect(null)}
@@ -523,7 +518,6 @@ export default function NovoAgendamento({ onVoltar, onVerMeusAgendamentos }) {
 
   return (
     <div className="novo-agendamento">
-      {/* Header */}
       <div className="agendamento-header">
         <button className="btn-voltar" onClick={step === 1 ? onVoltar : () => setStep((s) => s - 1)}>
           ← {step === 1 ? 'Dashboard' : 'Voltar'}
@@ -531,10 +525,8 @@ export default function NovoAgendamento({ onVoltar, onVerMeusAgendamentos }) {
         <h1 className="agendamento-titulo">{stepTitles[step - 1]}</h1>
       </div>
 
-      {/* Stepper */}
       <Stepper currentStep={step} />
 
-      {/* Conteúdo */}
       <div className="step-content">
         {step === 1 && (
           <StepBarbearia
