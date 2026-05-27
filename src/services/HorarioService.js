@@ -1,95 +1,58 @@
-// src/services/HorarioService.js
 import api from './api';
 
-// Dias da semana em ordem
+// DIAS DA SEMANA EM PORTUGUÊS (correto para o backend)
 export const DIAS_SEMANA = [
-  { value: 'MONDAY', label: 'Segunda-feira' },
-  { value: 'TUESDAY', label: 'Terça-feira' },
-  { value: 'WEDNESDAY', label: 'Quarta-feira' },
-  { value: 'THURSDAY', label: 'Quinta-feira' },
-  { value: 'FRIDAY', label: 'Sexta-feira' },
-  { value: 'SATURDAY', label: 'Sábado' },
-  { value: 'SUNDAY', label: 'Domingo' }
+  { value: 'SEGUNDA', label: 'Segunda-feira' },
+  { value: 'TERCA', label: 'Terça-feira' },
+  { value: 'QUARTA', label: 'Quarta-feira' },
+  { value: 'QUINTA', label: 'Quinta-feira' },
+  { value: 'SEXTA', label: 'Sexta-feira' },
+  { value: 'SABADO', label: 'Sábado' },
+  { value: 'DOMINGO', label: 'Domingo' }
 ];
 
 class HorarioService {
-  async criar(barbeariaId, horarioData) {
+  // Buscar horários de funcionamento da barbearia
+  async getHorarios(barbeariaId) {
     try {
-      const response = await api.post(`/api/horarios/barbearia/${barbeariaId}`, horarioData);
+      const response = await api.get(`/api/barbearias/${barbeariaId}/horarios`);
       return { success: true, data: response.data };
     } catch (error) {
+      console.error('Erro ao buscar horários:', error);
+      return { success: false, message: 'Erro ao buscar horários' };
+    }
+  }
+
+  // Atualizar horários de funcionamento (PUT - substitui todos)
+  async updateHorarios(barbeariaId, horarios) {
+    try {
+      // Garantir que os dias estão em português
+      const horariosCorrigidos = horarios.map(h => ({
+        ...h,
+        dia: h.dia // já deve estar em português (SEGUNDA, TERCA, etc.)
+      }));
+      
+      const response = await api.put(`/api/barbearias/${barbeariaId}/horarios`, horariosCorrigidos);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Erro ao salvar horários:', error);
       return {
         success: false,
-        message: error.response?.data?.mensagem || error.response?.data?.message || 'Erro ao criar horário'
+        message: error.response?.data?.mensagem || 'Erro ao salvar horários'
       };
     }
   }
 
-  async listarPorBarbearia(barbeariaId) {
+  // Buscar horários disponíveis para agendamento
+  async getHorariosDisponiveis(barbeariaId, data, duracaoServico = 30) {
     try {
-      const response = await api.get(`/api/horarios/barbearia/${barbeariaId}`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      return { success: false, message: 'Erro ao listar horários' };
-    }
-  }
-
-  async listarPorDia(barbeariaId, diaSemana) {
-    try {
-      const response = await api.get(`/api/horarios/barbearia/${barbeariaId}/dia/${diaSemana}`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      return { success: false, message: 'Erro ao listar horários' };
-    }
-  }
-
-  async atualizar(horarioId, horarioData) {
-    try {
-      const response = await api.put(`/api/horarios/${horarioId}`, horarioData);
-      return { success: true, data: response.data };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.response?.data?.mensagem || error.response?.data?.message || 'Erro ao atualizar horário'
-      };
-    }
-  }
-
-  async desativar(horarioId) {
-    try {
-      await api.delete(`/api/horarios/${horarioId}`);
-      return { success: true };
-    } catch (error) {
-      return { success: false, message: 'Erro ao desativar horário' };
-    }
-  }
-
-  async ativar(horarioId) {
-    try {
-      await api.patch(`/api/horarios/${horarioId}/ativar`);
-      return { success: true };
-    } catch (error) {
-      return { success: false, message: 'Erro ao ativar horário' };
-    }
-  }
-
-  async removerPermanentemente(horarioId) {
-    try {
-      await api.delete(`/api/horarios/${horarioId}/permanente`);
-      return { success: true };
-    } catch (error) {
-      return { success: false, message: 'Erro ao remover horário' };
-    }
-  }
-
-  async verificarHorario(barbeariaId, diaSemana, hora) {
-    try {
-      const response = await api.get(`/api/horarios/barbearia/${barbeariaId}/verificar`, {
-        params: { diaSemana, hora }
+      const response = await api.get(`/api/barbearias/${barbeariaId}/horarios-disponiveis`, {
+        params: { data, duracaoServico }
       });
-      return { success: true, valido: response.data };
+      return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, message: 'Erro ao verificar horário' };
+      console.error('Erro ao buscar horários disponíveis:', error);
+      return { success: false, message: 'Erro ao buscar horários disponíveis' };
     }
   }
 }
