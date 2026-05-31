@@ -4,7 +4,7 @@ import BarbeariaService from '../services/BarbeariaService';
 import AgendamentoService from '../services/AgendamentoService';
 import ServicoService from '../services/ServicoService';
 import FuncionarioService from '../services/FuncionarioService';
-import HorarioService, { DIAS_SEMANA } from '../services/HorarioService';
+import HorarioService, { DIAS_SEMANA, HORARIOS_PADRAO } from '../services/HorarioService';
 import StatusBadge from '../components/StatusBadge';
 import Loader from '../components/Loader';
 import CadastroBarbearia from '../components/CadastroBarbearia';
@@ -36,7 +36,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
   const [agendamentos, setAgendamentos] = useState([]);
   const [servicos, setServicos] = useState([]);
   const [funcionarios, setFuncionarios] = useState([]);
-  const [horarios, setHorarios] = useState([]);
+  const [horarios, setHorarios] = useState([...HORARIOS_PADRAO]);
   const [showBarbeariaForm, setShowBarbeariaForm] = useState(false);
   const [editingBarbearia, setEditingBarbearia] = useState(null);
   const [showServicoForm, setShowServicoForm] = useState(false);
@@ -62,9 +62,11 @@ const BarbeariaDashboard = ({ onNavigate }) => {
         setBarbearias(lista);
         if (lista.length > 0 && !selectedBarbearia) {
           setSelectedBarbearia(lista[0]);
-          carregarDadosBarbearia(lista[0].id);
+          await carregarDadosBarbearia(lista[0].id);
         }
       }
+    } catch (error) {
+      console.error('Erro ao carregar barbearias:', error);
     } finally {
       setLoading(false);
     }
@@ -96,12 +98,17 @@ const BarbeariaDashboard = ({ onNavigate }) => {
 
   const carregarHorarios = async (barbeariaId) => {
     const result = await HorarioService.getHorarios(barbeariaId);
-    if (result.success) setHorarios(result.data);
+    if (result.success && result.data && result.data.length > 0) {
+      const horariosConvertidos = HorarioService.converterHorariosParaFrontend(result.data);
+      setHorarios(horariosConvertidos);
+    } else {
+      setHorarios([...HORARIOS_PADRAO]);
+    }
   };
-
-  const handleSelectBarbearia = (barbearia) => {
+  
+  const handleSelectBarbearia = async (barbearia) => {
     setSelectedBarbearia(barbearia);
-    carregarDadosBarbearia(barbearia.id);
+    await carregarDadosBarbearia(barbearia.id);
     setActiveTab('agendamentos');
   };
 
@@ -116,7 +123,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
     }
     
     if (result?.success) {
-      carregarAgendamentos(selectedBarbearia.id);
+      await carregarAgendamentos(selectedBarbearia.id);
       showMessage('success', `Agendamento ${status.toLowerCase()} com sucesso`);
     } else {
       showMessage('error', result?.message || 'Erro ao atualizar agendamento');
@@ -146,7 +153,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
       setShowServicoForm(false);
       setEditingServico(null);
       setServicoForm({ nome: '', descricao: '', preco: '', duracaoMinutos: '' });
-      carregarServicos(selectedBarbearia.id);
+      await carregarServicos(selectedBarbearia.id);
     } else {
       showMessage('error', result.message);
     }
@@ -158,7 +165,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
       const result = await ServicoService.desativar(servicoId);
       if (result.success) {
         showMessage('success', 'Serviço desativado');
-        carregarServicos(selectedBarbearia.id);
+        await carregarServicos(selectedBarbearia.id);
       } else {
         showMessage('error', result.message);
       }
@@ -175,7 +182,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
       showMessage('success', 'Funcionário criado e vinculado com sucesso!');
       setShowFuncionarioForm(false);
       setFuncionarioForm({ name: '', email: '', telefone: '', password: '' });
-      carregarFuncionarios(selectedBarbearia.id);
+      await carregarFuncionarios(selectedBarbearia.id);
     } else {
       showMessage('error', result.message);
     }
@@ -191,7 +198,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
     if (result.success) {
       showMessage('success', 'Funcionário vinculado com sucesso!');
       setVincularEmail('');
-      carregarFuncionarios(selectedBarbearia.id);
+      await carregarFuncionarios(selectedBarbearia.id);
     } else {
       showMessage('error', result.message);
     }
@@ -203,10 +210,43 @@ const BarbeariaDashboard = ({ onNavigate }) => {
       const result = await FuncionarioService.desvincular(selectedBarbearia.id, funcionarioId);
       if (result.success) {
         showMessage('success', 'Funcionário desvinculado');
-        carregarFuncionarios(selectedBarbearia.id);
+        await carregarFuncionarios(selectedBarbearia.id);
       } else {
         showMessage('error', result.message);
       }
+    }
+  };
+
+  const salvarHorarios = async () => {
+    const { valid, errors } = HorarioService.validarHorarios(horarios);
+    if (!valid) {
+      showMessage('error', errors.join(', '));
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const horariosParaEnviar = horarios.map(h => ({
+        dia: h.dia,
+        horaAbertura: h.fechado ? null : (h.horaAbertura || '09:00'),
+        horaFechamento: h.fechado ? null : (h.horaFechamento || '18:00'),
+        fechado: h.fechado
+      }));
+      
+      const result = await HorarioService.updateHorarios(selectedBarbearia.id, horariosParaEnviar);
+      
+      if (result.success) {
+        showMessage('success', 'Horários salvos com sucesso!');
+        setShowHorarioForm(false);
+        await carregarHorarios(selectedBarbearia.id);
+      } else {
+        showMessage('error', result.message || 'Erro ao salvar horários');
+      }
+    } catch (error) {
+      console.error('Erro ao salvar horários:', error);
+      showMessage('error', 'Erro ao salvar horários. Tente novamente.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -264,7 +304,6 @@ const BarbeariaDashboard = ({ onNavigate }) => {
           <p>Gerencie seus estabelecimentos</p>
         </div>
 
-        {/* Seleção de Barbearia */}
         <div className="barbearia-selector">
           {barbearias.map(b => (
             <button
@@ -305,7 +344,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
             </div>
 
             <div className="dashboard-content">
-              {/* Aba de Agendamentos */}
+              {/* Aba de Agendamentos - COM OS 3 BOTÕES */}
               {activeTab === 'agendamentos' && (
                 <div className="agendamentos-list">
                   <h3>Agendamentos</h3>
@@ -322,17 +361,50 @@ const BarbeariaDashboard = ({ onNavigate }) => {
                           <p><strong>Data:</strong> {formatDate(ag.dataHora)}</p>
                           <p><strong>Serviço:</strong> {ag.servicoNome}</p>
                           <p><strong>Valor:</strong> R$ {ag.servicoPreco?.toFixed(2)}</p>
+                          <p><strong>Funcionário:</strong> {ag.funcionarioNome || 'Não definido'}</p>
                           {ag.observacao && <p><strong>Obs:</strong> {ag.observacao}</p>}
                         </div>
+                        
+                        {/* ✅ Status PENDENTE: mostra Confirmar e Cancelar */}
                         {ag.status === 'PENDENTE' && (
                           <div className="agendamento-actions">
-                            <button className="btn-success small" onClick={() => handleUpdateAgendamentoStatus(ag.id, 'CONFIRMADO')}>Confirmar</button>
-                            <button className="btn-danger small" onClick={() => handleUpdateAgendamentoStatus(ag.id, 'CANCELADO', 'Cancelado pela barbearia')}>Cancelar</button>
+                            <button 
+                              className="btn-success small" 
+                              onClick={() => handleUpdateAgendamentoStatus(ag.id, 'CONFIRMADO')}
+                            >
+                              ✓ Confirmar Agendamento
+                            </button>
+                            <button 
+                              className="btn-danger small" 
+                              onClick={() => handleUpdateAgendamentoStatus(ag.id, 'CANCELADO', 'Cancelado pela barbearia')}
+                            >
+                              ✗ Cancelar Agendamento
+                            </button>
                           </div>
                         )}
+                        
+                        {/* ✅ Status CONFIRMADO: mostra apenas Concluir */}
                         {ag.status === 'CONFIRMADO' && (
                           <div className="agendamento-actions">
-                            <button className="btn-primary small" onClick={() => handleUpdateAgendamentoStatus(ag.id, 'CONCLUIDO')}>Concluir</button>
+                            <button 
+                              className="btn-primary small" 
+                              onClick={() => handleUpdateAgendamentoStatus(ag.id, 'CONCLUIDO')}
+                            >
+                              ✓ Concluir Agendamento
+                            </button>
+                          </div>
+                        )}
+                        
+                        {/* ✅ Status CANCELADO ou CONCLUIDO: não mostra botões */}
+                        {(ag.status === 'CANCELADO_PELO_CLIENTE' || ag.status === 'CANCELADO_PELA_BARBEARIA') && (
+                          <div className="agendamento-actions">
+                            <span className="status-cancelled">Agendamento cancelado</span>
+                          </div>
+                        )}
+                        
+                        {ag.status === 'CONCLUIDO' && (
+                          <div className="agendamento-actions">
+                            <span className="status-finished">Agendamento concluído</span>
                           </div>
                         )}
                       </div>
@@ -479,9 +551,12 @@ const BarbeariaDashboard = ({ onNavigate }) => {
                                     checked={horarioAtual.fechado}
                                     onChange={(e) => {
                                       const novosHorarios = [...horarios];
-                                      const idx = novosHorarios.findIndex(h => h.dia === dia.value);
-                                      if (idx >= 0) {
-                                        novosHorarios[idx].fechado = e.target.checked;
+                                      const index = novosHorarios.findIndex(h => h.dia === dia.value);
+                                      if (index >= 0) {
+                                        novosHorarios[index] = {
+                                          ...novosHorarios[index],
+                                          fechado: e.target.checked
+                                        };
                                       } else {
                                         novosHorarios.push({
                                           dia: dia.value,
@@ -496,16 +571,19 @@ const BarbeariaDashboard = ({ onNavigate }) => {
                                   Fechado
                                 </label>
                                 {!horarioAtual.fechado && (
-                                  <>
+                                  <div className="horario-time-group">
                                     <input
                                       type="time"
                                       className="horario-edit-time"
                                       value={horarioAtual.horaAbertura || '09:00'}
                                       onChange={(e) => {
                                         const novosHorarios = [...horarios];
-                                        const idx = novosHorarios.findIndex(h => h.dia === dia.value);
-                                        if (idx >= 0) {
-                                          novosHorarios[idx].horaAbertura = e.target.value;
+                                        const index = novosHorarios.findIndex(h => h.dia === dia.value);
+                                        if (index >= 0) {
+                                          novosHorarios[index] = {
+                                            ...novosHorarios[index],
+                                            horaAbertura: e.target.value
+                                          };
                                         } else {
                                           novosHorarios.push({
                                             dia: dia.value,
@@ -524,9 +602,12 @@ const BarbeariaDashboard = ({ onNavigate }) => {
                                       value={horarioAtual.horaFechamento || '18:00'}
                                       onChange={(e) => {
                                         const novosHorarios = [...horarios];
-                                        const idx = novosHorarios.findIndex(h => h.dia === dia.value);
-                                        if (idx >= 0) {
-                                          novosHorarios[idx].horaFechamento = e.target.value;
+                                        const index = novosHorarios.findIndex(h => h.dia === dia.value);
+                                        if (index >= 0) {
+                                          novosHorarios[index] = {
+                                            ...novosHorarios[index],
+                                            horaFechamento: e.target.value
+                                          };
                                         } else {
                                           novosHorarios.push({
                                             dia: dia.value,
@@ -538,7 +619,7 @@ const BarbeariaDashboard = ({ onNavigate }) => {
                                         setHorarios(novosHorarios);
                                       }}
                                     />
-                                  </>
+                                  </div>
                                 )}
                               </div>
                             );
@@ -546,27 +627,20 @@ const BarbeariaDashboard = ({ onNavigate }) => {
                         </div>
                         
                         <div className="modal-actions">
-                          <button type="button" className="btn-secondary" onClick={() => {
-                            setShowHorarioForm(false);
-                            carregarHorarios(selectedBarbearia.id);
-                          }}>
+                          <button 
+                            type="button" 
+                            className="btn-secondary" 
+                            onClick={() => {
+                              setShowHorarioForm(false);
+                              carregarHorarios(selectedBarbearia.id);
+                            }}
+                          >
                             Cancelar
                           </button>
                           <button 
                             type="button" 
                             className="btn-primary" 
-                            onClick={async () => {
-                              setSubmitting(true);
-                              const result = await HorarioService.updateHorarios(selectedBarbearia.id, horarios);
-                              if (result.success) {
-                                showMessage('success', 'Horários salvos com sucesso!');
-                                setShowHorarioForm(false);
-                                carregarHorarios(selectedBarbearia.id);
-                              } else {
-                                showMessage('error', result.message);
-                              }
-                              setSubmitting(false);
-                            }}
+                            onClick={salvarHorarios}
                             disabled={submitting}
                           >
                             {submitting ? 'Salvando...' : 'Salvar Horários'}

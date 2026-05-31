@@ -15,10 +15,12 @@ class ServicoService {
 
   async listarPorBarbearia(barbeariaId) {
     try {
-     const response = await api.get(`/api/barbearias/${barbeariaId}/horarios`);
+      // ✅ CORRIGIDO: Rota correta para serviços
+      const response = await api.get(`/api/servicos/barbearia/${barbeariaId}`);
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, message: 'Erro ao listar serviços' };
+      console.error('Erro ao listar serviços:', error);
+      return { success: false, message: 'Erro ao listar serviços', data: [] };
     }
   }
 

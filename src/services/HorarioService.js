@@ -1,6 +1,5 @@
 import api from './api';
 
-// DIAS DA SEMANA EM PORTUGUÊS (correto para o backend)
 export const DIAS_SEMANA = [
   { value: 'SEGUNDA', label: 'Segunda-feira' },
   { value: 'TERCA', label: 'Terça-feira' },
@@ -11,8 +10,18 @@ export const DIAS_SEMANA = [
   { value: 'DOMINGO', label: 'Domingo' }
 ];
 
+export const HORARIOS_PADRAO = [
+  { dia: 'SEGUNDA', horaAbertura: '09:00', horaFechamento: '18:00', fechado: false },
+  { dia: 'TERCA', horaAbertura: '09:00', horaFechamento: '18:00', fechado: false },
+  { dia: 'QUARTA', horaAbertura: '09:00', horaFechamento: '18:00', fechado: false },
+  { dia: 'QUINTA', horaAbertura: '09:00', horaFechamento: '18:00', fechado: false },
+  { dia: 'SEXTA', horaAbertura: '09:00', horaFechamento: '18:00', fechado: false },
+  { dia: 'SABADO', horaAbertura: '09:00', horaFechamento: '18:00', fechado: false },
+  { dia: 'DOMINGO', horaAbertura: '09:00', horaFechamento: '18:00', fechado: false }
+];
+
 class HorarioService {
-  // Buscar horários de funcionamento da barbearia
+
   async getHorarios(barbeariaId) {
     try {
       const response = await api.get(`/api/barbearias/${barbeariaId}/horarios`);
@@ -23,13 +32,17 @@ class HorarioService {
     }
   }
 
-  // Atualizar horários de funcionamento (PUT - substitui todos)
   async updateHorarios(barbeariaId, horarios) {
     try {
-      // Garantir que os dias estão em português
-      const horariosCorrigidos = horarios.map(h => ({
-        ...h,
-        dia: h.dia // já deve estar em português (SEGUNDA, TERCA, etc.)
+      if (!horarios || !Array.isArray(horarios) || horarios.length === 0) {
+        return { success: false, message: 'Nenhum horário para salvar' };
+      }
+      
+      const horariosCorrigidos = horarios.map(horario => ({
+        dia: horario.dia.toUpperCase(),
+        horaAbertura: horario.fechado ? null : (horario.horaAbertura || null),
+        horaFechamento: horario.fechado ? null : (horario.horaFechamento || null),
+        fechado: horario.fechado || false
       }));
       
       const response = await api.put(`/api/barbearias/${barbeariaId}/horarios`, horariosCorrigidos);
@@ -38,12 +51,11 @@ class HorarioService {
       console.error('Erro ao salvar horários:', error);
       return {
         success: false,
-        message: error.response?.data?.mensagem || 'Erro ao salvar horários'
+        message: error.response?.data?.mensagem || error.response?.data?.message || 'Erro ao salvar horários'
       };
     }
   }
 
-  // Buscar horários disponíveis para agendamento
   async getHorariosDisponiveis(barbeariaId, data, duracaoServico = 30) {
     try {
       const response = await api.get(`/api/barbearias/${barbeariaId}/horarios-disponiveis`, {
@@ -54,6 +66,67 @@ class HorarioService {
       console.error('Erro ao buscar horários disponíveis:', error);
       return { success: false, message: 'Erro ao buscar horários disponíveis' };
     }
+  }
+
+  async criarHorariosPadrao(barbeariaId) {
+    return this.updateHorarios(barbeariaId, HORARIOS_PADRAO);
+  }
+
+  async verificarSeEstaAberta(barbeariaId, dataHora) {
+    try {
+      const data = dataHora.split('T')[0];
+      const horarios = await this.getHorariosDisponiveis(barbeariaId, data);
+      
+      if (!horarios.success) return false;
+      
+      const horarioEncontrado = horarios.data.find(h => h.horario === dataHora);
+      
+      return horarioEncontrado?.disponivel === true;
+    } catch (error) {
+      console.error('Erro ao verificar disponibilidade:', error);
+      return false;
+    }
+  }
+
+  converterHorariosParaFrontend(horariosBackend) {
+    if (!horariosBackend || !Array.isArray(horariosBackend) || horariosBackend.length === 0) {
+      return [...HORARIOS_PADRAO];
+    }
+    
+    return DIAS_SEMANA.map(dia => {
+      const horario = horariosBackend.find(h => h.dia === dia.value);
+      return {
+        dia: dia.value,
+        horaAbertura: horario?.horaAbertura || '09:00',
+        horaFechamento: horario?.horaFechamento || '18:00',
+        fechado: horario?.fechado || false
+      };
+    });
+  }
+
+  validarHorarios(horarios) {
+    const errors = [];
+    
+    for (const horario of horarios) {
+      if (!horario.dia) {
+        errors.push('Dia não informado');
+        continue;
+      }
+      
+      if (!horario.fechado) {
+        if (!horario.horaAbertura) {
+          errors.push(`${horario.dia}: Horário de abertura é obrigatório`);
+        }
+        if (!horario.horaFechamento) {
+          errors.push(`${horario.dia}: Horário de fechamento é obrigatório`);
+        }
+        if (horario.horaAbertura && horario.horaFechamento && horario.horaAbertura >= horario.horaFechamento) {
+          errors.push(`${horario.dia}: Horário de abertura deve ser menor que o de fechamento`);
+        }
+      }
+    }
+    
+    return { valid: errors.length === 0, errors };
   }
 }
 

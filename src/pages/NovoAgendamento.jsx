@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   listarBarbearias,
   listarServicos,
@@ -22,20 +22,25 @@ const formatarPreco = (valor) =>
   Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 const formatarHorario = (isoStr) => {
+  if (!isoStr) return '';
   const d = new Date(isoStr);
   return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 };
 
 const formatarDataExibicao = (isoDate) => {
+  if (!isoDate) return '';
   const [ano, mes, dia] = isoDate.split('-');
-  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  return `${dia} de ${meses[parseInt(mes) - 1]} de ${ano}`;
+  const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  return `${parseInt(dia)} de ${meses[parseInt(mes) - 1]} de ${ano}`;
 };
 
 const agruparHorarios = (horarios) => {
   const grupos = { Manhã: [], Tarde: [], Noite: [] };
+  if (!horarios || !Array.isArray(horarios)) return grupos;
+  
   horarios.forEach((h) => {
-    const hora = new Date(h.dataHora || h).getHours();
+    const horarioStr = h.horario || h;
+    const hora = new Date(horarioStr).getHours();
     if (hora < 12) grupos['Manhã'].push(h);
     else if (hora < 18) grupos['Tarde'].push(h);
     else grupos['Noite'].push(h);
@@ -43,7 +48,7 @@ const agruparHorarios = (horarios) => {
   return grupos;
 };
 
-// ✅ Stepper corrigido - adicionadas as keys corretamente
+// Stepper corrigido
 function Stepper({ currentStep }) {
   return (
     <div className="stepper">
@@ -78,7 +83,7 @@ function StepBarbearia({ onSelect }) {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="loading-state">Carregando barbearias</div>;
+  if (loading) return <div className="loading-state">Carregando barbearias...</div>;
   if (erro) return <div className="erro-msg">{erro}</div>;
   if (!barbearias.length)
     return <div className="empty-state">Nenhuma barbearia disponível no momento.</div>;
@@ -89,8 +94,8 @@ function StepBarbearia({ onSelect }) {
       <div className="barbearias-grid">
         {barbearias.map((b) => (
           <div key={b.id} className="card-barbearia" onClick={() => onSelect(b)}>
-            {b.fotoCapa ? (
-              <img src={b.fotoCapa} alt={b.nome} className="card-barbearia-img" />
+            {b.imgUrl ? (
+              <img src={b.imgUrl} alt={b.nome} className="card-barbearia-img" />
             ) : (
               <div className="card-barbearia-img placeholder">✂️</div>
             )}
@@ -132,33 +137,25 @@ function StepServicos({ barbearia, servicosSelecionados, onToggleServico, onAvan
   return (
     <div className="barbearia-detalhe">
       <div className="barbearia-info-card">
-        {barbearia.fotoCapa ? (
-          <img src={barbearia.fotoCapa} alt={barbearia.nome} className="barbearia-info-img" style={{display:'block'}} />
+        {barbearia.imgUrl ? (
+          <img src={barbearia.imgUrl} alt={barbearia.nome} className="barbearia-info-img" />
         ) : (
           <div className="barbearia-info-img">✂️</div>
         )}
         <div className="barbearia-info-body">
           <h2 className="barbearia-info-nome">{barbearia.nome}</h2>
-          {barbearia.endereco && (
-            <div className="barbearia-info-row">
-              <span className="icon">📍</span>
-              <span>{barbearia.endereco}{barbearia.cidade ? `, ${barbearia.cidade}` : ''}{barbearia.uf ? ` - ${barbearia.uf}` : ''}</span>
-            </div>
-          )}
+          <div className="barbearia-info-row">
+            <span className="icon">📍</span>
+            <span>{barbearia.logradouro}, {barbearia.numero} - {barbearia.bairro}, {barbearia.cidade} - {barbearia.uf}</span>
+          </div>
           {barbearia.telefone && (
             <div className="barbearia-info-row">
               <span className="icon">📞</span>
               <span>{barbearia.telefone}</span>
             </div>
           )}
-          {barbearia.horarioFuncionamento && (
-            <div className="barbearia-info-row">
-              <span className="icon">🕐</span>
-              <span>{barbearia.horarioFuncionamento}</span>
-            </div>
-          )}
           {barbearia.descricao && (
-            <div className="barbearia-info-row" style={{marginTop:12}}>
+            <div className="barbearia-info-row" style={{ marginTop: 12 }}>
               <span>{barbearia.descricao}</span>
             </div>
           )}
@@ -168,7 +165,7 @@ function StepServicos({ barbearia, servicosSelecionados, onToggleServico, onAvan
       <div>
         <div className="servicos-secao">
           <h3>Selecione os serviços</h3>
-          {loading && <div className="loading-state">Carregando serviços</div>}
+          {loading && <div className="loading-state">Carregando serviços...</div>}
           {erro && <div className="erro-msg">{erro}</div>}
           {!loading && !erro && (
             <div className="servicos-lista">
@@ -236,17 +233,19 @@ function StepHorario({ barbearia, servicosSelecionados, horarioSelecionado, onSe
     setLoading(true);
     setErro(null);
     try {
-      const ids = servicosSelecionados.map((s) => s.id);
-      const lista = await buscarHorariosDisponiveis(barbearia.id, ids, data);
-      setHorarios(lista);
-    } catch {
+      const lista = await buscarHorariosDisponiveis(barbearia.id, [], data);
+      setHorarios(lista || []);
+    } catch (err) {
+      console.error('Erro ao carregar horários:', err);
       setErro('Não foi possível carregar os horários.');
     } finally {
       setLoading(false);
     }
-  }, [barbearia.id, servicosSelecionados, data]);
+  }, [barbearia.id, data]);
 
-  useEffect(() => { carregarHorarios(); }, [carregarHorarios]);
+  useEffect(() => {
+    carregarHorarios();
+  }, [carregarHorarios]);
 
   const grupos = agruparHorarios(horarios);
 
@@ -264,7 +263,7 @@ function StepHorario({ barbearia, servicosSelecionados, horarioSelecionado, onSe
         {data && <span style={{ fontSize: 13, color: 'var(--corte-text-muted)' }}>{formatarDataExibicao(data)}</span>}
       </div>
 
-      {loading && <div className="loading-state">Verificando disponibilidade</div>}
+      {loading && <div className="loading-state">Verificando disponibilidade...</div>}
       {erro && <div className="erro-msg">{erro}</div>}
 
       {!loading && !erro && (
@@ -274,18 +273,19 @@ function StepHorario({ barbearia, servicosSelecionados, horarioSelecionado, onSe
               <div key={periodo} className="horarios-secao">
                 <p className="horario-periodo-titulo">{periodo}</p>
                 <div className="horarios-grid">
-                  {slots.map((slot, i) => {
-                    const slotKey = slot.dataHora || slot;
-                    const isSelected = horarioSelecionado === slotKey;
-                    const ocupado = slot.ocupado || false;
+                  {slots.map((slot, idx) => {
+                    const horarioObj = typeof slot === 'object' ? slot : { horario: slot, disponivel: true };
+                    const horarioStr = horarioObj.horario;
+                    const isSelected = horarioSelecionado === horarioStr;
+                    const disponivel = horarioObj.disponivel !== false;
                     return (
                       <button
-                        key={`${periodo}-${i}`}
-                        className={`horario-btn ${isSelected ? 'selected' : ''} ${ocupado ? 'ocupado' : ''}`}
-                        disabled={ocupado}
-                        onClick={() => !ocupado && onSelect(slotKey)}
+                        key={`${periodo}-${idx}`}
+                        className={`horario-btn ${isSelected ? 'selected' : ''} ${!disponivel ? 'ocupado' : ''}`}
+                        disabled={!disponivel}
+                        onClick={() => disponivel && onSelect(horarioStr)}
                       >
-                        {formatarHorario(slotKey)}
+                        {formatarHorario(horarioStr)}
                       </button>
                     );
                   })}
@@ -294,7 +294,7 @@ function StepHorario({ barbearia, servicosSelecionados, horarioSelecionado, onSe
             ) : null
           )}
 
-          {!horarios.length && (
+          {(!horarios || horarios.length === 0) && !loading && (
             <div className="empty-state">
               Nenhum horário disponível para esta data.<br />
               <span style={{ fontSize: 12 }}>Tente outra data.</span>
@@ -329,7 +329,7 @@ function StepFuncionario({ barbearia, funcionarioSelecionado, onSelect, onAvanca
       .finally(() => setLoading(false));
   }, [barbearia.id]);
 
-  if (loading) return <div className="loading-state">Carregando profissionais</div>;
+  if (loading) return <div className="loading-state">Carregando profissionais...</div>;
   if (erro) return <div className="erro-msg">{erro}</div>;
 
   return (
@@ -354,12 +354,12 @@ function StepFuncionario({ barbearia, funcionarioSelecionado, onSelect, onAvanca
           >
             <div className="funcionario-avatar">
               {f.fotoPerfil ? (
-                <img src={f.fotoPerfil} alt={f.nome} />
+                <img src={f.fotoPerfil} alt={f.name} />
               ) : (
                 '💈'
               )}
             </div>
-            <span className="funcionario-nome">{f.nome}</span>
+            <span className="funcionario-nome">{f.name}</span>
             {f.especialidade && (
               <span className="funcionario-esp">{f.especialidade}</span>
             )}
@@ -379,6 +379,18 @@ function StepFuncionario({ barbearia, funcionarioSelecionado, onSelect, onAvanca
 
 function StepConfirmacao({ barbearia, servicosSelecionados, horarioSelecionado, funcionario, onConfirmar, onVoltar, loading, erro }) {
   const total = servicosSelecionados.reduce((acc, s) => acc + (s.preco || 0), 0);
+
+  const formatarDataHoraConfirmacao = (dataHora) => {
+    if (!dataHora) return '—';
+    const d = new Date(dataHora);
+    return d.toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   return (
     <div>
@@ -404,19 +416,14 @@ function StepConfirmacao({ barbearia, servicosSelecionados, horarioSelecionado, 
         <div className="confirmacao-row">
           <span className="confirmacao-label">Data & Hora</span>
           <span className="confirmacao-valor">
-            {horarioSelecionado
-              ? new Date(horarioSelecionado).toLocaleString('pt-BR', {
-                  day: '2-digit', month: 'short', year: 'numeric',
-                  hour: '2-digit', minute: '2-digit',
-                })
-              : '—'}
+            {formatarDataHoraConfirmacao(horarioSelecionado)}
           </span>
         </div>
 
         <div className="confirmacao-row">
           <span className="confirmacao-label">Profissional</span>
           <span className="confirmacao-valor">
-            {funcionario ? funcionario.nome : 'Primeiro disponível'}
+            {funcionario ? funcionario.name : 'Primeiro disponível'}
           </span>
         </div>
 
@@ -442,7 +449,7 @@ function Sucesso({ onNovo, onVerMeus }) {
       <div className="sucesso-icone">✅</div>
       <h2 className="sucesso-titulo">Agendamento confirmado!</h2>
       <p className="sucesso-subtitulo">
-        Você receberá uma confirmação em breve. Até lá! 💈
+        Seu agendamento foi realizado com sucesso. Em breve você receberá a confirmação. 💈
       </p>
       <div style={{ display: 'flex', gap: 12, marginTop: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
         <button className="btn-ghost" onClick={onVerMeus}>Ver meus agendamentos</button>
@@ -482,8 +489,9 @@ export default function NovoAgendamento({ onVoltar, onVerMeusAgendamentos }) {
       });
       setSucesso(true);
     } catch (e) {
+      console.error('Erro ao confirmar agendamento:', e);
       setErroConfirm(
-        e?.response?.data?.message || 'Erro ao confirmar o agendamento. Tente novamente.'
+        e?.response?.data?.mensagem || e?.response?.data?.message || 'Erro ao confirmar o agendamento. Tente novamente.'
       );
     } finally {
       setLoadingConfirm(false);
