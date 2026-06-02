@@ -13,10 +13,10 @@ import SignupBarbearia from './pages/SignupBarbearia';
 
 
 import CadastroBarbearia from './components/CadastroBarbearia';
-import ClienteDashboard from './pages/ClienteDashboard';
-import BarbeariaDashboard from './pages/BarbeariaDashboard';
-import FuncionarioDashboard from './pages/FuncionarioDashboard';
-import AdminDashboard from './pages/AdminDashboard';
+import ClientePage from './pages/ClientePage';
+import BarbeariaPage from './pages/BarbeariaPage';
+import FuncionarioPage from './pages/FuncionarioPage';
+import AdminPage from './pages/AdminPage';
 import Perfil from './pages/Perfil';
 
 
@@ -40,35 +40,35 @@ const router = createBrowserRouter([
       },
       
       {
-        path: 'dashboard',
+        path: 'page',
         element: <PrivateRoute allowedRoles={['ROLE_CLIENTE', 'ROLE_ADMIN']} />,
         children: [
-          { path: 'cliente', element: <ClienteDashboard /> },
+          { path: 'cliente', element: <ClientePage /> },
         ],
       },
       
       {
-        path: 'dashboard',
+        path: 'page',
         element: <PrivateRoute allowedRoles={['ROLE_BARBEARIA_ADM', 'ROLE_ADMIN']} />,
         children: [
-          { path: 'barbearia', element: <BarbeariaDashboard /> },
+          { path: 'barbearia', element: <BarbeariaPage /> },
           { path: 'cadastro-barbearia', element: <CadastroBarbearia /> },
         ],
       },
       
       {
-        path: 'dashboard',
+        path: 'page',
         element: <PrivateRoute allowedRoles={['ROLE_FUNCIONARIO', 'ROLE_ADMIN']} />,
         children: [
-          { path: 'funcionario', element: <FuncionarioDashboard /> },
+          { path: 'funcionario', element: <FuncionarioPage /> },
         ],
       },
 
       {
-        path: 'dashboard',
+        path: 'page',
         element: <PrivateRoute allowedRoles={['ROLE_ADMIN']} />,
         children: [
-          { path: 'admin', element: <AdminDashboard /> },
+          { path: 'admin', element: <AdminPage /> },
         ],
       },
       

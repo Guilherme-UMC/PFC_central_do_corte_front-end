@@ -2,22 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
 import AgendamentoService from '../services/AgendamentoService';
 import NovoAgendamento from './NovoAgendamento';
-import '../styles/DashboardCliente.css';
-
-const formatarData = (iso) => {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  return d.toLocaleDateString('pt-BR', {
-    day: '2-digit', month: 'short', year: 'numeric',
-  });
-};
-
-const formatarHora = (iso) => {
-  if (!iso) return '';
-  return new Date(iso).toLocaleTimeString('pt-BR', {
-    hour: '2-digit', minute: '2-digit',
-  });
-};
+import '../styles/Cliente.css';
+import { formatarDataHora, formatarHora } from '../utils/dateUtils';
 
 const proximoDia = (iso) => {
   if (!iso) return { dia: '—', mes: '—' };
@@ -93,10 +79,7 @@ function TabelaAgendamentos({ agendamentos, loading, onNovoAgendamento }) {
             return (
               <tr key={ag.id}>
                 <td>
-                  <div style={{ fontWeight: 600 }}>{formatarData(ag.dataHora)}</div>
-                  <div style={{ fontSize: 12, color: 'var(--corte-text-muted)' }}>
-                    {formatarHora(ag.dataHora)}
-                  </div>
+                  <div style={{ fontWeight: 600 }}>{formatarDataHora(ag.dataHora)}</div>
                 </td>
                 <td>{ag.barbearia?.nome ?? ag.barbeariaNome ?? '—'}</td>
                 <td style={{ color: 'var(--corte-text-muted)' }}>
@@ -192,7 +175,7 @@ function TelaHome({ user, agendamentos, loadingAg, onNavegar }) {
   );
 }
 
-const DashboardCliente = () => {
+const ClientePage = () => {
   const { user, logout } = useAuthContext();
   const [abaAtiva, setAbaAtiva] = useState('home');
   const [agendamentos, setAgendamentos] = useState([]);
@@ -359,4 +342,4 @@ const DashboardCliente = () => {
   );
 };
 
-export default DashboardCliente;
+export default ClientePage;

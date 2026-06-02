@@ -48,6 +48,28 @@ class AgendamentoService {
     }
   }
 
+  // Listar meus agendamentos (funcionário)
+  async listarMeusComoFuncionario() {
+    try {
+      const response = await api.get('/api/agendamentos/funcionario/meus');
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Erro ao listar seus agendamentos (funcionário):', error);
+      return { success: false, message: 'Erro ao listar seus agendamentos', data: [] };
+    }
+  }
+
+  // Listar meus agendamentos do dia (funcionário)
+  async listarMeusHojeComoFuncionario() {
+    try {
+      const response = await api.get('/api/agendamentos/funcionario/hoje');
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Erro ao listar seus agendamentos do dia (funcionário):', error);
+      return { success: false, message: 'Erro ao listar agendamentos do dia', data: [] };
+    }
+  }
+
   // Cancelar agendamento
   async cancelar(agendamentoId, motivo) {
     try {
@@ -93,5 +115,4 @@ class AgendamentoService {
   }
 }
 
-// ✅ EXPORTAÇÃO CORRETA
 export default new AgendamentoService();

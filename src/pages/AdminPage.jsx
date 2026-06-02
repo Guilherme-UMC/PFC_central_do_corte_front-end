@@ -7,7 +7,7 @@ const IconEdit = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColo
 const IconTrash = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><polyline points="3 6 5 6 21 6" /><path d="M8 6V4h8v2" /><rect x="10" y="11" width="4" height="8" /></svg>);
 const IconPlus = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>);
 
-const AdminDashboard = ({ onNavigate }) => {
+const AdminPage = ({ onNavigate }) => {
   const { user } = useAuthContext();
   const [activeTab, setActiveTab] = useState('usuarios');
   const [usuarios, setUsuarios] = useState([]);
@@ -90,26 +90,26 @@ const AdminDashboard = ({ onNavigate }) => {
   if (loading) return <Loader />;
 
   return (
-    <div className="dashboard-admin">
+    <div className="page-admin">
 
-      <div className="dashboard-container">
+      <div className="page-container">
         {message.text && (
           <div className={`message ${message.type === 'success' ? 'success-message' : 'error-message'}`}>
             {message.text}
           </div>
         )}
 
-        <div className="dashboard-header">
+        <div className="page-header">
           <h1>Painel Administrativo</h1>
           <p>Bem-vindo, {user?.name}</p>
         </div>
 
-        <div className="dashboard-tabs">
+        <div className="page-tabs">
           <button className={`tab-btn ${activeTab === 'usuarios' ? 'active' : ''}`} onClick={() => setActiveTab('usuarios')}>Usuários</button>
           <button className={`tab-btn ${activeTab === 'barbearias' ? 'active' : ''}`} onClick={() => setActiveTab('barbearias')}>Barbearias</button>
         </div>
 
-        <div className="dashboard-content">
+        <div className="page-content">
           {activeTab === 'usuarios' && (
             <div>
               <div className="section-header-actions">
@@ -194,4 +194,4 @@ const AdminDashboard = ({ onNavigate }) => {
   );
 };
 
-export default AdminDashboard;
+export default AdminPage;

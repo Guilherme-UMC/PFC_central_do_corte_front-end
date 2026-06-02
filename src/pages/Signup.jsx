@@ -2,15 +2,16 @@ import { useState } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
 import { validators } from '../utils/validators';
 import { useNavigate } from 'react-router-dom';
+import PasswordInput from '../components/PasswordInput';
 
 const IconArrowLeft = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
-    <line x1="19" y1="12" x2="5" y2="12"/>
-    <polyline points="12 19 5 12 12 5"/>
+    <line x1="19" y1="12" x2="5" y2="12" />
+    <polyline points="12 19 5 12 12 5" />
   </svg>
 );
 
-const Signup = () => {  
+const Signup = () => {
   const navigate = useNavigate();
   const { signup } = useAuthContext();
   const [loading, setLoading] = useState(false);
@@ -57,14 +58,14 @@ const Signup = () => {
 
     if (result.success) {
       setSuccess('Cadastro realizado! Redirecionando...');
-      setTimeout(() => {navigate('/login');}, 2000);
+      setTimeout(() => { navigate('/login'); }, 2000);
     } else {
       setError(result.error || 'Erro ao cadastrar.');
     }
     setLoading(false);
   };
 
-  const handleBackToHome = () => {navigate('/')};
+  const handleBackToHome = () => { navigate('/') };
 
   return (
     <div className="auth-container">
@@ -92,14 +93,28 @@ const Signup = () => {
             <label className="form-label" htmlFor="email">Email</label>
             <input id="email" className="form-input" type="email" name="email" placeholder="seu@email.com" value={formData.email} onChange={handleChange} required />
           </div>
-          <div className="form-group">
-            <label className="form-label" htmlFor="password">Senha</label>
-            <input id="password" className="form-input" type="password" name="password" placeholder="Minimo 6 caracteres" value={formData.password} onChange={handleChange} required />
-          </div>
-          <div className="form-group">
-            <label className="form-label" htmlFor="confirmPassword">Confirmar senha</label>
-            <input id="confirmPassword" className="form-input" type="password" name="confirmPassword" placeholder="Repita a senha" value={formData.confirmPassword} onChange={handleChange} required />
-          </div>
+
+          {/*Password */}
+          <PasswordInput
+            id="password"
+            name="password"
+            label="Senha"
+            placeholder="Minimo 6 caracteres"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          {/* Confirm Password */}
+          <PasswordInput
+            id="confirmPassword"
+            name="confirmPassword"
+            label="Confirmar senha"
+            placeholder="Repita a senha"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+
           <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
             {loading ? 'Cadastrando...' : 'Cadastrar'}
           </button>

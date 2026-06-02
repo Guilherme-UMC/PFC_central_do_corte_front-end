@@ -59,7 +59,7 @@ class FuncionarioService {
   // Listar funcionários disponíveis (sem vínculo)
   async listarDisponiveis() {
     try {
-      const response = await api.get('/api/funcionarios/disponiveis');
+      const response = await api.get('/api/funcionarios/disponiveis-para-contratacao');
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Erro ao listar funcionários disponíveis:', error);
@@ -77,6 +77,17 @@ class FuncionarioService {
     } catch (error) {
       console.error('Erro ao verificar disponibilidade:', error);
       return { success: false, disponivel: false, message: 'Erro ao verificar disponibilidade' };
+    }
+  }
+
+  // Listar barbearias onde o funcionário está vinculado
+  async listarMinhasBarbearias() {
+    try {
+      const response = await api.get('/api/funcionarios/barbearias');
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Erro ao listar barbearias do funcionário:', error);
+      return { success: false, message: 'Erro ao listar barbearias', data: [] };
     }
   }
 }

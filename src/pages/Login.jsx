@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthContext } from '../contexts/AuthContext';
 import { validators } from '../utils/validators';
+import PasswordInput from '../components/PasswordInput';
 
 const IconArrowLeft = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
@@ -70,10 +71,16 @@ const Login = () => {
             <label className="form-label" htmlFor="email">Email</label>
             <input id="email" className="form-input" type="email" name="email" placeholder="seu@email.com" value={formData.email} onChange={handleChange} required />
           </div>
-          <div className="form-group">
-            <label className="form-label" htmlFor="password">Senha</label>
-            <input id="password" className="form-input" type="password" name="password" placeholder="Sua senha" value={formData.password} onChange={handleChange} required />
-          </div>
+           {/* Password */}
+          <PasswordInput
+            id="password"
+            name="password"
+            label="Senha"
+            placeholder="Sua senha"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
           <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
             {loading ? 'Entrando...' : 'Entrar'}
           </button>

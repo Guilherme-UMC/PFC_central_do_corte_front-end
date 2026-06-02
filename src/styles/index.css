@@ -32,9 +32,6 @@ body {
   background-repeat: no-repeat;
 }
 
-/* ============================================
-   NAVBAR
-   ============================================ */
 .navbar {
   position: sticky;
   top: 0;
@@ -316,9 +313,6 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* ============================================
-   HOME
-   ============================================ */
 .home {
   color: var(--white);
   overflow-x: hidden;
@@ -582,9 +576,6 @@ body {
 
 .btn-cadastrar:hover { background: var(--blue); }
 
-/* ============================================
-   FOOTER
-   ============================================ */
 .footer {
   background: var(--dark);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -682,9 +673,6 @@ body {
   color: var(--gray);
 }
 
-/* ============================================
-   AUTH PAGES
-   ============================================ */
 .auth-container {
   position: relative;
   min-height: calc(100vh - 200px);
@@ -851,10 +839,7 @@ body {
   transform: translateX(-2px);
 }
 
-/* ============================================
-   DASHBOARD LAYOUT
-   ============================================ */
-.dashboard-container {
+.page-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
@@ -862,16 +847,16 @@ body {
   color: var(--white);
 }
 
-.dashboard-header {
+.page-header {
   margin-bottom: 1.5rem;
 }
 
-.dashboard-header h1 {
+.page-header h1 {
   font-size: 2rem;
   margin-bottom: 1rem;
 }
 
-.dashboard-tabs {
+.page-tabs {
   display: flex;
   gap: 0.5rem;
   border-bottom: 1px solid var(--white);
@@ -981,7 +966,6 @@ body {
   border-top: 1px solid #f0f0f0;
 }
 
-/* Status Badges */
 .status-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
@@ -1010,7 +994,6 @@ body {
   color: #0c5460;
 }
 
-/* Serviços List */
 .servicos-list, .funcionarios-list, .horarios-list {
   display: flex;
   flex-direction: column;
@@ -1041,7 +1024,6 @@ body {
   font-size: 0.85rem;
 }
 
-/* Buttons */
 .btn-primary {
   background: var(--blue);
   color: white;
@@ -1112,9 +1094,6 @@ body {
   gap: 1rem;
 }
 
-/* ============================================
-   MODAL DE HORÁRIOS - SEM SCROLLBAR
-   ============================================ */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1383,6 +1362,40 @@ body {
   font-weight: 500;
 }
 
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrapper .form-input {
+  padding-right: 42px;
+  width: 100%;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--corte-text-muted);
+  transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+  color: var(--corte-gold);
+}
+
+.password-toggle-btn svg {
+  stroke: currentColor;
+}
+
 /* ============================================
    RESPONSIVIDADE - MODAL
    ============================================ */
@@ -1442,8 +1455,8 @@ body {
    RESPONSIVIDADE GERAL
    ============================================ */
 @media (max-width: 768px) {
-  .dashboard-container { padding: 1rem; }
-  .dashboard-tabs { gap: 0.25rem; }
+  .page-container { padding: 1rem; }
+  .page-tabs { gap: 0.25rem; }
   .tab-btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
   .agendamento-info { grid-template-columns: 1fr; }
   .servico-info, .funcionario-info, .horario-info { flex-direction: column; align-items: flex-start; gap: 0.25rem; }

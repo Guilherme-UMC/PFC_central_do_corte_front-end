@@ -15,10 +15,10 @@ const PublicRoute = () => {
   }
 
   if (isAuthenticated) {
-    if (user?.role === 'ROLE_CLIENTE') return <Navigate to="/dashboard/cliente" replace />;
-    if (user?.role === 'ROLE_BARBEARIA_ADM') return <Navigate to="/dashboard/barbearia" replace />;
-    if (user?.role === 'ROLE_FUNCIONARIO') return <Navigate to="/dashboard/funcionario" replace />;
-    if (user?.role === 'ROLE_ADMIN') return <Navigate to="/dashboard/admin" replace />;
+    if (user?.role === 'ROLE_CLIENTE') return <Navigate to="/page/cliente" replace />;
+    if (user?.role === 'ROLE_BARBEARIA_ADM') return <Navigate to="/page/barbearia" replace />;
+    if (user?.role === 'ROLE_FUNCIONARIO') return <Navigate to="/page/funcionario" replace />;
+    if (user?.role === 'ROLE_ADMIN') return <Navigate to="/page/admin" replace />;
     return <Navigate to="/" replace />;
   }
 

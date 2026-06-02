@@ -528,7 +528,7 @@ export default function NovoAgendamento({ onVoltar, onVerMeusAgendamentos }) {
     <div className="novo-agendamento">
       <div className="agendamento-header">
         <button className="btn-voltar" onClick={step === 1 ? onVoltar : () => setStep((s) => s - 1)}>
-          ← {step === 1 ? 'Dashboard' : 'Voltar'}
+          ← {step === 1 ? 'Page' : 'Voltar'}
         </button>
         <h1 className="agendamento-titulo">{stepTitles[step - 1]}</h1>
       </div>

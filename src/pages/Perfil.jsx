@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
 import UserService from '../services/UserService';
 import Loader from '../components/Loader';
+import PasswordInput from '../components/PasswordInput';
 
 const Perfil = ({ onNavigate }) => {
   const { user, logout } = useAuthContext();
@@ -37,7 +38,6 @@ const Perfil = ({ onNavigate }) => {
     const result = await UserService.updateProfile(user?.id, formData);
     if (result.success) {
       setProfile(result.data);
-      // Atualizar localStorage
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
       storedUser.name = result.data.name;
       localStorage.setItem('user', JSON.stringify(storedUser));
@@ -50,25 +50,36 @@ const Perfil = ({ onNavigate }) => {
     setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   };
 
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
+    
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setMessage({ type: 'error', text: 'As novas senhas não coincidem' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
       return;
     }
+    
     if (passwordData.newPassword.length < 6) {
       setMessage({ type: 'error', text: 'A nova senha deve ter no mínimo 6 caracteres' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
       return;
     }
     
     setSubmitting(true);
     const result = await UserService.changePassword(user?.id, passwordData.oldPassword, passwordData.newPassword);
+    
     if (result.success) {
       setMessage({ type: 'success', text: 'Senha alterada com sucesso!' });
       setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
     } else {
       setMessage({ type: 'error', text: result.message });
     }
+    
     setSubmitting(false);
     setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   };
@@ -83,13 +94,17 @@ const Perfil = ({ onNavigate }) => {
     return roles[role] || role;
   };
 
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
   if (loading) return <Loader />;
 
   return (
     <div className="perfil-page">
-      
-      <div className="dashboard-container">
-        <div className="dashboard-header">
+      <div className="page-container">
+        <div className="page-header">
           <h1>Meu Perfil</h1>
           <p>Gerencie suas informações</p>
         </div>
@@ -116,15 +131,32 @@ const Perfil = ({ onNavigate }) => {
               <form onSubmit={handleUpdateProfile}>
                 <div className="form-group">
                   <label>Nome</label>
-                  <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
+                  <input 
+                    type="text" 
+                    name="name"
+                    value={formData.name} 
+                    onChange={handleFormChange} 
+                    required 
+                  />
                 </div>
                 <div className="form-group">
                   <label>Email</label>
-                  <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} required />
+                  <input 
+                    type="email" 
+                    name="email"
+                    value={formData.email} 
+                    onChange={handleFormChange} 
+                    required 
+                  />
                 </div>
                 <div className="form-group">
                   <label>Telefone</label>
-                  <input type="tel" value={formData.telefone} onChange={e => setFormData({...formData, telefone: e.target.value})} />
+                  <input 
+                    type="tel" 
+                    name="telefone"
+                    value={formData.telefone} 
+                    onChange={handleFormChange} 
+                  />
                 </div>
                 <div className="form-actions">
                   <button type="button" className="btn-secondary" onClick={() => { setEditing(false); carregarPerfil(); }}>Cancelar</button>
@@ -146,19 +178,39 @@ const Perfil = ({ onNavigate }) => {
           <div className="perfil-card">
             <h3>Alterar Senha</h3>
             <form onSubmit={handleChangePassword}>
-              <div className="form-group">
-                <label>Senha Atual</label>
-                <input type="password" value={passwordData.oldPassword} onChange={e => setPasswordData({...passwordData, oldPassword: e.target.value})} required />
-              </div>
-              <div className="form-group">
-                <label>Nova Senha</label>
-                <input type="password" value={passwordData.newPassword} onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})} required />
-              </div>
-              <div className="form-group">
-                <label>Confirmar Nova Senha</label>
-                <input type="password" value={passwordData.confirmPassword} onChange={e => setPasswordData({...passwordData, confirmPassword: e.target.value})} required />
-              </div>
-              <button type="submit" className="btn-primary" disabled={submitting}>{submitting ? 'Alterando...' : 'Alterar Senha'}</button>
+              <PasswordInput
+                id="oldPassword"
+                name="oldPassword"
+                label="Senha Atual"
+                placeholder="Digite sua senha atual"
+                value={passwordData.oldPassword}
+                onChange={handlePasswordChange}
+                required
+              />
+              
+              <PasswordInput
+                id="newPassword"
+                name="newPassword"
+                label="Nova Senha"
+                placeholder="Mínimo 6 caracteres"
+                value={passwordData.newPassword}
+                onChange={handlePasswordChange}
+                required
+              />
+              
+              <PasswordInput
+                id="confirmPassword"
+                name="confirmPassword"
+                label="Confirmar Nova Senha"
+                placeholder="Repita a nova senha"
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+                required
+              />
+              
+              <button type="submit" className="btn-primary" disabled={submitting}>
+                {submitting ? 'Alterando...' : 'Alterar Senha'}
+              </button>
             </form>
           </div>
 
@@ -171,7 +223,6 @@ const Perfil = ({ onNavigate }) => {
           </div>
         </div>
       </div>
-      
     </div>
   );
 };
