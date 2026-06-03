@@ -227,8 +227,7 @@ const ClientePage = () => {
         <div className="dc-sidebar-logo">
           <span className="dc-logo-icon">💈</span>
           <div>
-            <div className="dc-logo-text">Central do Corte</div>
-            <div className="dc-logo-sub">Área do cliente</div>
+            <div className="dc-logo-text">Área do cliente</div>
           </div>
         </div>
 

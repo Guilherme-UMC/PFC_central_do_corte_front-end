@@ -8,6 +8,8 @@ import RootLayout from './layouts/RootLayout';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
+import EsqueciSenha from './pages/EsqueciSenha';
+import RedefinirSenha from './pages/RedefinirSenha';
 import Signup from './pages/Signup';
 import SignupBarbearia from './pages/SignupBarbearia';
 
@@ -36,6 +38,8 @@ const router = createBrowserRouter([
           { path: 'login', element: <Login /> },
           { path: 'signup', element: <Signup /> },
           { path: 'signup-barbearia', element: <SignupBarbearia /> },
+          { path: 'esqueci-senha', element: <EsqueciSenha /> },
+          { path: 'redefinir-senha', element: <RedefinirSenha /> },
         ],
       },
       

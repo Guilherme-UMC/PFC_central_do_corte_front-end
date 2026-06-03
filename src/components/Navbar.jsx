@@ -219,7 +219,7 @@ const Navbar = ({ search, onSearchChange }) => {
         <input
           value={localSearch}
           onChange={handleSearchChange}
-          placeholder="Buscar barbearias, locais ou serviços..."
+          placeholder="Buscar barbearias ou locais..."
         />
         {localSearch && (
           <button className="navbar__search-clear" onClick={handleClearSearch}>

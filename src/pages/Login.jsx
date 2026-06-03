@@ -6,8 +6,8 @@ import PasswordInput from '../components/PasswordInput';
 
 const IconArrowLeft = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
-    <line x1="19" y1="12" x2="5" y2="12"/>
-    <polyline points="12 19 5 12 12 5"/>
+    <line x1="19" y1="12" x2="5" y2="12" />
+    <polyline points="12 19 5 12 12 5" />
   </svg>
 );
 
@@ -71,7 +71,7 @@ const Login = () => {
             <label className="form-label" htmlFor="email">Email</label>
             <input id="email" className="form-input" type="email" name="email" placeholder="seu@email.com" value={formData.email} onChange={handleChange} required />
           </div>
-           {/* Password */}
+          {/* Password */}
           <PasswordInput
             id="password"
             name="password"
@@ -89,6 +89,9 @@ const Login = () => {
         <p className="auth-link">
           Nao tem conta?
           <Link to="/signup">Criar Conta</Link>
+        </p>
+        <p className="auth-link">
+          <Link to="/esqueci-senha">Esqueci minha senha</Link>
         </p>
       </div>
     </div>
