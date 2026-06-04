@@ -514,3 +514,55 @@
 @media (max-width: 480px) {
   .dc-stats-row { grid-template-columns: 1fr; }
 }
+/* Botão cancelar para cliente */
+.btn-cancelar-small {
+  background: #c62828;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-cancelar-small:hover:not(:disabled) {
+  background: #b71c1c;
+  transform: translateY(-1px);
+}
+
+.btn-cancelar-small:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.no-action {
+  color: var(--corte-text-muted);
+  font-size: 12px;
+}
+
+/* Modal de cancelamento */
+.cancel-modal {
+  max-width: 450px;
+}
+
+.cancel-info {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.cancel-info p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+/* Ajuste da tabela para coluna de ações */
+.dc-table th:last-child,
+.dc-table td:last-child {
+  text-align: center;
+  min-width: 80px;
+}

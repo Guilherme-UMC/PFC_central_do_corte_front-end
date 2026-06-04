@@ -50,6 +50,7 @@ const BarbeariaPage = ({ onNavigate }) => {
   const [showHorarioForm, setShowHorarioForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [loadingAction, setLoadingAction] = useState(null);
 
   useEffect(() => {
     carregarBarbearias();
@@ -79,7 +80,17 @@ const BarbeariaPage = ({ onNavigate }) => {
     }
   };
 
+  // FUNÇÃO MODIFICADA - Limpa os estados antes de recarregar
   const carregarDadosBarbearia = async (barbeariaId) => {
+    console.log('🔄 Recarregando dados da barbearia...');
+    
+    // Limpar os estados primeiro para forçar atualização visual
+    setAgendamentos([]);
+    setAgendamentosHoje([]);
+    setServicos([]);
+    setFuncionarios([]);
+    
+    // Aguardar todas as requisições
     await Promise.all([
       carregarAgendamentos(barbeariaId),
       carregarAgendamentosHoje(barbeariaId),
@@ -87,16 +98,24 @@ const BarbeariaPage = ({ onNavigate }) => {
       carregarFuncionarios(barbeariaId),
       carregarHorarios(barbeariaId)
     ]);
+    
+    console.log('✅ Dados recarregados com sucesso');
   };
 
   const carregarAgendamentos = async (barbeariaId) => {
     const result = await AgendamentoService.listarPorBarbearia(barbeariaId);
-    if (result.success) setAgendamentos(result.data);
+    if (result.success) {
+      setAgendamentos(result.data);
+      console.log(`📋 Agendamentos carregados: ${result.data.length}`);
+    }
   };
 
   const carregarAgendamentosHoje = async (barbeariaId) => {
     const result = await AgendamentoService.listarDoDia(barbeariaId);
-    if (result.success) setAgendamentosHoje(result.data);
+    if (result.success) {
+      setAgendamentosHoje(result.data);
+      console.log(`📅 Agendamentos de hoje: ${result.data.length}`);
+    }
   };
 
   const carregarServicos = async (barbeariaId) => {
@@ -124,21 +143,46 @@ const BarbeariaPage = ({ onNavigate }) => {
     setActiveTab('agendamentos');
   };
 
-  const handleUpdateAgendamentoStatus = async (agendamentoId, status, motivo = null) => {
-    let result;
-    if (status === 'CANCELADO') {
-      result = await AgendamentoService.cancelar(agendamentoId, motivo || 'Cancelado pelo proprietário');
-    } else if (status === 'CONFIRMADO') {
-      result = await AgendamentoService.confirmar(agendamentoId);
-    } else if (status === 'CONCLUIDO') {
-      result = await AgendamentoService.concluir(agendamentoId);
-    }
+  // FUNÇÕES DE AÇÃO DOS AGENDAMENTOS
+  const handleCancelarAgendamento = async (agendamentoId) => {
+    const motivo = prompt('Informe o motivo do cancelamento:');
+    if (!motivo || !motivo.trim()) return;
     
-    if (result?.success) {
-      showMessage('success', `Agendamento ${status.toLowerCase()} com sucesso`);
+    setLoadingAction(agendamentoId);
+    const result = await AgendamentoService.cancelar(agendamentoId, motivo);
+    setLoadingAction(null);
+    
+    if (result.success) {
+      showMessage('success', 'Agendamento cancelado com sucesso');
       await carregarDadosBarbearia(selectedBarbearia.id);
     } else {
-      showMessage('error', result?.message || 'Erro ao atualizar agendamento');
+      showMessage('error', result.message || 'Erro ao cancelar agendamento');
+    }
+  };
+
+  const handleConfirmarAgendamento = async (agendamentoId) => {
+    setLoadingAction(agendamentoId);
+    const result = await AgendamentoService.confirmar(agendamentoId);
+    setLoadingAction(null);
+    
+    if (result.success) {
+      showMessage('success', 'Agendamento confirmado com sucesso');
+      await carregarDadosBarbearia(selectedBarbearia.id);
+    } else {
+      showMessage('error', result.message || 'Erro ao confirmar agendamento');
+    }
+  };
+
+  const handleConcluirAgendamento = async (agendamentoId) => {
+    setLoadingAction(agendamentoId);
+    const result = await AgendamentoService.concluir(agendamentoId);
+    setLoadingAction(null);
+    
+    if (result.success) {
+      showMessage('success', 'Atendimento concluído com sucesso');
+      await carregarDadosBarbearia(selectedBarbearia.id);
+    } else {
+      showMessage('error', result.message || 'Erro ao concluir atendimento');
     }
   };
 
@@ -309,22 +353,16 @@ const BarbeariaPage = ({ onNavigate }) => {
           <p>Gerencie seus estabelecimentos</p>
         </div>
 
-        {/* Seletor de Barbearias */}
         <div className="barbearia-selector">
-          {barbearias.map(b => {
-            const totalAgendamentos = agendamentos.length;
-            const totalHoje = agendamentosHoje.length;
-            
-            return (
-              <button
-                key={b.id}
-                className={`barbearia-btn ${selectedBarbearia?.id === b.id ? 'active' : ''}`}
-                onClick={() => handleSelectBarbearia(b)}
-              >
-                {b.nome}
-              </button>
-            );
-          })}
+          {barbearias.map(b => (
+            <button
+              key={b.id}
+              className={`barbearia-btn ${selectedBarbearia?.id === b.id ? 'active' : ''}`}
+              onClick={() => handleSelectBarbearia(b)}
+            >
+              {b.nome}
+            </button>
+          ))}
           <button className="barbearia-btn barbearia-btn--new" onClick={() => {
             setEditingBarbearia(null);
             setShowBarbeariaForm(true);
@@ -333,7 +371,6 @@ const BarbeariaPage = ({ onNavigate }) => {
           </button>
         </div>
 
-        {/* Informações da Barbearia Selecionada */}
         {selectedBarbearia && (
           <div className="barbearia-info-card">
             <div className="barbearia-info-header">
@@ -356,20 +393,20 @@ const BarbeariaPage = ({ onNavigate }) => {
             
             <div className="barbearia-info-details">
               <div className="info-row">
-                <span className="info-icon"></span>
+                <span className="info-icon">📍</span>
                 <span>{selectedBarbearia.logradouro}, {selectedBarbearia.numero}</span>
               </div>
               <div className="info-row">
-                <span className="info-icon"></span>
+                <span className="info-icon">🏘️</span>
                 <span>{selectedBarbearia.bairro}</span>
               </div>
               <div className="info-row">
-                <span className="info-icon"></span>
+                <span className="info-icon">🏙️</span>
                 <span>{selectedBarbearia.cidade} - {selectedBarbearia.uf} | CEP: {selectedBarbearia.cep}</span>
               </div>
               {selectedBarbearia.telefone && (
                 <div className="info-row">
-                  <span className="info-icon"></span>
+                  <span className="info-icon">📞</span>
                   <span>{selectedBarbearia.telefone}</span>
                 </div>
               )}
@@ -377,56 +414,29 @@ const BarbeariaPage = ({ onNavigate }) => {
           </div>
         )}
 
-        {/* Tabs */}
         <div className="page-tabs">
-          <button 
-            className={`tab-btn ${activeTab === 'agendamentos' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('agendamentos')}
-          >
+          <button className={`tab-btn ${activeTab === 'agendamentos' ? 'active' : ''}`} onClick={() => setActiveTab('agendamentos')}>
             Todos os Agendamentos
-            {agendamentos.length > 0 && (
-              <span className="tab-count">{agendamentos.length}</span>
-            )}
+            {agendamentos.length > 0 && <span className="tab-count">{agendamentos.length}</span>}
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'hoje' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('hoje')}
-          >
+          <button className={`tab-btn ${activeTab === 'hoje' ? 'active' : ''}`} onClick={() => setActiveTab('hoje')}>
             Agendamentos de Hoje
-            {agendamentosHoje.length > 0 && (
-              <span className="tab-count today">{agendamentosHoje.length}</span>
-            )}
+            {agendamentosHoje.length > 0 && <span className="tab-count today">{agendamentosHoje.length}</span>}
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'servicos' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('servicos')}
-          >
-            Serviços
-            {servicos.length > 0 && (
-              <span className="tab-count">{servicos.length}</span>
-            )}
+          <button className={`tab-btn ${activeTab === 'servicos' ? 'active' : ''}`} onClick={() => setActiveTab('servicos')}>
+            Serviços {servicos.length > 0 && <span className="tab-count">{servicos.length}</span>}
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'funcionarios' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('funcionarios')}
-          >
-            Funcionários
-            {funcionarios.length > 0 && (
-              <span className="tab-count">{funcionarios.length}</span>
-            )}
+          <button className={`tab-btn ${activeTab === 'funcionarios' ? 'active' : ''}`} onClick={() => setActiveTab('funcionarios')}>
+            Funcionários {funcionarios.length > 0 && <span className="tab-count">{funcionarios.length}</span>}
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'horarios' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('horarios')}
-          >
+          <button className={`tab-btn ${activeTab === 'horarios' ? 'active' : ''}`} onClick={() => setActiveTab('horarios')}>
             Horários
           </button>
         </div>
 
-        {/* Conteúdo das Tabs */}
         <div className="page-content">
           
-          {/* Tab: Todos os Agendamentos */}
+          {/* TAB: TODOS OS AGENDAMENTOS */}
           {activeTab === 'agendamentos' && (
             <div className="agendamentos-list">
               {agendamentos.length === 0 ? (
@@ -434,66 +444,85 @@ const BarbeariaPage = ({ onNavigate }) => {
                   <p>Nenhum agendamento para esta barbearia.</p>
                 </div>
               ) : (
-                agendamentos.map(ag => (
-                  <div key={ag.id} className="agendamento-card">
-                    <div className="agendamento-header">
-                      <h3>{ag.clienteNome}</h3>
-                      <StatusBadge status={ag.status} />
+                agendamentos.map(ag => {
+                  const isLoading = loadingAction === ag.id;
+                  return (
+                    <div key={ag.id} className="agendamento-card">
+                      <div className="agendamento-header">
+                        <h3>{ag.clienteNome}</h3>
+                        <StatusBadge status={ag.status} />
+                      </div>
+                      <div className="agendamento-info">
+                        <p><strong>Data:</strong> {formatarDataHora(ag.dataHora)}</p>
+                        <p><strong>Serviço:</strong> {ag.servicoNome}</p>
+                        <p><strong>Valor:</strong> R$ {ag.servicoPreco?.toFixed(2)}</p>
+                        <p><strong>Funcionário:</strong> {ag.funcionarioNome || 'Não definido'}</p>
+                        {ag.observacao && <p><strong>Obs:</strong> {ag.observacao}</p>}
+                      </div>
+                      
+                      {/* Botões para agendamentos AGUARDANDO CONFIRMAÇÃO */}
+                      {ag.status === 'Aguardando confirmação' && (
+                        <div className="agendamento-actions">
+                          <button 
+                            className="btn-success small" 
+                            onClick={() => handleConfirmarAgendamento(ag.id)} 
+                            disabled={isLoading}
+                          >
+                            {isLoading ? '...' : '✓ Confirmar'}
+                          </button>
+                          <button 
+                            className="btn-danger small" 
+                            onClick={() => handleCancelarAgendamento(ag.id)} 
+                            disabled={isLoading}
+                          >
+                            {isLoading ? '...' : '✗ Cancelar'}
+                          </button>
+                        </div>
+                      )}
+                      
+                      {/* Botões para agendamentos CONFIRMADOS */}
+                      {ag.status === 'Confirmado' && (
+                        <div className="agendamento-actions">
+                          <button 
+                            className="btn-primary small" 
+                            onClick={() => handleConcluirAgendamento(ag.id)} 
+                            disabled={isLoading}
+                          >
+                            {isLoading ? '...' : '✓ Concluir Atendimento'}
+                          </button>
+                          <button 
+                            className="btn-danger small" 
+                            onClick={() => handleCancelarAgendamento(ag.id)} 
+                            disabled={isLoading}
+                          >
+                            {isLoading ? '...' : '✗ Cancelar'}
+                          </button>
+                        </div>
+                      )}
+                      
+                      {/* Status para agendamentos CANCELADOS */}
+                      {(ag.status === 'Cancelado pelo cliente' || ag.status === 'Cancelado pela barbearia') && (
+                        <div className="agendamento-actions">
+                          <span className="status-cancelled">
+                            {ag.status}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Status para agendamentos CONCLUÍDOS */}
+                      {ag.status === 'Concluído' && (
+                        <div className="agendamento-actions">
+                          <span className="status-finished">✓ Atendimento concluído</span>
+                        </div>
+                      )}
                     </div>
-                    <div className="agendamento-info">
-                      <p><strong>Data:</strong> {formatarDataHora(ag.dataHora)}</p>
-                      <p><strong>Serviço:</strong> {ag.servicoNome}</p>
-                      <p><strong>Valor:</strong> R$ {ag.servicoPreco?.toFixed(2)}</p>
-                      <p><strong>Funcionário:</strong> {ag.funcionarioNome || 'Não definido'}</p>
-                      {ag.observacao && <p><strong>Obs:</strong> {ag.observacao}</p>}
-                    </div>
-                    
-                    {ag.status === 'PENDENTE' && (
-                      <div className="agendamento-actions">
-                        <button 
-                          className="btn-success small" 
-                          onClick={() => handleUpdateAgendamentoStatus(ag.id, 'CONFIRMADO')}
-                        >
-                          ✓ Confirmar
-                        </button>
-                        <button 
-                          className="btn-danger small" 
-                          onClick={() => handleUpdateAgendamentoStatus(ag.id, 'CANCELADO', 'Cancelado pela barbearia')}
-                        >
-                          ✗ Cancelar
-                        </button>
-                      </div>
-                    )}
-                    
-                    {ag.status === 'CONFIRMADO' && (
-                      <div className="agendamento-actions">
-                        <button 
-                          className="btn-primary small" 
-                          onClick={() => handleUpdateAgendamentoStatus(ag.id, 'CONCLUIDO')}
-                        >
-                          ✓ Concluir
-                        </button>
-                      </div>
-                    )}
-                    
-                    {(ag.status === 'CANCELADO_PELO_CLIENTE' || ag.status === 'CANCELADO_PELA_BARBEARIA') && (
-                      <div className="agendamento-actions">
-                        <span className="status-cancelled">Agendamento cancelado</span>
-                      </div>
-                    )}
-                    
-                    {ag.status === 'CONCLUIDO' && (
-                      <div className="agendamento-actions">
-                        <span className="status-finished">Atendimento concluído</span>
-                      </div>
-                    )}
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}
 
-          {/* Tab: Agendamentos de Hoje */}
+          {/* TAB: AGENDAMENTOS DE HOJE */}
           {activeTab === 'hoje' && (
             <div className="agendamentos-list">
               <div className="today-header">
@@ -503,43 +532,89 @@ const BarbeariaPage = ({ onNavigate }) => {
                 <div className="empty-state-small">
                   <p>Nenhum agendamento para hoje.</p>
                   <p style={{ fontSize: '14px', marginTop: '8px', color: 'var(--corte-text-muted)' }}>
-                  Aproveite para organizar a agenda!
+                    Aproveite para organizar a agenda!
                   </p>
                 </div>
               ) : (
-                agendamentosHoje.map(ag => (
-                  <div key={ag.id} className="agendamento-card today-card">
-                    <div className="agendamento-header">
-                      <h3>{ag.clienteNome}</h3>
-                      <StatusBadge status={ag.status} />
-                    </div>
-                    <div className="agendamento-info">
-                      <p><strong>Horário:</strong> {formatarDataHora(ag.dataHora)}</p>
-                      <p><strong>Serviço:</strong> {ag.servicoNome}</p>
-                      <p><strong>Valor:</strong> R$ {ag.servicoPreco?.toFixed(2)}</p>
-                      <p><strong>Funcionário:</strong> {ag.funcionarioNome || 'Não definido'}</p>
-                      {ag.observacao && <p><strong>Obs:</strong> {ag.observacao}</p>}
-                    </div>
-                    
-                    {ag.status === 'PENDENTE' && (
-                      <div className="agendamento-actions">
-                        <button className="btn-success small" onClick={() => handleUpdateAgendamentoStatus(ag.id, 'CONFIRMADO')}>✓ Confirmar</button>
-                        <button className="btn-danger small" onClick={() => handleUpdateAgendamentoStatus(ag.id, 'CANCELADO', 'Cancelado pela barbearia')}>✗ Cancelar</button>
+                agendamentosHoje.map(ag => {
+                  const isLoading = loadingAction === ag.id;
+                  return (
+                    <div key={ag.id} className="agendamento-card today-card">
+                      <div className="agendamento-header">
+                        <h3>{ag.clienteNome}</h3>
+                        <StatusBadge status={ag.status} />
                       </div>
-                    )}
-                    
-                    {ag.status === 'CONFIRMADO' && (
-                      <div className="agendamento-actions">
-                        <button className="btn-primary small" onClick={() => handleUpdateAgendamentoStatus(ag.id, 'CONCLUIDO')}>✓ Concluir</button>
+                      <div className="agendamento-info">
+                        <p><strong>Horário:</strong> {formatarDataHora(ag.dataHora)}</p>
+                        <p><strong>Serviço:</strong> {ag.servicoNome}</p>
+                        <p><strong>Valor:</strong> R$ {ag.servicoPreco?.toFixed(2)}</p>
+                        <p><strong>Funcionário:</strong> {ag.funcionarioNome || 'Não definido'}</p>
+                        {ag.observacao && <p><strong>Obs:</strong> {ag.observacao}</p>}
                       </div>
-                    )}
-                  </div>
-                ))
+                      
+                      {/* Botões para agendamentos AGUARDANDO CONFIRMAÇÃO */}
+                      {ag.status === 'Aguardando confirmação' && (
+                        <div className="agendamento-actions">
+                          <button 
+                            className="btn-success small" 
+                            onClick={() => handleConfirmarAgendamento(ag.id)} 
+                            disabled={isLoading}
+                          >
+                            {isLoading ? '...' : '✓ Confirmar'}
+                          </button>
+                          <button 
+                            className="btn-danger small" 
+                            onClick={() => handleCancelarAgendamento(ag.id)} 
+                            disabled={isLoading}
+                          >
+                            {isLoading ? '...' : '✗ Cancelar'}
+                          </button>
+                        </div>
+                      )}
+                      
+                      {/* Botões para agendamentos CONFIRMADOS */}
+                      {ag.status === 'Confirmado' && (
+                        <div className="agendamento-actions">
+                          <button 
+                            className="btn-primary small" 
+                            onClick={() => handleConcluirAgendamento(ag.id)} 
+                            disabled={isLoading}
+                          >
+                            {isLoading ? '...' : '✓ Concluir Atendimento'}
+                          </button>
+                          <button 
+                            className="btn-danger small" 
+                            onClick={() => handleCancelarAgendamento(ag.id)} 
+                            disabled={isLoading}
+                          >
+                            {isLoading ? '...' : '✗ Cancelar'}
+                          </button>
+                        </div>
+                      )}
+                      
+                      {/* Status para agendamentos CANCELADOS */}
+                      {(ag.status === 'Cancelado pelo cliente' || ag.status === 'Cancelado pela barbearia') && (
+                        <div className="agendamento-actions">
+                          <span className="status-cancelled">
+                            {ag.status}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Status para agendamentos CONCLUÍDOS */}
+                      {ag.status === 'Concluído' && (
+                        <div className="agendamento-actions">
+                          <span className="status-finished">✓ Atendimento concluído</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
               )}
             </div>
           )}
 
-          {/* Tab: Serviços */}
+          {/* TAB: SERVIÇOS */}
           {activeTab === 'servicos' && (
             <div>
               <div className="section-header-actions">
@@ -590,7 +665,7 @@ const BarbeariaPage = ({ onNavigate }) => {
             </div>
           )}
 
-          {/* Tab: Funcionários */}
+          {/* TAB: FUNCIONÁRIOS */}
           {activeTab === 'funcionarios' && (
             <div>
               <div className="section-header-actions">
@@ -645,7 +720,7 @@ const BarbeariaPage = ({ onNavigate }) => {
             </div>
           )}
 
-          {/* Tab: Horários */}
+          {/* TAB: HORÁRIOS */}
           {activeTab === 'horarios' && (
             <div>
               <div className="section-header-actions">
@@ -790,123 +865,168 @@ const BarbeariaPage = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Estilos adicionais */}
-      <style>{`
-        .barbearia-info-card {
-          background: var(--corte-card-bg);
-          border-radius: var(--corte-radius-lg);
-          padding: 20px;
-          margin-bottom: 24px;
-          border: 1px solid var(--corte-border);
-        }
-        
-        .barbearia-info-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 16px;
-          flex-wrap: wrap;
-          gap: 12px;
-        }
-        
-        .barbearia-info-nome {
-          margin: 0 0 8px 0;
-          font-size: 22px;
-          color: var(--corte-text);
-        }
-        
-        .barbearia-info-desc {
-          margin: 0;
-          color: var(--corte-text-muted);
-          font-size: 14px;
-        }
-        
-        .barbearia-info-details {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          padding-top: 12px;
-          border-top: 1px solid var(--corte-border);
-        }
-        
-        .info-row {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 14px;
-          color: var(--corte-text-muted);
-        }
-        
-        .info-icon {
-          font-size: 16px;
-          min-width: 24px;
-        }
-        
-        .badge-count {
-          background: var(--corte-gold);
-          color: #0f0f0f;
-          font-size: 11px;
-          font-weight: 600;
-          padding: 2px 6px;
-          border-radius: 20px;
-          margin-left: 8px;
-        }
-        
-        .badge-today {
-          background: #2e7d32;
-          color: white;
-          font-size: 11px;
-          font-weight: 600;
-          padding: 2px 6px;
-          border-radius: 20px;
-          margin-left: 8px;
-        }
-        
-        .tab-count {
-          background: var(--corte-gold);
-          color: #0f0f0f;
-          font-size: 11px;
-          font-weight: 600;
-          padding: 2px 6px;
-          border-radius: 20px;
-          margin-left: 8px;
-        }
-        
-        .tab-count.today {
-          background: #2e7d32;
-          color: white;
-        }
-        
-        .today-header {
-          margin-bottom: 20px;
-          padding-bottom: 12px;
-          border-bottom: 2px solid var(--corte-gold);
-        }
-        
-        .today-date {
-          font-size: 16px;
-          font-weight: 600;
-          color: var(--corte-text);
-        }
-        
-        .today-card {
-          border-left: 4px solid var(--corte-gold);
-        }
-        
-        .empty-state-small {
-          text-align: center;
-          padding: 40px;
-          color: var(--corte-text-muted);
-        }
-        
-        .status-cancelled, .status-finished {
-          font-size: 13px;
-          padding: 6px 12px;
-          border-radius: var(--corte-radius-sm);
-          background: var(--corte-bg-tertiary);
-          color: var(--corte-text-muted);
-        }
-      `}</style>
+<style>{`
+  .barbearia-info-card {
+    background-color: rgba(17, 17, 17, 0.85);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid var(--corte-border);
+    transition: all 0.2s ease;
+    border-left: 3px solid var(--corte-gold);
+    position: relative;
+  }
+  
+  .barbearia-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .barbearia-info-nome {
+    margin: 0 0 8px 0;
+    font-size: 22px;
+    color: var(--corte-text);
+  }
+  
+  .barbearia-info-desc {
+    margin: 0;
+    color: var(--corte-text-muted);
+    font-size: 14px;
+  }
+  
+  .barbearia-info-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--corte-border);
+  }
+  
+  .info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--corte-text-muted);
+  }
+  
+  .info-icon {
+    font-size: 16px;
+    min-width: 24px;
+  }
+  
+  .tab-count {
+    background: var(--corte-gold);
+    color: #0f0f0f;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 20px;
+    margin-left: 8px;
+  }
+  
+  .tab-count.today {
+    background: #2e7d32;
+    color: white;
+  }
+  
+  .today-header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--corte-gold);
+  }
+  
+  .today-date {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--corte-text);
+  }
+  
+  .today-card {
+    border-left: 4px solid var(--corte-gold);
+  }
+  
+  .empty-state-small {
+    text-align: center;
+    padding: 40px;
+    color: var(--corte-text-muted);
+  }
+  
+  .status-cancelled {
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: var(--corte-radius-sm);
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+  }
+  
+  .status-finished {
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: var(--corte-radius-sm);
+    background: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+  }
+  
+  .agendamento-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--corte-border);
+    flex-wrap: wrap;
+  }
+  
+  .btn-success.small, .btn-primary.small, .btn-danger.small {
+    padding: 6px 14px;
+    font-size: 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+  
+  .btn-success.small {
+    background: #2e7d32;
+    color: white;
+  }
+  
+  .btn-success.small:hover:not(:disabled) {
+    background: #1b5e20;
+    transform: translateY(-1px);
+  }
+  
+  .btn-primary.small {
+    background: var(--corte-gold);
+    color: #0f0f0f;
+  }
+  
+  .btn-primary.small:hover:not(:disabled) {
+    background: var(--corte-gold-light);
+    transform: translateY(-1px);
+  }
+  
+  .btn-danger.small {
+    background: #c62828;
+    color: white;
+  }
+  
+  .btn-danger.small:hover:not(:disabled) {
+    background: #b71c1c;
+    transform: translateY(-1px);
+  }
+  
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+`}</style>
     </div>
   );
 };

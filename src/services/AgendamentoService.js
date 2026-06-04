@@ -1,3 +1,4 @@
+// services/AgendamentoService.js
 import api from './api';
 
 class AgendamentoService {
@@ -70,7 +71,7 @@ class AgendamentoService {
     }
   }
 
-  // Cancelar agendamento
+  // Cancelar agendamento (cliente ou barbearia_adm)
   async cancelar(agendamentoId, motivo) {
     try {
       const response = await api.put(`/api/agendamentos/${agendamentoId}/cancelar`, null, {
@@ -81,12 +82,12 @@ class AgendamentoService {
       console.error('Erro ao cancelar agendamento:', error);
       return {
         success: false,
-        message: error.response?.data?.mensagem || 'Erro ao cancelar agendamento'
+        message: error.response?.data?.mensagem || error.response?.data?.message || 'Erro ao cancelar agendamento'
       };
     }
   }
 
-  // Confirmar agendamento (dono)
+  // Confirmar agendamento (apenas barbearia_adm)
   async confirmar(agendamentoId) {
     try {
       const response = await api.put(`/api/agendamentos/${agendamentoId}/confirmar`);
@@ -95,12 +96,12 @@ class AgendamentoService {
       console.error('Erro ao confirmar agendamento:', error);
       return {
         success: false,
-        message: error.response?.data?.mensagem || 'Erro ao confirmar agendamento'
+        message: error.response?.data?.mensagem || error.response?.data?.message || 'Erro ao confirmar agendamento'
       };
     }
   }
 
-  // Concluir agendamento (dono)
+  // Concluir agendamento (barbearia_adm e funcionario)
   async concluir(agendamentoId) {
     try {
       const response = await api.put(`/api/agendamentos/${agendamentoId}/concluir`);
@@ -109,7 +110,7 @@ class AgendamentoService {
       console.error('Erro ao concluir agendamento:', error);
       return {
         success: false,
-        message: error.response?.data?.mensagem || 'Erro ao concluir agendamento'
+        message: error.response?.data?.mensagem || error.response?.data?.message || 'Erro ao concluir agendamento'
       };
     }
   }

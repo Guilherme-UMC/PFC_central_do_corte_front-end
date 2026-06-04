@@ -4,16 +4,17 @@ import AgendamentoService from '../services/AgendamentoService';
 import FuncionarioService from '../services/FuncionarioService';
 import StatusBadge from '../components/StatusBadge';
 import Loader from '../components/Loader';
-import {formatarDataHora} from '../utils/dateUtils';
+import { formatarDataHora } from '../utils/dateUtils';
 
 const FuncionarioPage = () => {
-  const { user } = useAuthContext();
+  const { user, logout } = useAuthContext();
   const [barbearias, setBarbearias] = useState([]);
   const [selectedBarbearia, setSelectedBarbearia] = useState(null);
   const [agendamentos, setAgendamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('todos');
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [loadingAction, setLoadingAction] = useState(null);
 
   useEffect(() => {
     carregarBarbeariasVinculadas();
@@ -68,22 +69,34 @@ const FuncionarioPage = () => {
     setSelectedBarbearia(barbearia);
   };
 
-  const handleUpdateStatus = async (agendamentoId, status, motivo = null) => {
-    let result;
-    
-    if (status === 'CANCELADO') {
-      result = await AgendamentoService.cancelar(agendamentoId, motivo || 'Cancelado pelo funcionário');
-    } else if (status === 'CONFIRMADO') {
-      result = await AgendamentoService.confirmar(agendamentoId);
-    } else if (status === 'CONCLUIDO') {
-      result = await AgendamentoService.concluir(agendamentoId);
+  // FUNÇÃO CORRIGIDA PARA CONCLUIR AGENDAMENTO
+  const handleConcluirAgendamento = async (agendamentoId, e) => {
+    // Prevenir propagação do evento e comportamento padrão
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
     }
+
+    console.log('🔍 Tentando concluir agendamento:', agendamentoId);
     
-    if (result?.success) {
-      showMessage('success', `Agendamento ${status.toLowerCase()} com sucesso`);
-      await carregarAgendamentos();
-    } else {
-      showMessage('error', result?.message || 'Erro ao atualizar agendamento');
+    setLoadingAction(agendamentoId);
+    
+    try {
+      const result = await AgendamentoService.concluir(agendamentoId);
+      console.log('📥 Resposta do servidor:', result);
+
+      if (result.success) {
+        showMessage('success', 'Atendimento concluído com sucesso!');
+        // Recarregar os agendamentos após concluir
+        await carregarAgendamentos();
+      } else {
+        showMessage('error', result.message || 'Erro ao concluir atendimento');
+      }
+    } catch (error) {
+      console.error('Erro ao concluir agendamento:', error);
+      showMessage('error', error.response?.data?.message || 'Erro ao concluir atendimento');
+    } finally {
+      setLoadingAction(null);
     }
   };
 
@@ -117,7 +130,6 @@ const FuncionarioPage = () => {
           </div>
         ) : (
           <>
-            {/* Seletor de Barbearias */}
             <div className="barbearia-selector">
               {barbearias.map(b => {
                 const totalAgendamentos = agendamentos.filter(
@@ -139,7 +151,6 @@ const FuncionarioPage = () => {
               })}
             </div>
 
-            {/* Informações da barbearia selecionada */}
             {selectedBarbearia && (
               <div className="barbearia-info">
                 <h3>{selectedBarbearia.nome}</h3>
@@ -147,12 +158,11 @@ const FuncionarioPage = () => {
                   {selectedBarbearia.logradouro}, {selectedBarbearia.numero} - {selectedBarbearia.bairro}, {selectedBarbearia.cidade} - {selectedBarbearia.uf}
                 </p>
                 {selectedBarbearia.telefone && (
-                  <p className="barbearia-telefone"> {selectedBarbearia.telefone}</p>
+                  <p className="barbearia-telefone">📞 {selectedBarbearia.telefone}</p>
                 )}
               </div>
             )}
 
-            {/* Tabs */}
             <div className="page-tabs">
               <button 
                 className={`tab-btn ${activeTab === 'todos' ? 'active' : ''}`} 
@@ -173,7 +183,7 @@ const FuncionarioPage = () => {
                   const dataAg = new Date(a.dataHora).toDateString();
                   return dataAg === hoje;
                 }).length > 0 && (
-                  <span className="tab-count">
+                  <span className="tab-count today">
                     {agendamentos.filter(a => {
                       const hoje = new Date().toDateString();
                       const dataAg = new Date(a.dataHora).toDateString();
@@ -184,7 +194,6 @@ const FuncionarioPage = () => {
               </button>
             </div>
 
-            {/* Lista de Agendamentos */}
             <div className="agendamentos-list">
               {agendamentos.length === 0 ? (
                 <div className="empty-agendamentos">
@@ -196,68 +205,71 @@ const FuncionarioPage = () => {
                   )}
                 </div>
               ) : (
-                agendamentos.map(ag => (
-                  <div key={ag.id} className="agendamento-card">
-                    <div className="agendamento-header">
-                      <h3>{ag.clienteNome}</h3>
-                      <StatusBadge status={ag.status} />
+                agendamentos.map(ag => {
+                  const isLoading = loadingAction === ag.id;
+                  const isToday = new Date(ag.dataHora).toDateString() === new Date().toDateString();
+                  
+                  return (
+                    <div key={ag.id} className={`agendamento-card ${isToday ? 'today-card' : ''}`}>
+                      <div className="agendamento-header">
+                        <h3>{ag.clienteNome}</h3>
+                        <StatusBadge status={ag.status} />
+                      </div>
+                      <div className="agendamento-info">
+                        <p><strong>Data:</strong> {formatarDataHora(ag.dataHora)}</p>
+                        <p><strong>Serviço:</strong> {ag.servicoNome || 'Não informado'}</p>
+                        <p><strong>Valor:</strong> R$ {ag.servicoPreco?.toFixed(2) || '0,00'}</p>
+                        {ag.observacao && <p><strong>Observações:</strong> {ag.observacao}</p>}
+                      </div>
+                      
+                      {/* BOTÃO PARA CONCLUIR - Agendamentos CONFIRMADOS */}
+{ag.status === 'Confirmado' && (
+  <div className="agendamento-actions">
+    <button 
+      className="btn-primary small" 
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleConcluirAgendamento(ag.id);
+      }} 
+      disabled={isLoading}
+    >
+      {isLoading ? '...' : '✓ Concluir Atendimento'}
+    </button>
+  </div>
+)}
+                      
+                      {/* Agendamentos AGUARDANDO CONFIRMAÇÃO */}
+                      {ag.status === 'Aguardando confirmação' && (
+                        <div className="agendamento-actions">
+                          <span className="status-pending-msg">Aguardando confirmação da barbearia</span>
+                        </div>
+                      )}
+                      
+                      {/* Agendamentos CANCELADOS */}
+                      {(ag.status === 'Cancelado pelo cliente' || ag.status === 'Cancelado pela barbearia') && (
+                        <div className="agendamento-actions">
+                          <span className="status-cancelled">
+                            {ag.status === 'Cancelado pelo cliente' ? 'Cancelado pelo cliente' : 'Cancelado pela barbearia'}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Agendamentos CONCLUÍDOS */}
+                      {ag.status === 'Concluído' && (
+                        <div className="agendamento-actions">
+                          <span className="status-finished">✓ Atendimento concluído</span>
+                        </div>
+                      )}
                     </div>
-                    <div className="agendamento-info">
-                      <p><strong>Data:</strong> {formatarDataHora(ag.dataHora)}</p>
-                      <p><strong>Serviço:</strong> {ag.servicoNome || 'Não informado'}</p>
-                      <p><strong>Valor:</strong> R$ {ag.servicoPreco?.toFixed(2) || '0,00'}</p>
-                      {ag.observacao && <p><strong>Observações:</strong> {ag.observacao}</p>}
-                    </div>
-                    
-                    {/* Botões de ação conforme o status */}
-                    {ag.status === 'PENDENTE' && (
-                      <div className="agendamento-actions">
-                        <button 
-                          className="btn-success small" 
-                          onClick={() => handleUpdateStatus(ag.id, 'CONFIRMADO')}
-                        >
-                          ✓ Confirmar
-                        </button>
-                        <button 
-                          className="btn-danger small" 
-                          onClick={() => handleUpdateStatus(ag.id, 'CANCELADO', 'Cancelado pelo funcionário')}
-                        >
-                          ✗ Cancelar
-                        </button>
-                      </div>
-                    )}
-                    
-                    {ag.status === 'CONFIRMADO' && (
-                      <div className="agendamento-actions">
-                        <button 
-                          className="btn-primary small" 
-                          onClick={() => handleUpdateStatus(ag.id, 'CONCLUIDO')}
-                        >
-                          ✓ Concluir Atendimento
-                        </button>
-                      </div>
-                    )}
-                    
-                    {(ag.status === 'CANCELADO_PELO_CLIENTE' || ag.status === 'CANCELADO_PELA_BARBEARIA') && (
-                      <div className="agendamento-actions">
-                        <span className="status-cancelled">Agendamento cancelado</span>
-                      </div>
-                    )}
-                    
-                    {ag.status === 'CONCLUIDO' && (
-                      <div className="agendamento-actions">
-                        <span className="status-finished">Atendimento concluído</span>
-                      </div>
-                    )}
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </>
         )}
       </div>
 
-      {/* Estilos adicionais */}
       <style>{`
         .barbearia-info {
           background: var(--corte-card-bg);
@@ -298,18 +310,75 @@ const FuncionarioPage = () => {
           margin-left: 8px;
         }
         
+        .tab-count.today {
+          background: #2e7d32;
+          color: white;
+        }
+        
+        .today-card {
+          border-left: 3px solid var(--corte-gold);
+          background: rgba(201, 168, 76, 0.03);
+        }
+        
         .empty-agendamentos {
           text-align: center;
           padding: 40px;
           color: var(--corte-text-muted);
         }
         
-        .status-cancelled, .status-finished {
+        .status-cancelled, .status-finished, .status-pending-msg {
           font-size: 13px;
           padding: 6px 12px;
           border-radius: var(--corte-radius-sm);
           background: var(--corte-bg-tertiary);
           color: var(--corte-text-muted);
+        }
+        
+        .status-finished {
+          color: #4caf50;
+          background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .status-cancelled {
+          color: #f44336;
+          background: rgba(244, 67, 54, 0.1);
+        }
+        
+        .status-pending-msg {
+          color: #ff9800;
+          background: rgba(255, 152, 0, 0.1);
+        }
+        
+        .agendamento-actions {
+          display: flex;
+          gap: 10px;
+          margin-top: 12px;
+          padding-top: 12px;
+          border-top: 1px solid var(--corte-border);
+          flex-wrap: wrap;
+        }
+        
+        .btn-primary.small {
+          background: var(--corte-gold);
+          color: #0f0f0f;
+          border: none;
+          padding: 6px 14px;
+          font-size: 12px;
+          border-radius: 6px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        
+        .btn-primary.small:hover:not(:disabled) {
+          background: var(--corte-gold-light);
+          transform: translateY(-1px);
+        }
+        
+        button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
         }
       `}</style>
     </div>

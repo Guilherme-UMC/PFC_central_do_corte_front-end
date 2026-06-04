@@ -14,13 +14,6 @@ const proximoDia = (iso) => {
   };
 };
 
-const statusConfig = {
-  CONFIRMADO: { label: 'Confirmado', cls: 'confirmado', icon: '✓' },
-  CANCELADO:  { label: 'Cancelado',  cls: 'cancelado',  icon: '✕' },
-  PENDENTE:   { label: 'Pendente',   cls: 'pendente',   icon: '●' },
-  CONCLUIDO:  { label: 'Concluído',  cls: 'confirmado', icon: '★' },
-};
-
 const obterIniciais = (nome = '') => {
   const partes = nome.trim().split(' ');
   if (partes.length >= 2) return (partes[0][0] + partes[1][0]).toUpperCase();
@@ -36,11 +29,83 @@ const NAV_ITEMS = [
   { id: 'home',       icon: '⌂',  label: 'Início' },
   { id: 'agendar',    icon: '✂',  label: 'Novo Agendamento' },
   { id: 'historico',  icon: '☰',  label: 'Meus Agendamentos' },
-  { id: 'barbearias', icon: '', label: 'Barbearias' },
+  { id: 'barbearias', icon: '📍', label: 'Barbearias' },
   { id: 'perfil',     icon: '◉',  label: 'Meu Perfil' },
 ];
 
-function TabelaAgendamentos({ agendamentos, loading, onNovoAgendamento }) {
+// Funções auxiliares para status (agora em português)
+const getStatusLabel = (status) => {
+  const labels = {
+    'Aguardando confirmação': 'Aguardando confirmação',
+    'Confirmado': 'Confirmado',
+    'Cancelado pelo cliente': 'Cancelado',
+    'Cancelado pela barbearia': 'Cancelado',
+    'Concluído': 'Concluído',
+    'Não compareceu': 'Não compareceu'
+  };
+  return labels[status] || status;
+};
+
+const getStatusIcon = (status) => {
+  const icons = {
+    'Aguardando confirmação': '●',
+    'Confirmado': '✓',
+    'Cancelado pelo cliente': '✕',
+    'Cancelado pela barbearia': '✕',
+    'Concluído': '★',
+    'Não compareceu': '⚠'
+  };
+  return icons[status] || '●';
+};
+
+const getStatusClass = (status) => {
+  if (status === 'Confirmado') return 'confirmado';
+  if (status === 'Concluído') return 'confirmado';
+  if (status === 'Cancelado pelo cliente' || status === 'Cancelado pela barbearia') return 'cancelado';
+  if (status === 'Não compareceu') return 'cancelado';
+  return 'pendente';
+};
+
+function TabelaAgendamentos({ agendamentos, loading, onNovoAgendamento, onCancelarAgendamento, onRecarregar }) {
+  const [cancelandoId, setCancelandoId] = useState(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedAgendamento, setSelectedAgendamento] = useState(null);
+  const [motivoCancelamento, setMotivoCancelamento] = useState('');
+
+  // Verifica se o cliente pode cancelar (aguardando confirmação e com mais de 2 horas de antecedência)
+  const podeCancelar = (dataHora, status) => {
+    if (status !== 'Aguardando confirmação') return false;
+    
+    const agora = new Date();
+    const dataAgendamento = new Date(dataHora);
+    const diffHoras = (dataAgendamento - agora) / (1000 * 60 * 60);
+    return diffHoras >= 2;
+  };
+
+  const handleCancelarClick = (agendamento) => {
+    setSelectedAgendamento(agendamento);
+    setMotivoCancelamento('');
+    setShowCancelModal(true);
+  };
+
+  const handleConfirmarCancelamento = async () => {
+    if (!motivoCancelamento.trim()) {
+      alert('Por favor, informe o motivo do cancelamento');
+      return;
+    }
+
+    setCancelandoId(selectedAgendamento.id);
+    const result = await onCancelarAgendamento(selectedAgendamento.id, motivoCancelamento);
+    setCancelandoId(null);
+    
+    if (result?.success) {
+      setShowCancelModal(false);
+      setSelectedAgendamento(null);
+      setMotivoCancelamento('');
+      if (onRecarregar) onRecarregar();
+    }
+  };
+
   if (loading) {
     return <div className="dc-loading">Carregando agendamentos…</div>;
   }
@@ -62,50 +127,103 @@ function TabelaAgendamentos({ agendamentos, loading, onNovoAgendamento }) {
   }
 
   return (
-    <div className="dc-table-wrap">
-      <table className="dc-table">
-        <thead>
-          <tr>
-            <th>Data & Hora</th>
-            <th>Barbearia</th>
-            <th>Serviço(s)</th>
-            <th>Profissional</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {agendamentos.map((ag) => {
-            const st = statusConfig[ag.status] ?? statusConfig.PENDENTE;
-            return (
-              <tr key={ag.id}>
-                <td>
-                  <div style={{ fontWeight: 600 }}>{formatarDataHora(ag.dataHora)}</div>
-                </td>
-                <td>{ag.barbearia?.nome ?? ag.barbeariaNome ?? '—'}</td>
-                <td style={{ color: 'var(--corte-text-muted)' }}>
-                  {Array.isArray(ag.servicos)
-                    ? ag.servicos.map((s) => s.nome).join(', ')
-                    : ag.servicoNome ?? '—'}
-                </td>
-                <td>{ag.funcionario?.nome ?? ag.funcionarioNome ?? 'Qualquer'}</td>
-                <td>
-                  <span className={`dc-badge ${st.cls}`}>
-                    {st.icon} {st.label}
-                  </span>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+    <>
+      <div className="dc-table-wrap">
+        <table className="dc-table">
+          <thead>
+            <tr>
+              <th>Data & Hora</th>
+              <th>Barbearia</th>
+              <th>Serviço(s)</th>
+              <th>Profissional</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {agendamentos.map((ag) => {
+              const podeCancelarAgendamento = podeCancelar(ag.dataHora, ag.status);
+              const cancelando = cancelandoId === ag.id;
+              
+              return (
+                <tr key={ag.id}>
+                  <td>
+                    <div style={{ fontWeight: 600 }}>{formatarDataHora(ag.dataHora)}</div>
+                  </td>
+                   <td>{ag.barbearia?.nome ?? ag.barbeariaNome ?? '—'}</td>
+                  <td style={{ color: 'var(--corte-text-muted)' }}>
+                    {Array.isArray(ag.servicos)
+                      ? ag.servicos.map((s) => s.nome).join(', ')
+                      : ag.servicoNome ?? '—'}
+                   </td>
+                   <td>{ag.funcionario?.nome ?? ag.funcionarioNome ?? 'Qualquer'}</td>
+                   <td>
+                    <span className={`dc-badge ${getStatusClass(ag.status)}`}>
+                      {getStatusIcon(ag.status)} {getStatusLabel(ag.status)}
+                    </span>
+                   </td>
+                   <td>
+                    {podeCancelarAgendamento ? (
+                      <button
+                        className="btn-cancelar-small"
+                        onClick={() => handleCancelarClick(ag)}
+                        disabled={cancelando}
+                      >
+                        {cancelando ? '...' : 'Cancelar'}
+                      </button>
+                    ) : (
+                      <span className="no-action">—</span>
+                    )}
+                   </td>
+                 </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Modal de Cancelamento */}
+      {showCancelModal && selectedAgendamento && (
+        <div className="modal-overlay" onClick={() => setShowCancelModal(false)}>
+          <div className="modal-content cancel-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Cancelar Agendamento</h3>
+            <div className="cancel-info">
+              <p><strong>Barbearia:</strong> {selectedAgendamento.barbearia?.nome ?? selectedAgendamento.barbeariaNome}</p>
+              <p><strong>Data:</strong> {formatarDataHora(selectedAgendamento.dataHora)}</p>
+              <p><strong>Serviço:</strong> {selectedAgendamento.servicoNome}</p>
+            </div>
+            <div className="form-group">
+              <label>Motivo do cancelamento:</label>
+              <textarea
+                className="form-input"
+                rows="3"
+                placeholder="Digite o motivo do cancelamento..."
+                value={motivoCancelamento}
+                onChange={(e) => setMotivoCancelamento(e.target.value)}
+              />
+            </div>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setShowCancelModal(false)}>
+                Voltar
+              </button>
+              <button 
+                className="btn-danger" 
+                onClick={handleConfirmarCancelamento}
+                disabled={cancelandoId === selectedAgendamento.id}
+              >
+                Confirmar Cancelamento
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
-function TelaHome({ user, agendamentos, loadingAg, onNavegar }) {
-  const confirmados = agendamentos.filter((a) => a.status === 'CONFIRMADO');
-  const concluidos  = agendamentos.filter((a) => a.status === 'CONCLUIDO');
-  const proximo     = confirmados.sort(
+function TelaHome({ user, agendamentos, loadingAg, onNavegar, onCancelarAgendamento, onRecarregar }) {
+  const confirmados = agendamentos.filter((a) => a.status === 'Confirmado');
+  const proximo = confirmados.sort(
     (a, b) => new Date(a.dataHora) - new Date(b.dataHora)
   )[0];
 
@@ -168,6 +286,8 @@ function TelaHome({ user, agendamentos, loadingAg, onNavegar }) {
             agendamentos={agendamentos.slice(0, 5)}
             loading={loadingAg}
             onNovoAgendamento={() => onNavegar('agendar')}
+            onCancelarAgendamento={onCancelarAgendamento}
+            onRecarregar={onRecarregar}
           />
         </>
       )}
@@ -181,9 +301,9 @@ const ClientePage = () => {
   const [agendamentos, setAgendamentos] = useState([]);
   const [loadingAg, setLoadingAg] = useState(true);
 
-  useEffect(() => {
   const carregarAgendamentos = async () => {
     try {
+      setLoadingAg(true);
       const response = await AgendamentoService.listarMeus();
       if (response.success) {
         setAgendamentos(response.data);
@@ -197,9 +317,21 @@ const ClientePage = () => {
       setLoadingAg(false);
     }
   };
-  
-  carregarAgendamentos();
-}, []);
+
+  useEffect(() => {
+    carregarAgendamentos();
+  }, []);
+
+  const handleCancelarAgendamento = async (agendamentoId, motivo) => {
+    const result = await AgendamentoService.cancelar(agendamentoId, motivo);
+    if (result.success) {
+      alert('Agendamento cancelado com sucesso!');
+      await carregarAgendamentos();
+    } else {
+      alert(result.message || 'Erro ao cancelar agendamento');
+    }
+    return result;
+  };
 
   if (abaAtiva === 'agendar') {
     return (
@@ -221,9 +353,8 @@ const ClientePage = () => {
 
   return (
     <div className="dc-root">
-      {/* ── Sidebar ──────────────────────────────────────────── */}
+      {/* Sidebar */}
       <aside className="dc-sidebar">
-        {/* Logo */}
         <div className="dc-sidebar-logo">
           <span className="dc-logo-icon">💈</span>
           <div>
@@ -231,7 +362,6 @@ const ClientePage = () => {
           </div>
         </div>
 
-        {/* User card */}
         <div className="dc-user-card">
           <div className="dc-avatar">
             {user?.fotoPerfil
@@ -244,7 +374,6 @@ const ClientePage = () => {
           </div>
         </div>
 
-        {/* Nav */}
         <nav className="dc-nav">
           {NAV_ITEMS.map((item) => (
             <button
@@ -266,9 +395,8 @@ const ClientePage = () => {
         </nav>
       </aside>
 
-      {/* ── Área principal ──────────────────────────────────── */}
+      {/* Área principal */}
       <main className="dc-main">
-        {/* Topbar */}
         <div className="dc-topbar">
           <div>
             <h1 className="dc-page-title">{pg.title}</h1>
@@ -277,7 +405,6 @@ const ClientePage = () => {
           <span className="dc-topbar-date">{hojeFormatado()}</span>
         </div>
 
-        {/* Conteúdo da aba */}
         <div className="dc-content">
           {abaAtiva === 'home' && (
             <TelaHome
@@ -285,6 +412,8 @@ const ClientePage = () => {
               agendamentos={agendamentos}
               loadingAg={loadingAg}
               onNavegar={setAbaAtiva}
+              onCancelarAgendamento={handleCancelarAgendamento}
+              onRecarregar={carregarAgendamentos}
             />
           )}
 
@@ -295,6 +424,8 @@ const ClientePage = () => {
                 agendamentos={agendamentos}
                 loading={loadingAg}
                 onNovoAgendamento={() => setAbaAtiva('agendar')}
+                onCancelarAgendamento={handleCancelarAgendamento}
+                onRecarregar={carregarAgendamentos}
               />
             </>
           )}
