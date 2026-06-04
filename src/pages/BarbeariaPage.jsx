@@ -249,7 +249,7 @@ const BarbeariaPage = ({ onNavigate }) => {
     e.preventDefault();
     setSubmitting(true);
 
-    const result = await FuncionarioService.vincularExistente(selectedBarbearia.id, vincularEmail);
+    const result = await FuncionarioService.vincularFuncionarioExistente(selectedBarbearia.id, vincularEmail);
 
     if (result.success) {
       showMessage('success', 'Funcionário vinculado com sucesso!');
@@ -423,15 +423,18 @@ const BarbeariaPage = ({ onNavigate }) => {
             Agendamentos de Hoje
             {agendamentosHoje.length > 0 && <span className="tab-count today">{agendamentosHoje.length}</span>}
           </button>
-          <button className={`tab-btn ${activeTab === 'servicos' ? 'active' : ''}`} onClick={() => setActiveTab('servicos')}>
-            Serviços {servicos.length > 0 && <span className="tab-count">{servicos.length}</span>}
-          </button>
-          <button className={`tab-btn ${activeTab === 'funcionarios' ? 'active' : ''}`} onClick={() => setActiveTab('funcionarios')}>
-            Funcionários {funcionarios.length > 0 && <span className="tab-count">{funcionarios.length}</span>}
-          </button>
-          <button className={`tab-btn ${activeTab === 'horarios' ? 'active' : ''}`} onClick={() => setActiveTab('horarios')}>
-            Horários
-          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'servicos' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('servicos')}
+          >Serviços</button>
+          <button 
+            className={`tab-btn ${activeTab === 'funcionarios' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('funcionarios')}
+          >Funcionários</button>
+          <button 
+            className={`tab-btn ${activeTab === 'horarios' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('horarios')}
+          >Horários</button>
         </div>
 
         <div className="page-content">

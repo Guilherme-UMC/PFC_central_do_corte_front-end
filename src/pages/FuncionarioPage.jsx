@@ -143,9 +143,6 @@ const FuncionarioPage = () => {
                     onClick={() => handleSelectBarbearia(b)}
                   >
                     {b.nome}
-                    {totalAgendamentos > 0 && (
-                      <span className="badge-count">{totalAgendamentos}</span>
-                    )}
                   </button>
                 );
               })}

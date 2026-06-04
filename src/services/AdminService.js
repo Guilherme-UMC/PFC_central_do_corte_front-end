@@ -25,12 +25,22 @@ class AdminService {
     }
   }
 
-  async listarTodosUsuarios() {
+  async listarTodosUsuarios(page = 0, size = 10, ativo = null, role = null, search = null) {
     try {
-      const response = await api.get('/usuarios');
+      const params = { page, size };
+      if (ativo !== null) params.ativo = ativo;
+      if (role) params.role = role;
+      if (search) params.search = search;
+      
+      const response = await api.get('/usuarios', { params });
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, message: 'Erro ao listar usuários' };
+      console.error('Erro ao listar usuários:', error);
+      return { 
+        success: false, 
+        message: 'Erro ao listar usuários',
+        data: { content: [], totalPages: 0, totalElements: 0 }
+      };
     }
   }
 
@@ -39,7 +49,7 @@ class AdminService {
       const response = await api.get(`/usuarios/role/${role}`);
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, message: 'Erro ao listar usuários' };
+      return { success: false, message: 'Erro ao listar usuários', data: [] };
     }
   }
 
@@ -48,25 +58,47 @@ class AdminService {
       const response = await api.get('/usuarios/search', { params: { name: nome } });
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, message: 'Erro ao buscar usuários' };
+      return { success: false, message: 'Erro ao buscar usuários', data: [] };
     }
   }
 
   async ativarDesativarUsuario(userId) {
     try {
-      await api.patch(`/usuarios/${userId}/toggle-status`);
-      return { success: true };
+      const response = await api.patch(`/usuarios/${userId}/toggle-status`);
+      return { success: true, message: response.data?.message || 'Status alterado com sucesso' };
     } catch (error) {
-      return { success: false, message: 'Erro ao alterar status do usuário' };
+      let errorMessage = 'Erro ao alterar status do usuário';
+      
+      if (error.response?.data?.mensagem) {
+        errorMessage = error.response.data.mensagem;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      return { 
+        success: false, 
+        message: errorMessage 
+      };
     }
   }
 
   async deletarUsuario(userId) {
     try {
       await api.delete(`/usuarios/${userId}`);
-      return { success: true };
+      return { success: true, message: 'Usuário removido com sucesso' };
     } catch (error) {
-      return { success: false, message: 'Erro ao deletar usuário' };
+      let errorMessage = 'Erro ao deletar usuário';
+      
+      if (error.response?.data?.mensagem) {
+        errorMessage = error.response.data.mensagem;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      return { 
+        success: false, 
+        message: errorMessage 
+      };
     }
   }
 
@@ -75,7 +107,7 @@ class AdminService {
       const response = await api.get('/barbearia', { params: { page, size } });
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, message: 'Erro ao listar barbearias' };
+      return { success: false, message: 'Erro ao listar barbearias', data: [] };
     }
   }
 
@@ -93,7 +125,7 @@ class AdminService {
       const response = await api.get(`/barbearia/owner/${proprietarioId}`);
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, message: 'Erro ao listar barbearias do proprietário' };
+      return { success: false, message: 'Erro ao listar barbearias do proprietário', data: [] };
     }
   }
 }

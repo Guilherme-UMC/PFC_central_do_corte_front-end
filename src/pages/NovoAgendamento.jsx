@@ -452,14 +452,18 @@ function Sucesso({ onNovo, onVerMeus }) {
         Seu agendamento foi realizado com sucesso. Em breve você receberá a confirmação. 💈
       </p>
       <div style={{ display: 'flex', gap: 12, marginTop: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <button className="btn-ghost" onClick={onVerMeus}>Ver meus agendamentos</button>
-        <button className="btn-primary" onClick={onNovo}>Novo agendamento</button>
+        <button className="btn-ghost" onClick={() => {
+          onVerMeus();
+          }}>Ver meus agendamentos</button>
+        <button className="btn-primary" onClick={() => {
+          onNovo();
+        }}>Novo agendamento</button>
       </div>
     </div>
   );
 }
 
-export default function NovoAgendamento({ onVoltar, onVerMeusAgendamentos }) {
+export default function NovoAgendamento({ onVoltar, onVerMeusAgendamentos, onAgendamentoSucesso }) {
   const [step, setStep] = useState(1);
   const [barbearia, setBarbearia] = useState(null);
   const [servicosSelecionados, setServicosSelecionados] = useState([]);
@@ -506,6 +510,15 @@ export default function NovoAgendamento({ onVoltar, onVerMeusAgendamentos }) {
     setFuncionario(null);
     setSucesso(false);
     setErroConfirm(null);
+    if(onAgendamentoSucesso){
+      onAgendamentoSucesso();
+    }
+  };
+
+  const handleVerMeusAgendamentos = () => {
+    if (onVerMeusAgendamentos) {
+      onVerMeusAgendamentos();
+    }
   };
 
   const stepTitles = [

@@ -1,25 +1,26 @@
 import api from './api';
 
 class AuthService {
-  async login(email, password) {
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify({
-          id: response.data.userId,
-          name: response.data.name,
-          role: response.data.role,
-          email: email
-        }));
-      }
-      
-      return response.data;
-    } catch (error) {
-      throw error;
+    async login(email, password) {
+        try {
+            const response = await api.post('/auth/login', { email, password });
+            
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('refreshToken', response.data.refreshToken); 
+                localStorage.setItem('user', JSON.stringify({
+                    id: response.data.userId,
+                    name: response.data.name,
+                    role: response.data.role,
+                    email: email
+                }));
+            }
+            
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
     }
-  }
   
   async signup(userData) {
     try {
@@ -72,24 +73,27 @@ class AuthService {
   }
   
   async refreshToken() {
-    try {
-      const token = this.getToken();
-      if (!token) throw new Error('No token');
-      
-      const response = await api.post('/auth/refresh-token', null, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-      }
-      
-      return response.data;
-    } catch (error) {
-      this.logout();
-      throw error;
+        try {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) throw new Error('No refresh token');
+            
+            const response = await api.post('/auth/refresh-token', null, {
+                headers: { Authorization: `Bearer ${refreshToken}` }
+            });
+            
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+                if (response.data.refreshToken) {
+                    localStorage.setItem('refreshToken', response.data.refreshToken);
+                }
+            }
+            
+            return response.data;
+        } catch (error) {
+            this.logout();
+            throw error;
+        }
     }
   }
-}
 
 export default new AuthService();

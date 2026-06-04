@@ -12,6 +12,7 @@ import EsqueciSenha from './pages/EsqueciSenha';
 import RedefinirSenha from './pages/RedefinirSenha';
 import Signup from './pages/Signup';
 import SignupBarbearia from './pages/SignupBarbearia';
+import BarbeariaDetalhes from './pages/BarbeariaDetalhes';
 
 
 import CadastroBarbearia from './components/CadastroBarbearia';
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
           { path: 'signup-barbearia', element: <SignupBarbearia /> },
           { path: 'esqueci-senha', element: <EsqueciSenha /> },
           { path: 'redefinir-senha', element: <RedefinirSenha /> },
+          { path: 'barbearia/:id', element: <BarbeariaDetalhes /> },
         ],
       },
       

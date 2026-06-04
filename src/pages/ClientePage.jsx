@@ -301,28 +301,29 @@ const ClientePage = () => {
   const [agendamentos, setAgendamentos] = useState([]);
   const [loadingAg, setLoadingAg] = useState(true);
 
-  const carregarAgendamentos = async () => {
-    try {
-      setLoadingAg(true);
-      const response = await AgendamentoService.listarMeus();
-      if (response.success) {
-        setAgendamentos(response.data);
-      } else {
-        setAgendamentos([]);
-      }
-    } catch (error) {
-      console.error('Erro ao carregar agendamentos:', error);
+const carregarAgendamentos = async () => {
+  try {
+    const response = await AgendamentoService.listarMeus();
+    if (response.success) {
+     response.data.forEach(ag => {
+        console.log(`Agendamento ${ag.id}: dataHora = ${ag.dataHora}, tipo = ${typeof ag.dataHora}`);
+      });
+      setAgendamentos(response.data);
+    } else {
       setAgendamentos([]);
-    } finally {
-      setLoadingAg(false);
-    }
-  };
+    }  } catch (error) {
+    console.error('Erro ao carregar agendamentos:', error);
+    setAgendamentos([]);
+  } finally {
+    setLoadingAg(false);
+  }
+};
 
-  useEffect(() => {
-    carregarAgendamentos();
-  }, []);
+useEffect(() => {
+  carregarAgendamentos();
+}, []);
 
-  const handleCancelarAgendamento = async (agendamentoId, motivo) => {
+ const handleCancelarAgendamento = async (agendamentoId, motivo) => {
     const result = await AgendamentoService.cancelar(agendamentoId, motivo);
     if (result.success) {
       alert('Agendamento cancelado com sucesso!');
@@ -333,14 +334,21 @@ const ClientePage = () => {
     return result;
   };
 
-  if (abaAtiva === 'agendar') {
-    return (
-      <NovoAgendamento
-        onVoltar={() => setAbaAtiva('home')}
-        onVerMeusAgendamentos={() => setAbaAtiva('historico')}
-      />
-    );
-  }
+
+if (abaAtiva === 'agendar') {
+  return (
+    <NovoAgendamento
+      onVoltar={() => setAbaAtiva('home')}
+      onVerMeusAgendamentos={() => {
+        carregarAgendamentos(); 
+        setAbaAtiva('historico');
+      }}
+      onAgendamentoSucesso={() => {
+        carregarAgendamentos(); 
+      }}
+    />
+  );
+}
 
   const pageTitles = {
     home:       { title: `Olá, ${user?.name?.split(' ')[0] || 'Cliente'} 👋`, sub: hojeFormatado() },

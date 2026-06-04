@@ -152,7 +152,7 @@ const Navbar = ({ search, onSearchChange }) => {
             onChange={handleSearchChange}
             onFocus={handleSearchFocus}
             onBlur={handleSearchBlur}
-            placeholder="Buscar barbearias, serviços ou profissionais..."
+            placeholder="Buscar barbearias ou locais..."
           />
           {localSearch && (
             <button className="navbar__search-clear" onClick={handleClearSearch}>

@@ -16,7 +16,7 @@ class FuncionarioService {
   }
 
   // Vincular funcionário existente à barbearia
-  async vincularExistente(barbeariaId, email) {
+  async vincularFuncionarioExistente(barbeariaId, email) {
     try {
       const response = await api.post(`/api/funcionarios/barbearia/${barbeariaId}/vincular`, {
         funcionarioEmail: email
