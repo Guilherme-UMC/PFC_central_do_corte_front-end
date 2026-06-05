@@ -8,6 +8,7 @@ import HorarioService, { DIAS_SEMANA, HORARIOS_PADRAO } from '../services/Horari
 import StatusBadge from '../components/StatusBadge';
 import Loader from '../components/Loader';
 import CadastroBarbearia from '../components/CadastroBarbearia';
+import Dashboard from './DashboardPage';
 import { formatarDataHora, formatarData, isHoje } from '../utils/dateUtils';
 
 const IconEdit = () => (
@@ -435,6 +436,13 @@ const BarbeariaPage = ({ onNavigate }) => {
             className={`tab-btn ${activeTab === 'horarios' ? 'active' : ''}`} 
             onClick={() => setActiveTab('horarios')}
           >Horários</button>
+          {/* NOVA TAB: DASHBOARD */}
+          <button 
+            className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('dashboard')}
+          >
+            📊 Dashboard
+          </button>
         </div>
 
         <div className="page-content">
@@ -615,6 +623,11 @@ const BarbeariaPage = ({ onNavigate }) => {
                 })
               )}
             </div>
+          )}
+
+          {/* TAB: DASHBOARD */}
+          {activeTab === 'dashboard' && (
+            <Dashboard barbeariaId={selectedBarbearia?.id} />
           )}
 
           {/* TAB: SERVIÇOS */}
