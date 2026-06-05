@@ -1,6 +1,6 @@
-// src/components/Footer.jsx - VERSÃO REACT ROUTER DOM
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../styles/components/footer.css';
 
 const IconWhatsApp = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">

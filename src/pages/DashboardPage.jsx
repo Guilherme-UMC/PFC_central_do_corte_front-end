@@ -5,7 +5,7 @@ import DashboardService from '../services/DashboardService';
 import DashboardCard from '../components/DashboardCard';
 import ChartBar from '../components/ChartBar';
 import Loader from '../components/Loader';
-import '../styles/Dashboard.css';
+import '../styles/pages/dashboard.css';
 
 const IconCalendar = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24">

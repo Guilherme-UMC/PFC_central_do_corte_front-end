@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
 import AgendamentoService from '../services/AgendamentoService';
 import NovoAgendamento from './NovoAgendamento';
-import '../styles/Cliente.css';
+import '../styles/pages/cliente.css'; 
 import { formatarDataHora, formatarHora } from '../utils/dateUtils';
 
 const proximoDia = (iso) => {
@@ -33,7 +33,6 @@ const NAV_ITEMS = [
   { id: 'perfil',     icon: '◉',  label: 'Meu Perfil' },
 ];
 
-// Funções auxiliares para status (agora em português)
 const getStatusLabel = (status) => {
   const labels = {
     'Aguardando confirmação': 'Aguardando confirmação',
@@ -72,14 +71,13 @@ function TabelaAgendamentos({ agendamentos, loading, onNovoAgendamento, onCancel
   const [selectedAgendamento, setSelectedAgendamento] = useState(null);
   const [motivoCancelamento, setMotivoCancelamento] = useState('');
 
-  // Verifica se o cliente pode cancelar (aguardando confirmação e com mais de 2 horas de antecedência)
   const podeCancelar = (dataHora, status) => {
     if (status !== 'Aguardando confirmação') return false;
     
     const agora = new Date();
     const dataAgendamento = new Date(dataHora);
     const diffHoras = (dataAgendamento - agora) / (1000 * 60 * 60);
-    return diffHoras >= 2;
+    return diffHoras >= 24;
   };
 
   const handleCancelarClick = (agendamento) => {
@@ -113,11 +111,10 @@ function TabelaAgendamentos({ agendamentos, loading, onNovoAgendamento, onCancel
   if (!agendamentos.length) {
     return (
       <div className="dc-table-empty">
-        <div style={{ fontSize: 36, marginBottom: 12 }}>✂️</div>
+        <div>✂️</div>
         <p>Você ainda não tem agendamentos.</p>
         <button
           className="btn-primary"
-          style={{ marginTop: 16 }}
           onClick={onNovoAgendamento}
         >
           Agendar agora
@@ -148,10 +145,10 @@ function TabelaAgendamentos({ agendamentos, loading, onNovoAgendamento, onCancel
               return (
                 <tr key={ag.id}>
                   <td>
-                    <div style={{ fontWeight: 600 }}>{formatarDataHora(ag.dataHora)}</div>
+                    <div>{formatarDataHora(ag.dataHora)}</div>
                   </td>
                    <td>{ag.barbearia?.nome ?? ag.barbeariaNome ?? '—'}</td>
-                  <td style={{ color: 'var(--corte-text-muted)' }}>
+                  <td>
                     {Array.isArray(ag.servicos)
                       ? ag.servicos.map((s) => s.nome).join(', ')
                       : ag.servicoNome ?? '—'}
@@ -373,7 +370,7 @@ if (abaAtiva === 'agendar') {
         <div className="dc-user-card">
           <div className="dc-avatar">
             {user?.fotoPerfil
-              ? <img src={user.fotoPerfil} alt={user.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+              ? <img src={user.fotoPerfil} alt={user.name} />
               : obterIniciais(user?.name)}
           </div>
           <div className="dc-user-info">
@@ -439,26 +436,15 @@ if (abaAtiva === 'agendar') {
           )}
 
           {abaAtiva === 'barbearias' && (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--corte-text-muted)' }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>📍</div>
-              <p style={{ fontSize: 15, marginBottom: 20 }}>
+            <div>
+              <div>📍</div>
+              <p>
                 Para ver as barbearias, inicie um novo agendamento.
               </p>
               <button
                 className="btn-primary"
                 onClick={() => setAbaAtiva('agendar')}
-                style={{
-                  background: 'var(--corte-gold)',
-                  color: '#0f0f0f',
-                  border: 'none',
-                  padding: '12px 28px',
-                  borderRadius: 'var(--corte-radius-sm)',
-                  fontSize: 14,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                }}
+
               >
                 Novo Agendamento
               </button>
@@ -466,10 +452,10 @@ if (abaAtiva === 'agendar') {
           )}
 
           {abaAtiva === 'perfil' && (
-            <div style={{ color: 'var(--corte-text-muted)', fontSize: 14 }}>
-              <p>👤 Nome: <strong style={{ color: 'var(--corte-text)' }}>{user?.name}</strong></p>
-              <p style={{ marginTop: 10 }}>📧 Email: <strong style={{ color: 'var(--corte-text)' }}>{user?.email}</strong></p>
-              <p style={{ marginTop: 24, color: 'var(--corte-text-muted)', fontSize: 12 }}>
+            <div>
+              <p>👤 Nome: <strong>{user?.name}</strong></p>
+              <p>📧 Email: <strong>{user?.email}</strong></p>
+              <p>
                 Edição de perfil em breve.
               </p>
             </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles/components/dashboard-card.css';
 
 const DashboardCard = ({ title, value, icon, color, subtitle, onClick }) => {
   return (

@@ -3,6 +3,7 @@ import { useAuthContext } from '../contexts/AuthContext';
 import AdminService from '../services/AdminService';
 import BarbeariaService from '../services/BarbeariaService';
 import Loader from '../components/Loader';
+import '../styles/pages/admin.css';
 
 const IconEdit = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M17 3l4 4-7 7H10v-4l7-7z" /><path d="M4 20h16" /></svg>);
 const IconTrash = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><polyline points="3 6 5 6 21 6" /><path d="M8 6V4h8v2" /><rect x="10" y="11" width="4" height="8" /></svg>);
@@ -175,21 +176,21 @@ const AdminPage = ({ onNavigate }) => {
             <div>
               <div className="section-header-actions">
                 <h3>Gerenciar Usuários</h3>
-                <button className="btn-primary small" onClick={() => setShowUserForm(true)}>
-                  <IconPlus /> Novo Usuário
-                </button>
-              </div>
 
-              {/* Barra de busca */}
-              <div className="search-bar">
-                <input
-                  type="text"
-                  placeholder="Buscar por nome..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
-                />
-                <button className="btn-clear" onClick={() => setSearchTerm('')}>Limpar</button>
+                {/* Barra de busca */}
+                <div className="search-bar">
+                  <input
+                    type="text"
+                    placeholder="Buscar por nome..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="search-input"
+                  />
+                  <button className="btn-clear" onClick={() => setSearchTerm('')}>Limpar</button>
+                  <button className="btn-user" onClick={() => setShowUserForm(true)}>
+                    <IconPlus /> Novo Usuário
+                  </button>
+                </div>
               </div>
 
               {/* Filtros */}
@@ -386,7 +387,7 @@ const AdminPage = ({ onNavigate }) => {
                         </td>
                         <td className="table-actions">
                           <button
-                            className="btn-action btn-warning"
+                            className="btn-action btn-cancelar"
                             onClick={() => handleToggleBarbeariaStatus(b.id)}
                           >
                             Alternar Status
@@ -424,11 +425,11 @@ const AdminPage = ({ onNavigate }) => {
             </p>
 
             <div className="modal-actions">
-              <button className="btn-secondary" onClick={() => setShowConfirmModal(false)}>
+              <button className="btn-cancelar" onClick={() => setShowConfirmModal(false)}>
                 Cancelar
               </button>
               <button
-                className={actionType === 'delete' ? 'btn-danger' : 'btn-warning'}
+                className={actionType === 'delete' ? 'btn-danger' : 'btn-warning'} className="btn-danger"
                 onClick={handleConfirmAction}
               >
                 {actionType === 'toggle'
@@ -440,177 +441,6 @@ const AdminPage = ({ onNavigate }) => {
           </div>
         </div>
       )}
-
-      <style>{`
-        .search-bar {
-          display: flex;
-          gap: 10px;
-          margin-bottom: 16px;
-        }
-        
-        .search-input {
-          flex: 1;
-          padding: 8px 12px;
-          border: 1px solid var(--corte-border);
-          border-radius: 8px;
-          background: var(--corte-surface);
-          color: var(--corte-text);
-        }
-        
-        .btn-clear {
-          padding: 8px 16px;
-          background: var(--corte-surface);
-          border: 1px solid var(--corte-border);
-          border-radius: 8px;
-          color: var(--corte-text-muted);
-          cursor: pointer;
-        }
-        
-        .filter-buttons {
-          display: flex;
-          gap: 10px;
-          margin-bottom: 20px;
-          flex-wrap: wrap;
-        }
-        
-        .role-filters {
-          margin-bottom: 20px;
-          padding-bottom: 10px;
-          border-bottom: 1px solid var(--corte-border);
-        }
-        
-        .filter-btn {
-          background: var(--corte-surface);
-          border: 1px solid var(--corte-border);
-          color: var(--corte-text-muted);
-          padding: 6px 16px;
-          border-radius: 20px;
-          cursor: pointer;
-          font-size: 13px;
-          transition: all 0.2s;
-        }
-        
-        .filter-btn:hover {
-          border-color: var(--corte-gold);
-          color: var(--corte-gold);
-        }
-        
-        .filter-btn.active {
-          background: var(--corte-gold);
-          border-color: var(--corte-gold);
-          color: #0f0f0f;
-        }
-        
-        .table-actions {
-          display: flex;
-          gap: 8px;
-          flex-wrap: wrap;
-        }
-        
-        .btn-action {
-          padding: 4px 10px;
-          border-radius: 4px;
-          font-size: 11px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-          border: none;
-        }
-        
-        .btn-success {
-          background: #2e7d32;
-          color: white;
-        }
-        
-        .btn-warning {
-          background: #ed6c02;
-          color: white;
-        }
-        
-        .btn-danger {
-          background: #d32f2f;
-          color: white;
-        }
-        
-        .pagination {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 16px;
-          margin-top: 24px;
-          padding-top: 16px;
-          border-top: 1px solid var(--corte-border);
-        }
-        
-        .pagination-btn {
-          padding: 6px 12px;
-          background: var(--corte-surface);
-          border: 1px solid var(--corte-border);
-          border-radius: 6px;
-          color: var(--corte-text);
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-        
-        .pagination-btn:hover:not(:disabled) {
-          border-color: var(--corte-gold);
-          color: var(--corte-gold);
-        }
-        
-        .pagination-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-        
-        .pagination-info {
-          color: var(--corte-text-muted);
-          font-size: 14px;
-        }
-        
-        .confirm-modal {
-          max-width: 450px;
-        }
-        
-        .confirm-info {
-          background: var(--corte-bg-tertiary);
-          padding: 12px;
-          border-radius: 8px;
-          margin-bottom: 16px;
-        }
-        
-        .confirm-info p {
-          margin: 4px 0;
-          font-size: 13px;
-        }
-        
-        .confirm-message {
-          margin-bottom: 20px;
-          padding: 12px;
-          background: rgba(237, 108, 2, 0.1);
-          border-radius: 8px;
-          color: var(--corte-gold);
-          font-weight: 500;
-        }
-        
-        .status-active {
-          color: #4caf50;
-          font-weight: 600;
-        }
-        
-        .status-inactive {
-          color: #f44336;
-          font-weight: 600;
-        }
-
-        .badge-removido {
-  background: #555;
-  color: #ccc;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-}
-      `}</style>
     </div>
   );
 };

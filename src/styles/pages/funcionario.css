@@ -1,0 +1,27 @@
+.page-funcionario .barbearia-info {
+  background: var(--corte-card-bg);
+  padding: 16px 20px;
+  border-radius: var(--corte-radius-md);
+  margin-bottom: 24px;
+  border-left: 4px solid var(--corte-gold);
+}
+.page-funcionario .barbearia-info h3 { margin: 0 0 8px 0; font-size: 18px; }
+.page-funcionario .barbearia-endereco,
+.page-funcionario .barbearia-telefone {
+  margin: 4px 0;
+  font-size: 14px;
+  color: var(--corte-text-muted);
+}
+.page-funcionario .today-card { border-left: 3px solid var(--corte-gold); background: rgba(201, 168, 76, 0.03); }
+.page-funcionario .empty-agendamentos {
+  text-align: center;
+  padding: 40px;
+  color: var(--corte-text-muted);
+}
+.status-pending-msg {
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: var(--corte-radius-sm);
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+}

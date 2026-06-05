@@ -115,14 +115,16 @@ const SignupBarbearia = () => {
           </button>
         </form>
 
-        <p className="auth-link">
+        <div className="auth-link">
+          <p>
           Ja e proprietario?
           <a href="#" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>Fazer Login</a>
         </p>
-        <p className="auth-link">
+        <p>
           Quer ser cliente?
           <a href="#" onClick={(e) => { e.preventDefault(); navigate('/signup'); }}>Cadastrar como Cliente</a>
         </p>
+        </div>
       </div>
     </div>
   );

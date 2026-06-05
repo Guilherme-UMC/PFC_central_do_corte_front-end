@@ -3,6 +3,7 @@ import { useAuthContext } from '../contexts/AuthContext';
 import UserService from '../services/UserService';
 import Loader from '../components/Loader';
 import PasswordInput from '../components/PasswordInput';
+import '../styles/pages/perfil.css';
 
 const Perfil = ({ onNavigate }) => {
   const { user, logout } = useAuthContext();

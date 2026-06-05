@@ -10,6 +10,7 @@ import Loader from '../components/Loader';
 import CadastroBarbearia from '../components/CadastroBarbearia';
 import Dashboard from './DashboardPage';
 import { formatarDataHora, formatarData, isHoje } from '../utils/dateUtils';
+import '../styles/pages/barbearia.css';
 
 const IconEdit = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
@@ -81,17 +82,14 @@ const BarbeariaPage = ({ onNavigate }) => {
     }
   };
 
-  // FUNÇÃO MODIFICADA - Limpa os estados antes de recarregar
   const carregarDadosBarbearia = async (barbeariaId) => {
     console.log('🔄 Recarregando dados da barbearia...');
     
-    // Limpar os estados primeiro para forçar atualização visual
     setAgendamentos([]);
     setAgendamentosHoje([]);
     setServicos([]);
     setFuncionarios([]);
     
-    // Aguardar todas as requisições
     await Promise.all([
       carregarAgendamentos(barbeariaId),
       carregarAgendamentosHoje(barbeariaId),
@@ -144,7 +142,6 @@ const BarbeariaPage = ({ onNavigate }) => {
     setActiveTab('agendamentos');
   };
 
-  // FUNÇÕES DE AÇÃO DOS AGENDAMENTOS
   const handleCancelarAgendamento = async (agendamentoId) => {
     const motivo = prompt('Informe o motivo do cancelamento:');
     if (!motivo || !motivo.trim()) return;
@@ -542,7 +539,7 @@ const BarbeariaPage = ({ onNavigate }) => {
               {agendamentosHoje.length === 0 ? (
                 <div className="empty-state-small">
                   <p>Nenhum agendamento para hoje.</p>
-                  <p style={{ fontSize: '14px', marginTop: '8px', color: 'var(--corte-text-muted)' }}>
+                  <p>
                     Aproveite para organizar a agenda!
                   </p>
                 </div>
@@ -748,9 +745,9 @@ const BarbeariaPage = ({ onNavigate }) => {
 
               {showHorarioForm && (
                 <div className="modal-overlay">
-                  <div className="modal-content" style={{ maxWidth: '600px' }}>
+                  <div className="modal-content">
                     <h3>Editar Horários de Funcionamento</h3>
-                    <p className="text-muted" style={{ fontSize: '13px', marginBottom: '20px' }}>
+                    <p className="text-muted">
                       Configure os horários de funcionamento para cada dia da semana
                     </p>
                     
@@ -880,169 +877,6 @@ const BarbeariaPage = ({ onNavigate }) => {
           )}
         </div>
       </div>
-
-<style>{`
-  .barbearia-info-card {
-    background-color: rgba(17, 17, 17, 0.85);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 24px;
-    border: 1px solid var(--corte-border);
-    transition: all 0.2s ease;
-    border-left: 3px solid var(--corte-gold);
-    position: relative;
-  }
-  
-  .barbearia-info-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  
-  .barbearia-info-nome {
-    margin: 0 0 8px 0;
-    font-size: 22px;
-    color: var(--corte-text);
-  }
-  
-  .barbearia-info-desc {
-    margin: 0;
-    color: var(--corte-text-muted);
-    font-size: 14px;
-  }
-  
-  .barbearia-info-details {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-top: 12px;
-    border-top: 1px solid var(--corte-border);
-  }
-  
-  .info-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: var(--corte-text-muted);
-  }
-  
-  .info-icon {
-    font-size: 16px;
-    min-width: 24px;
-  }
-  
-  .tab-count {
-    background: var(--corte-gold);
-    color: #0f0f0f;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 20px;
-    margin-left: 8px;
-  }
-  
-  .tab-count.today {
-    background: #2e7d32;
-    color: white;
-  }
-  
-  .today-header {
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid var(--corte-gold);
-  }
-  
-  .today-date {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--corte-text);
-  }
-  
-  .today-card {
-    border-left: 4px solid var(--corte-gold);
-  }
-  
-  .empty-state-small {
-    text-align: center;
-    padding: 40px;
-    color: var(--corte-text-muted);
-  }
-  
-  .status-cancelled {
-    font-size: 13px;
-    padding: 6px 12px;
-    border-radius: var(--corte-radius-sm);
-    background: rgba(244, 67, 54, 0.1);
-    color: #f44336;
-  }
-  
-  .status-finished {
-    font-size: 13px;
-    padding: 6px 12px;
-    border-radius: var(--corte-radius-sm);
-    background: rgba(76, 175, 80, 0.1);
-    color: #4caf50;
-  }
-  
-  .agendamento-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--corte-border);
-    flex-wrap: wrap;
-  }
-  
-  .btn-success.small, .btn-primary.small, .btn-danger.small {
-    padding: 6px 14px;
-    font-size: 12px;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-  }
-  
-  .btn-success.small {
-    background: #2e7d32;
-    color: white;
-  }
-  
-  .btn-success.small:hover:not(:disabled) {
-    background: #1b5e20;
-    transform: translateY(-1px);
-  }
-  
-  .btn-primary.small {
-    background: var(--corte-gold);
-    color: #0f0f0f;
-  }
-  
-  .btn-primary.small:hover:not(:disabled) {
-    background: var(--corte-gold-light);
-    transform: translateY(-1px);
-  }
-  
-  .btn-danger.small {
-    background: #c62828;
-    color: white;
-  }
-  
-  .btn-danger.small:hover:not(:disabled) {
-    background: #b71c1c;
-    transform: translateY(-1px);
-  }
-  
-  button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-`}</style>
     </div>
   );
 };

@@ -1,0 +1,101 @@
+.barbearia-detalhes .barbearia-detalhes-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+.barbearia-detalhes .btn-voltar {
+   position: absolute;
+  left: 4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 1px solid var(--gray);
+  border-radius: 999px;
+  padding: 0.8rem 1.2rem;
+  font-weight: 600;
+  color: var(--white);
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 100;
+}
+.barbearia-detalhes-header {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--corte-border);
+}
+.barbearia-detalhes-header img,
+.barbearia-detalhes-header .placeholder-img {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--corte-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+}
+
+.barberia-dados{
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5rem;
+}
+.btn-agendar-principal {
+  background: var(--blue);
+  color: var(--white);
+  border: none;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1.5rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--corte-border);
+  margin-bottom: 2rem;
+}
+.tabs button {
+  background: none;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  color: var(--corte-text-muted);
+  cursor: pointer;
+  font-weight: 500;
+}
+.tabs button.active {
+  color: var(--white);
+  border-bottom: 3px solid var(--blue);
+  background: linear-gradient(
+    to top,
+    var(--blue),
+    transparent
+  );
+}
+h1{
+  font-size: 1.5rem;
+  margin: 1rem 0;
+}
+
+.servicos-lista, .funcionarios-lista, .horarios-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.servico-card, .funcionario-card, .horario-item {
+  background: var(--corte-surface);
+  border: 1px solid var(--corte-border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+.servico-card h4 { margin: 0 0 0.5rem 0; }
+.servico-card > div { display: flex; justify-content: space-between; margin-top: 0.5rem; }
+.funcionario-card { display: flex; gap: 1rem; align-items: center; }
+.funcionario-card .avatar { font-size: 32px; }
+.horario-item { display: flex; justify-content: space-between; }

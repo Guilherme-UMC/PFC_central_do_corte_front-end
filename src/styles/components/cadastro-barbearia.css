@@ -1,0 +1,28 @@
+.cadastro-barbearia .btn-cancel {
+  background: transparent;
+  border: 1px solid var(--gray2);
+  color: var(--white);
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.cadastro-barbearia .btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--white);
+}
+
+/* Ajuste para os botões em linha */
+.cadastro-barbearia .form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cadastro-barbearia .form-actions .btn-primary,
+.cadastro-barbearia .form-actions .btn-cancel {
+  flex: 1;
+}

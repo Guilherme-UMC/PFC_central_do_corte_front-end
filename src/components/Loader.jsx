@@ -1,5 +1,5 @@
-// src/components/Loader.jsx
 import React from 'react';
+import '../styles/components/loader.css';
 
 const Loader = ({ size = 40, color = '#1a1a1a' }) => {
   return (

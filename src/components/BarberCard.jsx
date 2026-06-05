@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../contexts/AuthContext';
+import '../styles/components/barber-card.css';
 
 const IconWhatsApp = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
@@ -61,9 +62,9 @@ const BarberCard = ({ barbearia, onAgendarClick, isLoggedIn }) => {
 
         <p className="barber-card__addr">
           <span><IconPin /> {barbearia.logradouro}{barbearia.numero ? `, ${barbearia.numero}` : ''}</span>
-          {barbearia.bairro && <span style={{ paddingLeft: '18px' }}>{barbearia.bairro}</span>}
-          <span style={{ paddingLeft: '18px' }}>{barbearia.cidade} - {barbearia.uf}</span>
-          {barbearia.cep && <span style={{ paddingLeft: '18px' }}>CEP: {barbearia.cep}</span>}
+          {barbearia.bairro && <span>{barbearia.bairro}</span>}
+          <span>{barbearia.cidade} - {barbearia.uf}</span>
+          {barbearia.cep && <span>CEP: {barbearia.cep}</span>}
         </p>
 
         {barbearia.telefone && (

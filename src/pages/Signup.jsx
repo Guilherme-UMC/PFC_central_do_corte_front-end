@@ -120,14 +120,15 @@ const Signup = () => {
           </button>
         </form>
 
-        <p className="auth-link">
-          Ja tem conta?
+        <div className="auth-link">
+          <p>Ja tem conta?
           <a href="#" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>Fazer Login</a>
         </p>
-        <p className="auth-link">
+        <p>
           E proprietario?
           <a href="#" onClick={(e) => { e.preventDefault(); navigate('/signup-barbearia'); }}>Cadastrar Barbearia</a>
         </p>
+        </div>
       </div>
     </div>
   );

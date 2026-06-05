@@ -28,14 +28,12 @@ const ChartPie = ({ data, labels, title, colors }) => {
       const sliceAngle = (data[i] / total) * Math.PI * 2;
       const endAngle = startAngle + sliceAngle;
       
-      // Desenhar fatia
       ctx.beginPath();
       ctx.fillStyle = (colors && colors[i]) || defaultColors[i % defaultColors.length];
       ctx.moveTo(centerX, centerY);
       ctx.arc(centerX, centerY, radius, startAngle, endAngle);
       ctx.fill();
       
-      // Linha de contorno
       ctx.strokeStyle = '#1a1a2e';
       ctx.lineWidth = 2;
       ctx.stroke();
@@ -43,7 +41,6 @@ const ChartPie = ({ data, labels, title, colors }) => {
       startAngle = endAngle;
     }
     
-    // Título
     ctx.fillStyle = '#f0ece4';
     ctx.font = 'bold 14px DM Sans';
     ctx.fillText(title, 10, 25);

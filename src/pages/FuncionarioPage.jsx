@@ -5,6 +5,7 @@ import FuncionarioService from '../services/FuncionarioService';
 import StatusBadge from '../components/StatusBadge';
 import Loader from '../components/Loader';
 import { formatarDataHora } from '../utils/dateUtils';
+import '../styles/pages/funcionario.css';
 
 const FuncionarioPage = () => {
   const { user, logout } = useAuthContext();
@@ -69,9 +70,7 @@ const FuncionarioPage = () => {
     setSelectedBarbearia(barbearia);
   };
 
-  // FUNÇÃO CORRIGIDA PARA CONCLUIR AGENDAMENTO
   const handleConcluirAgendamento = async (agendamentoId, e) => {
-    // Prevenir propagação do evento e comportamento padrão
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -87,7 +86,6 @@ const FuncionarioPage = () => {
 
       if (result.success) {
         showMessage('success', 'Atendimento concluído com sucesso!');
-        // Recarregar os agendamentos após concluir
         await carregarAgendamentos();
       } else {
         showMessage('error', result.message || 'Erro ao concluir atendimento');
@@ -124,7 +122,7 @@ const FuncionarioPage = () => {
         {barbearias.length === 0 ? (
           <div className="empty-state">
             <p>Você ainda não está vinculado a nenhuma barbearia.</p>
-            <p style={{ fontSize: '14px', marginTop: '8px', color: 'var(--corte-text-muted)' }}>
+            <p>
               Solicite ao proprietário da barbearia que vincule seu email.
             </p>
           </div>
@@ -196,7 +194,7 @@ const FuncionarioPage = () => {
                 <div className="empty-agendamentos">
                   <p>Nenhum agendamento para você nesta barbearia.</p>
                   {activeTab === 'hoje' && (
-                    <p style={{ fontSize: '14px', marginTop: '8px', color: 'var(--corte-text-muted)' }}>
+                    <p>
                       Você não tem atendimentos agendados para hoje.
                     </p>
                   )}
@@ -266,118 +264,6 @@ const FuncionarioPage = () => {
           </>
         )}
       </div>
-
-      <style>{`
-        .barbearia-info {
-          background: var(--corte-card-bg);
-          padding: 16px 20px;
-          border-radius: var(--corte-radius-md);
-          margin-bottom: 24px;
-          border-left: 4px solid var(--corte-gold);
-        }
-        
-        .barbearia-info h3 {
-          margin: 0 0 8px 0;
-          font-size: 18px;
-        }
-        
-        .barbearia-endereco, .barbearia-telefone {
-          margin: 4px 0;
-          font-size: 14px;
-          color: var(--corte-text-muted);
-        }
-        
-        .badge-count {
-          background: var(--corte-gold);
-          color: #0f0f0f;
-          font-size: 11px;
-          font-weight: 600;
-          padding: 2px 6px;
-          border-radius: 20px;
-          margin-left: 8px;
-        }
-        
-        .tab-count {
-          background: var(--corte-gold);
-          color: #0f0f0f;
-          font-size: 11px;
-          font-weight: 600;
-          padding: 2px 6px;
-          border-radius: 20px;
-          margin-left: 8px;
-        }
-        
-        .tab-count.today {
-          background: #2e7d32;
-          color: white;
-        }
-        
-        .today-card {
-          border-left: 3px solid var(--corte-gold);
-          background: rgba(201, 168, 76, 0.03);
-        }
-        
-        .empty-agendamentos {
-          text-align: center;
-          padding: 40px;
-          color: var(--corte-text-muted);
-        }
-        
-        .status-cancelled, .status-finished, .status-pending-msg {
-          font-size: 13px;
-          padding: 6px 12px;
-          border-radius: var(--corte-radius-sm);
-          background: var(--corte-bg-tertiary);
-          color: var(--corte-text-muted);
-        }
-        
-        .status-finished {
-          color: #4caf50;
-          background: rgba(76, 175, 80, 0.1);
-        }
-        
-        .status-cancelled {
-          color: #f44336;
-          background: rgba(244, 67, 54, 0.1);
-        }
-        
-        .status-pending-msg {
-          color: #ff9800;
-          background: rgba(255, 152, 0, 0.1);
-        }
-        
-        .agendamento-actions {
-          display: flex;
-          gap: 10px;
-          margin-top: 12px;
-          padding-top: 12px;
-          border-top: 1px solid var(--corte-border);
-          flex-wrap: wrap;
-        }
-        
-        .btn-primary.small {
-          background: var(--corte-gold);
-          color: #0f0f0f;
-          border: none;
-          padding: 6px 14px;
-          font-size: 12px;
-          border-radius: 6px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-        
-        .btn-primary.small:hover:not(:disabled) {
-          background: var(--corte-gold-light);
-          transform: translateY(-1px);
-        }
-        
-        button:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-          transform: none;
-        }
-      `}</style>
     </div>
   );
 };
