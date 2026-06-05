@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ViaCepService from '../services/ViaCepService';
 import BarbeariaService from '../services/BarbeariaService';
+import '../styles/components/cadastro-barbearia.css';
 
 const IconArrowLeft = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
@@ -312,13 +313,12 @@ function CadastroBarbearia({ onSuccess, onCancel, editingData }) {
                             value={formData.descricao}
                             onChange={handleChange}
                             rows={3}
-                            style={{ resize: 'vertical' }}
                         />
                     </div>
 
                     <div className="form-group">
                         <label className="form-label">CEP *</label>
-                        <div style={{ position: 'relative' }}>
+                        <div>
                             <input
                                 className="form-input"
                                 type="text"
@@ -331,26 +331,12 @@ function CadastroBarbearia({ onSuccess, onCancel, editingData }) {
                                 required
                             />
                             {loadingCep && (
-                                <span style={{ 
-                                    position: 'absolute', 
-                                    right: '12px', 
-                                    top: '50%', 
-                                    transform: 'translateY(-50%)',
-                                    fontSize: '12px',
-                                    color: 'var(--gray)'
-                                }}>
+                                <span >
                                     Buscando...
                                 </span>
                             )}
                             {!cepManual && formData.logradouro && !loadingCep && (
-                                <span style={{ 
-                                    position: 'absolute', 
-                                    right: '12px', 
-                                    top: '50%', 
-                                    transform: 'translateY(-50%)',
-                                    fontSize: '12px',
-                                    color: '#4c9aff'
-                                }}>
+                                <span>
                                     ✓ Encontrado
                                 </span>
                             )}
@@ -370,8 +356,8 @@ function CadastroBarbearia({ onSuccess, onCancel, editingData }) {
                         />
                     </div>
 
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <div className="form-group" style={{ flex: 1 }}>
+                    <div>
+                        <div className="form-group">
                             <label className="form-label">Número *</label>
                             <input
                                 className="form-input"
@@ -384,7 +370,7 @@ function CadastroBarbearia({ onSuccess, onCancel, editingData }) {
                             />
                         </div>
 
-                        <div className="form-group" style={{ flex: 1 }}>
+                        <div className="form-group">
                             <label className="form-label">Complemento</label>
                             <input
                                 className="form-input"
@@ -410,8 +396,8 @@ function CadastroBarbearia({ onSuccess, onCancel, editingData }) {
                         />
                     </div>
 
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <div className="form-group" style={{ flex: 2 }}>
+                    <div >
+                        <div className="form-group">
                             <label className="form-label">Cidade *</label>
                             <input
                                 className="form-input"
@@ -424,7 +410,7 @@ function CadastroBarbearia({ onSuccess, onCancel, editingData }) {
                             />
                         </div>
 
-                        <div className="form-group" style={{ flex: 1 }}>
+                        <div className="form-group">
                             <label className="form-label">UF *</label>
                             <input
                                 className="form-input"
@@ -434,7 +420,6 @@ function CadastroBarbearia({ onSuccess, onCancel, editingData }) {
                                 value={formData.uf}
                                 onChange={handleChange}
                                 maxLength={2}
-                                style={{ textTransform: 'uppercase' }}
                                 required
                             />
                         </div>
@@ -463,12 +448,12 @@ function CadastroBarbearia({ onSuccess, onCancel, editingData }) {
                             value={formData.imgUrl}
                             onChange={handleChange}
                         />
-                        <small style={{ color: 'var(--gray)', fontSize: '12px', display: 'block', marginTop: '4px' }}>
+                        <small>
                             Link para foto da barbearia (opcional)
                         </small>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                    <div className='form-actions'>
                         <button
                             type="submit"
                             className="btn btn-primary btn-block"
@@ -481,11 +466,6 @@ function CadastroBarbearia({ onSuccess, onCancel, editingData }) {
                                 type="button"
                                 onClick={onCancel}
                                 className="btn"
-                                style={{ 
-                                    background: 'transparent', 
-                                    border: '1px solid var(--gray2)',
-                                    color: 'var(--white)'
-                                }}
                             >
                                 Cancelar
                             </button>

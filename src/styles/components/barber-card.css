@@ -1,0 +1,62 @@
+.barber-card {
+  flex: 0 0 220px;
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+}
+.barber-card__img-wrap { position: relative; }
+.barber-card__img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+.barber-card__wa {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  background: #25D366;
+  border: none;
+  color: var(--white);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.barber-card__wa:hover { transform: scale(1.1); }
+.barber-card__body { padding: 0.75rem; }
+.barber-card__name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.4rem;
+}
+.barber-card__addr {
+  font-size: 0.78rem;
+  color: var(--gray);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+.btn-agendar {
+  width: 100%;
+  background: var(--blue);
+  border: none;
+  color: var(--white);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: background 0.2s;
+  margin-top: 1.5rem;
+}
+.btn-agendar:hover { background: var(--lightblue); }

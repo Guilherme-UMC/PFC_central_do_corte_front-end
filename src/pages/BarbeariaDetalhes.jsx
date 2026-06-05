@@ -6,12 +6,30 @@ import servicoService from '../services/ServicoService';
 import funcionarioService from '../services/FuncionarioService';
 import horarioService, { DIAS_SEMANA } from '../services/HorarioService';
 import Loader from '../components/Loader';
+import '../styles/pages/barbearia-detalhes.css';
+
+const IconTelefone = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+  </svg>
+);
+
+const IconAvatar = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round-icon lucide-user-round"><circle cx="12" cy="8" r="5" /><path d="M20 21a8 8 0 0 0-16 0" /></svg>
+)
+
+const IconArrowLeft = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+    <line x1="19" y1="12" x2="5" y2="12" />
+    <polyline points="12 19 5 12 12 5" />
+  </svg>
+);
 
 const BarbeariaDetalhes = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, isCliente } = useAuthContext();
-  
+
   const [barbearia, setBarbearia] = useState(null);
   const [servicos, setServicos] = useState([]);
   const [funcionarios, setFuncionarios] = useState([]);
@@ -28,13 +46,13 @@ const BarbeariaDetalhes = () => {
     try {
       const barbeariaResult = await barbeariaService.buscarPorId(id);
       if (barbeariaResult.success) setBarbearia(barbeariaResult.data);
-      
+
       const servicosResult = await servicoService.listarPorBarbearia(id);
       if (servicosResult.success) setServicos(servicosResult.data);
-      
+
       const funcionariosResult = await funcionarioService.listarPorBarbearia(id);
       if (funcionariosResult.success) setFuncionarios(funcionariosResult.data);
-      
+
       const horariosResult = await horarioService.getHorarios(id);
       if (horariosResult.success && horariosResult.data) {
         setHorarios(horariosResult.data);
@@ -60,7 +78,7 @@ const BarbeariaDetalhes = () => {
   return (
     <div className="barbearia-detalhes">
       <div className="barbearia-detalhes-container">
-        <button className="btn-voltar" onClick={() => navigate('/')}>← Voltar</button>
+        <button className="btn-voltar" onClick={() => navigate('/')}><IconArrowLeft/></button>
 
         {/* Cabeçalho */}
         <div className="barbearia-detalhes-header">
@@ -69,11 +87,11 @@ const BarbeariaDetalhes = () => {
           ) : (
             <div className="placeholder-img">✂️</div>
           )}
-          <div>
+          <div className='barberia-dados'>
             <h1>{barbearia.nome}</h1>
             <p>{barbearia.logradouro}, {barbearia.numero} - {barbearia.bairro}</p>
             <p>{barbearia.cidade} - {barbearia.uf} | CEP: {barbearia.cep}</p>
-            {barbearia.telefone && <p>📞 {barbearia.telefone}</p>}
+            {barbearia.telefone && <p> <IconTelefone /> {barbearia.telefone}</p>}
             <button className="btn-agendar-principal" onClick={handleAgendar}>
               AGENDAR
             </button>
@@ -114,7 +132,7 @@ const BarbeariaDetalhes = () => {
             <div className="funcionarios-lista">
               {funcionarios.map(f => (
                 <div key={f.id} className="funcionario-card">
-                  <div className="avatar">💈</div>
+                  <div className="avatar"><IconAvatar/></div>
                   <div>
                     <h4>{f.name}</h4>
                     {f.telefone && <p>{f.telefone}</p>}

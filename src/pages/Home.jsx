@@ -4,6 +4,9 @@ import { useAuthContext } from '../contexts/AuthContext';
 import { useSearch } from '../layouts/RootLayout';
 import barbeariaService from '../services/BarbeariaService';
 import BarberCard from '../components/BarberCard';
+import BarbeariaImg from '../img/cadastre-barbearia.png';
+import ClienteImg from '../img/cadastre-cliente.png';
+import '../styles/pages/home.css';
 
 const IconScissors = ({ size = 36 }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
@@ -99,7 +102,6 @@ const Home = () => {
   const [loadingServicos, setLoadingServicos] = useState(false);
   const sliderRef = useRef(null);
 
-  // Carregar barbearias
   useEffect(() => {
     const carregarBarbearias = async () => {
       try {
@@ -117,7 +119,6 @@ const Home = () => {
     carregarBarbearias();
   }, []);
 
-  // Carregar serviços quando um serviço for selecionado
   useEffect(() => {
     if (!servicoAtivo || barbearias.length === 0) {
       setServicosPorBarbearia({});
@@ -127,7 +128,7 @@ const Home = () => {
     const buscarServicos = async () => {
       setLoadingServicos(true);
       const mapa = {};
-      
+
       await Promise.all(
         barbearias.map(async (b) => {
           try {
@@ -152,25 +153,22 @@ const Home = () => {
     buscarServicos();
   }, [servicoAtivo, barbearias]);
 
-  // Filtrar barbearias
   const barbeariasFiltradas = barbearias
     .map((b) => {
-      // Filtro por texto da busca (nome, cidade, bairro, logradouro, UF ou serviço)
       if (search.trim()) {
         const termo = search.toLowerCase();
         const campos = [b.nome, b.cidade, b.bairro, b.logradouro, b.uf]
           .map(v => (v || '').toLowerCase());
         const textoMatch = campos.some(c => c.includes(termo));
-        
+
         const servicosB = servicosPorBarbearia[b.id] || [];
         const servicoTextoMatch = servicosB.some(s =>
           (s.nome || '').toLowerCase().includes(termo)
         );
-        
+
         if (!textoMatch && !servicoTextoMatch) return null;
       }
 
-      // Filtro por serviço selecionado
       if (servicoAtivo) {
         const servicosB = servicosPorBarbearia[b.id] || [];
         const matches = servicosB.filter(s =>
@@ -189,10 +187,9 @@ const Home = () => {
       setServicoAtivo(null);
     } else {
       setServicoAtivo(key);
-      // Limpar busca textual quando filtrar por serviço
       if (search) setSearch('');
     }
-    
+
     setTimeout(() => {
       document.getElementById('barbearias')?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
@@ -273,7 +270,7 @@ const Home = () => {
             <div className="slider-wrap">
               <div className="cards-slider" ref={sliderRef}>
                 {barbeariasFiltradas.map(b => (
-                  <BarberCard 
+                  <BarberCard
                     key={b.id}
                     barbearia={b}
                     onAgendarClick={handleAgendar}
@@ -320,12 +317,16 @@ const Home = () => {
         <SectionHeader title="AGENDAMENTOS" side="left" />
         <div className="secao">
           <div className="agendamentos-body">
+            <img src={ClienteImg} alt="cadastre-cliente" className='homeImg' />
             <div />
             <div className="agendamentos-right">
               <p>
-                Agende no seu tempo, na sua barbearia<br />
-                favorita e com seu funcionário e serviço de<br />
-                escolha!
+                <strong>Agende com facilidade!</strong><br /></p>
+              <p>
+                Escolha a barbearia, o profissional e o serviço<br />
+                que mais combinam com você.<br />
+                Agende em poucos cliques,
+                no seu tempo <br />e sem complicação!
               </p>
               <button className="btn-virar" onClick={() => navigate('/login')}>
                 VIRAR CLIENTE
@@ -333,13 +334,14 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Cadastro barbearia CTA */}
-      <section className="home-section cadastro-section" id="cadastro">
+      < section className="home-section cadastro-section" id="cadastro" >
         <SectionHeader title="CADASTRE SUA BARBEARIA" />
         <div className="secao">
           <div className="cadastro-body">
+            <img src={BarbeariaImg} alt="cadastre-barbearia" className='homeImg' />
             <div className="cadastro-text">
               <p><strong>Cadastre sua barbearia e aumente seus agendamentos.</strong></p>
               <p>
@@ -355,8 +357,8 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </section>
-    </div>
+      </section >
+    </div >
   );
 };
 

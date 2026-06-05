@@ -21,6 +21,7 @@ import BarbeariaPage from './pages/BarbeariaPage';
 import FuncionarioPage from './pages/FuncionarioPage';
 import AdminPage from './pages/AdminPage';
 import Perfil from './pages/Perfil';
+import DashboardPage from './pages/DashboardPage';
 
 
 import PrivateRoute from './components/PrivateRoute';
@@ -78,6 +79,16 @@ const router = createBrowserRouter([
         ],
       },
       
+      {
+        path: 'page',
+        element: <PrivateRoute allowedRoles={['ROLE_BARBEARIA_ADM', 'ROLE_ADMIN']} />,
+        children: [
+          { path: 'barbearia', element: <BarbeariaPage /> },
+          { path: 'dashboard', element: <DashboardPage /> },  // ← ADICIONE ESTA LINHA
+          { path: 'cadastro-barbearia', element: <CadastroBarbearia /> },
+        ],
+      },
+
       {
         path: 'perfil',
         element: <PrivateRoute />,

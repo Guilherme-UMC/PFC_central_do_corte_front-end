@@ -6,7 +6,7 @@ import {
   listarFuncionarios,
   criarAgendamento,
 } from '../services/NovoAgendamentoService';
-import '../styles/NovoAgendamento.css';
+import '../styles/pages/novo-agendamento.css';
 
 const STEPS = [
   { id: 1, label: 'Barbearia' },
@@ -48,7 +48,6 @@ const agruparHorarios = (horarios) => {
   return grupos;
 };
 
-// Stepper corrigido
 function Stepper({ currentStep }) {
   return (
     <div className="stepper">

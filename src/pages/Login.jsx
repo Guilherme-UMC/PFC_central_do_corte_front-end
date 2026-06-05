@@ -86,13 +86,11 @@ const Login = () => {
           </button>
         </form>
 
-        <p className="auth-link">
-          Nao tem conta?
-          <Link to="/signup">Criar Conta</Link>
-        </p>
-        <p className="auth-link">
-          <Link to="/esqueci-senha">Esqueci minha senha</Link>
-        </p>
+        <div className="auth-link">
+          <p>Não tem conta?
+          <Link to="/signup">Criar Conta</Link></p>
+          <p>Esqueceu sua senha?<Link to="/esqueci-senha">Recuperar</Link></p>
+        </div>
       </div>
     </div>
   );

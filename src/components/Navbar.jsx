@@ -4,7 +4,7 @@ import { useAuthContext } from '../contexts/AuthContext';
 import BuscaGlobal from '../components/BuscaGlobal';
 import BuscaService from '../services/BuscaService';
 import { debounce } from '../utils/helpers';
-import '../styles/Busca.css';
+import '../styles/components/navbar.css';
 
 const IconUser = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
@@ -66,7 +66,6 @@ const Navbar = ({ search, onSearchChange }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Sincronizar com o search do RootLayout quando mudar
   useEffect(() => {
     if (search !== undefined && search !== localSearch) {
       setLocalSearch(search);
@@ -87,7 +86,6 @@ const Navbar = ({ search, onSearchChange }) => {
   };
 
   const handleSearchBlur = () => {
-    // Delay para permitir clique no dropdown
     setTimeout(() => {
       setShowBuscaDropdown(false);
     }, 200);
@@ -114,7 +112,6 @@ const Navbar = ({ search, onSearchChange }) => {
   const goToSection = (sectionId) => {
     setMenuOpen(false);
     setShowBuscaDropdown(false);
-    // Se não estiver na home, navega primeiro
     if (location.pathname !== '/') {
       navigate('/');
       setTimeout(() => {

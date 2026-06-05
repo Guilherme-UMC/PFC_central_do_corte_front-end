@@ -1,0 +1,27 @@
+.perfil-page .perfil-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 1.5rem;
+}
+.perfil-card {
+  background: rgba(17, 17, 17, 0.85);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--corte-border);
+}
+.perfil-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--corte-border);
+}
+.perfil-card .profile-info p {
+  margin: 0.75rem 0;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+}
+.logout-card { text-align: center; }
+.logout-card button { width: 100%; }
