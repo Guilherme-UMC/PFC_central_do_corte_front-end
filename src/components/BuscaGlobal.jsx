@@ -11,6 +11,16 @@ const IconSearch = () => (
     </svg>
 );
 
+const IconCorte = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scissors-icon lucide-scissors"><circle cx="6" cy="6" r="3" /><path d="M8.12 8.12 12 12" /><path d="M20 4 8.12 15.88" /><circle cx="6" cy="18" r="3" /><path d="M14.8 14.8 20 20" /></svg>)
+const IconTelefone = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-icon lucide-phone"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" /></svg>
+)
+
+const IconLocal = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-icon lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>)
+
+const IconBarber = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store-icon lucide-store"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5" /><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244" /><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05" /></svg>)
+
+
 const BuscaGlobal = ({ termo, onClose, isOpen, onNavigate }) => {
     const [resultados, setResultados] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -87,9 +97,9 @@ const BuscaGlobal = ({ termo, onClose, isOpen, onNavigate }) => {
             <div className="busca-dropdown-header">
                 <IconSearch />
                 <span>
-                    {resultados?.tipo === 'cep' && '📍 '}
-                    {resultados?.tipo === 'localizacao' && '🏙️ '}
-                    {resultados?.tipo === 'nome' && '✂️ '}
+                    {resultados?.tipo === 'cep' && ''}
+                    {resultados?.tipo === 'localizacao' && ''}
+                    {resultados?.tipo === 'nome' && ''}
                     {isLoading ? 'Buscando...' : `${total} resultado${total !== 1 ? 's' : ''} para "${termo}"`}
                 </span>
             </div>
@@ -102,7 +112,7 @@ const BuscaGlobal = ({ termo, onClose, isOpen, onNavigate }) => {
                     {resultados?.tipo === 'cep' && resultados.endereco && (
                         <div className="busca-cep-info">
                             <div className="busca-cep-endereco">
-                                <strong>📍 Endereço do CEP:</strong>
+                                <strong><IconLocal/> Endereço do CEP:</strong>
                                 <span>{resultados.endereco.logradouro || '—'}, {resultados.endereco.bairro || '—'}</span>
                                 <span>{resultados.endereco.cidade} - {resultados.endereco.uf}</span>
                             </div>
@@ -122,14 +132,14 @@ const BuscaGlobal = ({ termo, onClose, isOpen, onNavigate }) => {
                                     className="busca-item" 
                                     onClick={() => handleItemClick({ ...item, link: `/barbearia/${item.id}` })}
                                 >
-                                    <div className="busca-item-icon">✂️</div>
+                                    <div className="busca-item-icon"><IconCorte/></div>
                                     <div className="busca-item-content">
                                         <div className="busca-item-title">{item.nome}</div>
                                         <div className="busca-item-subtitle">
                                             {item.logradouro}, {item.numero} - {item.bairro}
                                         </div>
                                         <div className="busca-item-subtitle">
-                                            {item.cidade} - {item.uf} | 📞 {item.telefone}
+                                            {item.cidade} - {item.uf} | <IconTelefone/> {item.telefone}
                                         </div>
                                     </div>
                                 </div>

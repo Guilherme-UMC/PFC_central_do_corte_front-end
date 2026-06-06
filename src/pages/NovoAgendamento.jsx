@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   listarBarbearias,
   listarServicos,
@@ -6,7 +7,22 @@ import {
   listarFuncionarios,
   criarAgendamento,
 } from '../services/NovoAgendamentoService';
+import barbeariaService from '../services/BarbeariaService';
 import '../styles/pages/novo-agendamento.css';
+
+const IconPerfil = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round-icon lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+)
+
+const IconTelefone = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+  </svg>
+);
+
+const IconLocal = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-icon lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /><circle cx="12" cy="10" r="3" /></svg>
+)
 
 const STEPS = [
   { id: 1, label: 'Barbearia' },
@@ -102,12 +118,12 @@ function StepBarbearia({ onSelect }) {
               <h3 className="card-barbearia-nome">{b.nome}</h3>
               {b.cidade && (
                 <p className="card-barbearia-info">
-                  <span>📍</span> {b.cidade}{b.uf ? `, ${b.uf}` : ''}
+                  <span><IconLocal/></span> {b.cidade}{b.uf ? `, ${b.uf}` : ''}
                 </p>
               )}
               {b.telefone && (
                 <p className="card-barbearia-info">
-                  <span>📞</span> {b.telefone}
+                  <span><IconTelefone/></span> {b.telefone}
                 </p>
               )}
             </div>
@@ -144,12 +160,12 @@ function StepServicos({ barbearia, servicosSelecionados, onToggleServico, onAvan
         <div className="barbearia-info-body">
           <h2 className="barbearia-info-nome">{barbearia.nome}</h2>
           <div className="barbearia-info-row">
-            <span className="icon">📍</span>
+            <span className="icon"><IconLocal/></span>
             <span>{barbearia.logradouro}, {barbearia.numero} - {barbearia.bairro}, {barbearia.cidade} - {barbearia.uf}</span>
           </div>
           {barbearia.telefone && (
             <div className="barbearia-info-row">
-              <span className="icon">📞</span>
+              <span className="icon"><IconTelefone/></span>
               <span>{barbearia.telefone}</span>
             </div>
           )}
@@ -355,7 +371,7 @@ function StepFuncionario({ barbearia, funcionarioSelecionado, onSelect, onAvanca
               {f.fotoPerfil ? (
                 <img src={f.fotoPerfil} alt={f.name} />
               ) : (
-                '💈'
+                <IconPerfil/>
               )}
             </div>
             <span className="funcionario-nome">{f.name}</span>
@@ -376,7 +392,7 @@ function StepFuncionario({ barbearia, funcionarioSelecionado, onSelect, onAvanca
   );
 }
 
-function StepConfirmacao({ barbearia, servicosSelecionados, horarioSelecionado, funcionario, onConfirmar, onVoltar, loading, erro }) {
+function StepConfirmacao({ barbearia, servicosSelecionados, horarioSelecionado, funcionario, observacao, onObservacaoChange, onConfirmar, onVoltar, loading, erro }) {
   const total = servicosSelecionados.reduce((acc, s) => acc + (s.preco || 0), 0);
 
   const formatarDataHoraConfirmacao = (dataHora) => {
@@ -425,6 +441,18 @@ function StepConfirmacao({ barbearia, servicosSelecionados, horarioSelecionado, 
             {funcionario ? funcionario.name : 'Primeiro disponível'}
           </span>
         </div>
+        <div className="confirmacao-row observacao-row">
+          <span className="confirmacao-label">Observação</span>
+          <div className="confirmacao-valor observacao-field">
+            <textarea
+              className="observacao-input"
+              placeholder="Alguma observação? (ex: prefiro horário no início da manhã, tenho alergia a produtos x, etc.)"
+              value={observacao}
+              onChange={(e) => onObservacaoChange(e.target.value)}
+              rows={3}
+            />
+          </div>
+        </div>
 
         <div className="confirmacao-total">
           <span className="confirmacao-total-label">Total</span>
@@ -462,15 +490,38 @@ function Sucesso({ onNovo, onVerMeus }) {
   );
 }
 
-export default function NovoAgendamento({ onVoltar, onVerMeusAgendamentos, onAgendamentoSucesso }) {
+export default function NovoAgendamento({ onVoltar, onVerMeusAgendamentos, onAgendamentoSucesso, barbeariaIdPreselecionado }) {
+  const location = useLocation();
   const [step, setStep] = useState(1);
   const [barbearia, setBarbearia] = useState(null);
   const [servicosSelecionados, setServicosSelecionados] = useState([]);
   const [horarioSelecionado, setHorarioSelecionado] = useState(null);
   const [funcionario, setFuncionario] = useState(null);
+  const [observacao, setObservacao] = useState('');
   const [loadingConfirm, setLoadingConfirm] = useState(false);
   const [erroConfirm, setErroConfirm] = useState(null);
   const [sucesso, setSucesso] = useState(false);
+
+  const [usouPreselecao, setUsouPreselecao] = useState(false);
+
+ useEffect(() => {
+   if (barbeariaIdPreselecionado && !barbearia && !usouPreselecao) {
+      const carregarBarbeariaPreselecionada = async () => {
+        try {
+          const result = await barbeariaService.buscarPorId(barbeariaIdPreselecionado);
+          if (result.success) {
+            setBarbearia(result.data);
+            setStep(2);
+            setUsouPreselecao(true); 
+          }
+        } catch (error) {
+          console.error('Erro ao carregar barbearia:', error);
+        }
+      };
+      carregarBarbeariaPreselecionada();
+    }
+  }, [barbeariaIdPreselecionado, barbearia, usouPreselecao]);
+
 
   const toggleServico = (s) => {
     setServicosSelecionados((prev) =>
@@ -489,6 +540,7 @@ export default function NovoAgendamento({ onVoltar, onVerMeusAgendamentos, onAge
         servicoIds: servicosSelecionados.map((s) => s.id),
         funcionarioId: funcionario?.id ?? null,
         dataHora: horarioSelecionado,
+        observacao: observacao.trim() || null,
       });
       setSucesso(true);
     } catch (e) {
@@ -507,10 +559,21 @@ export default function NovoAgendamento({ onVoltar, onVerMeusAgendamentos, onAge
     setServicosSelecionados([]);
     setHorarioSelecionado(null);
     setFuncionario(null);
+    setObservacao('');
     setSucesso(false);
     setErroConfirm(null);
+    setUsouPreselecao(false);
     if(onAgendamentoSucesso){
       onAgendamentoSucesso();
+    }
+  };
+
+  const handleVoltar = () => {
+    if (step === 1) {
+      onVoltar();
+      setUsouPreselecao(false); 
+    } else {
+      setStep(s => s - 1);
     }
   };
 
@@ -591,6 +654,8 @@ export default function NovoAgendamento({ onVoltar, onVerMeusAgendamentos, onAge
             servicosSelecionados={servicosSelecionados}
             horarioSelecionado={horarioSelecionado}
             funcionario={funcionario}
+            observacao={observacao}
+            onObservacaoChange={setObservacao}
             onConfirmar={confirmar}
             onVoltar={() => setStep(4)}
             loading={loadingConfirm}

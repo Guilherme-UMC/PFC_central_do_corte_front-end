@@ -1,6 +1,6 @@
 import api from './api';
 
-class UserService {
+class UsuarioService {
   async getProfile(userId) {
     try {
       const response = await api.get(`/usuarios/${userId}`);
@@ -56,4 +56,4 @@ class UserService {
   }
 }
 
-export default new UserService();
+export default new UsuarioService();

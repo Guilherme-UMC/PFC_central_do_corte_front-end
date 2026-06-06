@@ -1,35 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-/* ── Reset / base ───────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-/* ── Variáveis (mesmas do NovoAgendamento) ──────────────── */
-:root {
-  --corte-bg:         #0f0f0f;
-  --corte-surface:    #1a1a1a;
-  --corte-surface-2:  #242424;
-  --corte-border:     #2e2e2e;
-  --corte-gold:       #c9a84c;
-  --corte-gold-light: #e0c070;
-  --corte-text:       #f0ece4;
-  --corte-text-muted: #8a8278;
-  --corte-green:      #4caf7a;
-  --corte-red:        #e05555;
-  --corte-radius:     12px;
-  --corte-radius-sm:  8px;
-  --corte-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ── Layout principal ───────────────────────────────────── */
 .dc-root {
   display: flex;
   min-height: 100vh;
   background: var(--corte-bg);
   color: var(--corte-text);
-  font-family: 'DM Sans', sans-serif;
 }
 
-/* ── Sidebar ─────────────────────────────────────────────── */
 .dc-sidebar {
   width: 240px;
   flex-shrink: 0;
@@ -43,38 +18,6 @@
   overflow: hidden;
 }
 
-.dc-sidebar-logo {
-  padding: 28px 24px 22px;
-  border-bottom: 1px solid var(--corte-border);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.dc-logo-icon {
-  font-size: 22px;
-  line-height: 1;
-}
-
-.dc-logo-text {
-  font-family: 'Playfair Display', serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--corte-gold);
-  letter-spacing: 0.03em;
-  line-height: 1.2;
-}
-
-.dc-logo-sub {
-  font-size: 10px;
-  color: var(--corte-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 400;
-}
-
-/* Avatar do usuário */
 .dc-user-card {
   padding: 20px 20px 16px;
   border-bottom: 1px solid var(--corte-border);
@@ -84,16 +27,17 @@
 }
 
 .dc-avatar {
-  width: 42px;
-  height: 42px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
-  border: 2px solid var(--corte-gold);
+  background: linear-gradient(135deg, #2a2a2a, var(--lightblue));
+  border: 2px solid var(--lightblue);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 1.5rem;
   flex-shrink: 0;
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 .dc-user-info {
@@ -101,7 +45,6 @@
 }
 
 .dc-user-name {
-  font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -109,10 +52,11 @@
 }
 
 .dc-user-role {
-  font-size: 11px;
-  color: var(--corte-gold);
+  color: var(--lightblue);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-weight: bold;
+  margin-top: 0.3rem;
+  font-size: 0.9rem;
 }
 
 /* Nav itens */
@@ -149,8 +93,8 @@
 }
 
 .dc-nav-item.active {
-  background: rgba(201, 168, 76, 0.1);
-  color: var(--corte-gold);
+  background: var(--corte-surface-2);
+  color: var(--lightblue);
   font-weight: 600;
 }
 
@@ -194,7 +138,6 @@
 }
 
 .dc-page-title {
-  font-family: 'Playfair Display', serif;
   font-size: 26px;
   font-weight: 700;
   line-height: 1;
@@ -261,7 +204,6 @@
 }
 
 .dc-stat-value {
-  font-family: 'Playfair Display', serif;
   font-size: 28px;
   font-weight: 700;
   line-height: 1;
@@ -356,9 +298,9 @@
 }
 
 .dc-proximo-data {
-  background: rgba(201, 168, 76, 0.1);
-  border: 1px solid rgba(201, 168, 76, 0.3);
-  border-radius: var(--corte-radius-sm);
+  background: var(--corte-surface2);
+  border: 3px solid var(--lightblue);
+  border-radius: var(--corte-radius);
   padding: 12px 16px;
   text-align: center;
   flex-shrink: 0;
@@ -366,10 +308,9 @@
 }
 
 .dc-proximo-dia {
-  font-family: 'Playfair Display', serif;
   font-size: 30px;
   font-weight: 700;
-  color: var(--corte-gold);
+  color: var(--lightblue);
   line-height: 1;
 }
 
@@ -377,7 +318,7 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--corte-gold);
+  color: var(--lightblue);
   margin-top: 2px;
 }
 
@@ -387,15 +328,15 @@
 }
 
 .dc-proximo-titulo {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 4px;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
 }
 
 .dc-proximo-detalhe {
   font-size: 13px;
   color: var(--corte-text-muted);
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -548,6 +489,10 @@
   max-width: 450px;
 }
 
+.form-input{
+  margin-top: 1rem;
+}
+
 .cancel-info {
   background: rgba(255, 255, 255, 0.05);
   padding: 12px;
@@ -565,4 +510,83 @@
 .dc-table td:last-child {
   text-align: center;
   min-width: 80px;
+}
+.barbearias-grid-cliente {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--corte-text-muted);
+}
+
+.observacao-cell {
+  text-align: center;
+}
+
+.btn-ver-observacao {
+  background: none;
+  border: none;
+  color: var(--lightblue);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-ver-observacao:hover {
+  background: var(--corte-surface-2);
+  transform: scale(1.05);
+}
+
+.sem-observacao {
+  color: var(--corte-text-muted);
+  font-size: 12px;
+}
+
+/* Modal de observação */
+.observacao-modal {
+  max-width: 500px;
+}
+
+.observacao-modal h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.observacao-content {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.observacao-content p {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 14px;
+  color: var(--corte-text);
+}
+
+@media (max-width: 768px) {
+  .dc-table th:nth-child(5),
+  .dc-table td:nth-child(5) {
+    display: table-cell;
+  }
+  
+  .btn-ver-observacao {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
 }

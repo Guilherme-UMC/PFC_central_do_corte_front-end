@@ -28,11 +28,11 @@
 
 .agendamento-card {
   padding: 1.25rem;
-  transition: box-shadow 0.2s;
   color: var(--white);
   border-bottom: 3px solid var(--corte-border);
-  background-color: var(--card);
+  background-color: var(--corte-surface);
   border-radius: var(--corte-radius);
+  margin-bottom: 1rem;
 }
 
 .agendamento-header {
@@ -41,7 +41,7 @@
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 2px solid var(--corte-border);
 }
 
 .agendamento-header h3 {
@@ -65,6 +65,6 @@
   display: flex;
   gap: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #f0f0f0;
+  border-top: 2px solid var(--corte-border);
   justify-content: flex-end;
 }

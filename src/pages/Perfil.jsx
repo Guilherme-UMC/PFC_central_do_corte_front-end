@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
-import UserService from '../services/UserService';
+import UsuarioService from '../services/UsuarioService';
 import Loader from '../components/Loader';
 import PasswordInput from '../components/PasswordInput';
 import '../styles/pages/perfil.css';
@@ -21,7 +21,7 @@ const Perfil = ({ onNavigate }) => {
 
   const carregarPerfil = async () => {
     setLoading(true);
-    const result = await UserService.getProfile(user?.id);
+    const result = await UsuarioService.getProfile(user?.id);
     if (result.success) {
       setProfile(result.data);
       setFormData({
@@ -36,7 +36,7 @@ const Perfil = ({ onNavigate }) => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    const result = await UserService.updateProfile(user?.id, formData);
+    const result = await UsuarioService.updateProfile(user?.id, formData);
     if (result.success) {
       setProfile(result.data);
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -72,7 +72,7 @@ const Perfil = ({ onNavigate }) => {
     }
     
     setSubmitting(true);
-    const result = await UserService.changePassword(user?.id, passwordData.oldPassword, passwordData.newPassword);
+    const result = await UsuarioService.changePassword(user?.id, passwordData.oldPassword, passwordData.newPassword);
     
     if (result.success) {
       setMessage({ type: 'success', text: 'Senha alterada com sucesso!' });

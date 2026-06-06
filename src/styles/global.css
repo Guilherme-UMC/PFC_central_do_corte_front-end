@@ -28,6 +28,7 @@ body {
   --corte-border: #2e2e2e;
   --corte-text: #f0ece4;
   --corte-text-muted: #8a8278;
+  --corte-gold: #bd801d;
   --corte-green: #4caf7a;
   --corte-radius: 12px;
   --corte-radius-sm: 8px;
@@ -238,6 +239,35 @@ body {
   border-color: var(--blue);
 }
 .form-input::placeholder { color: var(--gray2); }
+
+select.form-input,
+select.form-select {
+  background: var(--corte-surface);
+  border: 1px solid var(--corte-border);
+  border-radius: 8px;
+  padding: 0.75rem 2rem 0.75rem 1rem;
+  color: var(--corte-text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+
+select.form-input option:hover,
+select.form-select option:hover {
+  background: var(--corte-surface-2) !important;
+  color: var(--corte-text) !important;
+}
+
+select.form-input option:checked,
+select.form-select option:checked {
+  background: var(--blue) !important;
+  color: var(--corte-text) !important;
+}
 
 /* Tabelas base */
 table { width: 100%; border-collapse: collapse; }

@@ -3,7 +3,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: var(--corte-card-bg);
+  background: var(--card);
   border-radius: var(--corte-radius-md);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   margin-top: 8px;
@@ -18,7 +18,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: 0.8rem;
   color: var(--corte-text-muted);
 }
 
@@ -28,10 +28,9 @@
 
 .busca-section h4 {
   padding: 8px 16px;
-  font-size: 12px;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--corte-gold);
+  color: var(--lightblue);
   margin: 0;
 }
 
@@ -45,7 +44,7 @@
 }
 
 .busca-item:hover {
-  background: var(--corte-bg-tertiary);
+  background: var(--corte-surface-2);
 }
 
 .busca-item-img {
@@ -59,7 +58,6 @@
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  background: var(--corte-bg-tertiary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,13 +69,12 @@
 }
 
 .busca-item-title {
-  font-weight: 600;
-  font-size: 14px;
+  font-size: 0.8rem;
   margin-bottom: 4px;
 }
 
 .busca-item-subtitle {
-  font-size: 12px;
+  font-size: 0.8rem;
   color: var(--corte-text-muted);
 }
 
@@ -88,15 +85,14 @@
 }
 
 .busca-empty-suggestion {
-  font-size: 12px;
+  font-size: 0.8rem;
   margin-top: 8px;
 }
 
 .busca-cep-info {
   padding: 12px 16px;
-  background: var(--corte-bg-tertiary);
   border-bottom: 1px solid var(--corte-border);
-  font-size: 13px;
+  font-size: 0.8rem;
 }
 
 .busca-cep-endereco {
@@ -110,142 +106,19 @@
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid var(--corte-border);
-  color: var(--corte-gold);
-  font-size: 12px;
-}
-
-.busca-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--corte-card-bg);
-    border-radius: var(--corte-radius-md);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    margin-top: 8px;
-    max-height: 400px;
-    overflow-y: auto;
-    z-index: 1000;
-    border: 1px solid var(--corte-border);
-}
-
-.busca-dropdown-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--corte-border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--corte-text-muted);
-    background: var(--corte-bg-secondary);
-    border-radius: var(--corte-radius-md) var(--corte-radius-md) 0 0;
-}
-
-.busca-loading {
-    padding: 32px;
-    text-align: center;
-    color: var(--corte-text-muted);
-    font-size: 14px;
-}
-
-.busca-section {
-    padding: 8px 0;
-}
-
-.busca-section h4 {
-    padding: 8px 16px;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--corte-gold);
-    margin: 0;
-    font-weight: 600;
-}
-
-.busca-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.busca-item:hover {
-    background: var(--corte-bg-tertiary);
-}
-
-.busca-item-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: var(--corte-bg-tertiary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    flex-shrink: 0;
-}
-
-.busca-item-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.busca-item-title {
-    font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 4px;
-    color: var(--corte-text);
-}
-
-.busca-item-subtitle {
-    font-size: 12px;
-    color: var(--corte-text-muted);
-    line-height: 1.4;
-}
-
-.busca-empty {
-    padding: 32px;
-    text-align: center;
-    color: var(--corte-text-muted);
+  color: var(--lightblue);
+  font-size: 0.8rem;
 }
 
 .busca-empty p:first-child {
     margin-bottom: 8px;
-    font-size: 14px;
+    font-size: 0.8rem;
 }
 
-.busca-empty-suggestion {
-    font-size: 12px;
-    opacity: 0.8;
-}
-
-.busca-cep-info {
-    padding: 12px 16px;
-    background: var(--corte-bg-tertiary);
-    border-bottom: 1px solid var(--corte-border);
-    font-size: 13px;
-}
-
-.busca-cep-endereco {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    color: var(--corte-text-muted);
-}
 
 .busca-cep-endereco strong {
     color: var(--corte-text);
     margin-bottom: 4px;
-}
-
-.busca-cep-mensagem {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid var(--corte-border);
-    color: var(--corte-gold);
-    font-size: 12px;
 }
 
 .busca-dropdown::-webkit-scrollbar {
@@ -263,5 +136,5 @@
 }
 
 .busca-dropdown::-webkit-scrollbar-thumb:hover {
-    background: var(--corte-gold);
+    background: var(--lightblue);
 }

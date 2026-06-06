@@ -4,6 +4,7 @@ import BarbeariaService from '../services/BarbeariaService';
 import AgendamentoService from '../services/AgendamentoService';
 import ServicoService from '../services/ServicoService';
 import FuncionarioService from '../services/FuncionarioService';
+import ProdutoService from '../services/ProdutoService';
 import HorarioService, { DIAS_SEMANA, HORARIOS_PADRAO } from '../services/HorarioService';
 import StatusBadge from '../components/StatusBadge';
 import Loader from '../components/Loader';
@@ -11,6 +12,11 @@ import CadastroBarbearia from '../components/CadastroBarbearia';
 import Dashboard from './DashboardPage';
 import { formatarDataHora, formatarData, isHoje } from '../utils/dateUtils';
 import '../styles/pages/barbearia.css';
+import PasswordInput from '../components/PasswordInput';
+
+const IconProduto = () =>(
+  <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-bag-icon lucide-shopping-bag"><path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/></svg>
+)
 
 const IconEdit = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
@@ -61,6 +67,18 @@ const BarbeariaPage = ({ onNavigate }) => {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [loadingAction, setLoadingAction] = useState(null);
+  const [produtos, setProdutos] = useState([]);
+  const [produtosCategorias, setProdutosCategorias] = useState([]);
+  const [showProdutoForm, setShowProdutoForm] = useState(false);
+  const [editingProduto, setEditingProduto] = useState(null);
+  const [produtoForm, setProdutoForm] = useState({
+    nome: '',
+    descricao: '',
+    preco: '',
+    imagemUrl: '',
+    categoria: '',
+    marca: ''
+  });
 
   useEffect(() => {
     carregarBarbearias();
@@ -91,19 +109,22 @@ const BarbeariaPage = ({ onNavigate }) => {
   };
 
   const carregarDadosBarbearia = async (barbeariaId) => {
-    console.log('🔄 Recarregando dados da barbearia...');
+    console.log('Recarregando dados da barbearia...');
 
     setAgendamentos([]);
     setAgendamentosHoje([]);
     setServicos([]);
     setFuncionarios([]);
+    setProdutos([]);
 
     await Promise.all([
       carregarAgendamentos(barbeariaId),
       carregarAgendamentosHoje(barbeariaId),
       carregarServicos(barbeariaId),
       carregarFuncionarios(barbeariaId),
-      carregarHorarios(barbeariaId)
+      carregarHorarios(barbeariaId),
+      carregarProdutos(barbeariaId),
+      carregarCategorias(barbeariaId)
     ]);
 
     console.log('Dados recarregados com sucesso');
@@ -142,6 +163,21 @@ const BarbeariaPage = ({ onNavigate }) => {
       setHorarios(horariosConvertidos);
     } else {
       setHorarios([...HORARIOS_PADRAO]);
+    }
+  };
+
+  const carregarProdutos = async (barbeariaId) => {
+    const result = await ProdutoService.listarTodosPorBarbearia(barbeariaId);
+    if (result.success) {
+      setProdutos(result.data || []);
+      console.log(`📦 Produtos carregados: ${result.data?.length || 0}`);
+    }
+  };
+
+  const carregarCategorias = async (barbeariaId) => {
+    const result = await ProdutoService.listarCategorias(barbeariaId);
+    if (result.success) {
+      setProdutosCategorias(result.data || []);
     }
   };
 
@@ -277,6 +313,79 @@ const BarbeariaPage = ({ onNavigate }) => {
         showMessage('error', result.message);
       }
     }
+  };
+
+  const handleProdutoSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    const produtoData = {
+      nome: produtoForm.nome,
+      descricao: produtoForm.descricao || null,
+      preco: parseFloat(produtoForm.preco),
+      imagemUrl: produtoForm.imagemUrl || null,
+      categoria: produtoForm.categoria || null,
+      marca: produtoForm.marca || null
+    };
+
+    let result;
+    if (editingProduto) {
+      result = await ProdutoService.atualizar(editingProduto.id, produtoData);
+    } else {
+      result = await ProdutoService.criar(selectedBarbearia.id, produtoData);
+    }
+
+    if (result.success) {
+      showMessage('success', editingProduto ? 'Produto atualizado!' : 'Produto criado!');
+      setShowProdutoForm(false);
+      setEditingProduto(null);
+      setProdutoForm({ nome: '', descricao: '', preco: '', imagemUrl: '', categoria: '', marca: '' });
+      await carregarProdutos(selectedBarbearia.id);
+      await carregarCategorias(selectedBarbearia.id);
+    } else {
+      showMessage('error', result.message);
+    }
+    setSubmitting(false);
+  };
+
+  const handleDesativarProduto = async (produtoId) => {
+    if (window.confirm('Tem certeza que deseja desativar este produto?')) {
+      const result = await ProdutoService.desativar(produtoId);
+      if (result.success) {
+        showMessage('success', 'Produto desativado');
+        await carregarProdutos(selectedBarbearia.id);
+      } else {
+        showMessage('error', result.message);
+      }
+    }
+  };
+
+  const handleAtivarProduto = async (produtoId) => {
+    const result = await ProdutoService.ativar(produtoId);
+    if (result.success) {
+      showMessage('success', 'Produto ativado');
+      await carregarProdutos(selectedBarbearia.id);
+    } else {
+      showMessage('error', result.message);
+    }
+  };
+
+  const openProdutoForm = (produto = null) => {
+    if (produto) {
+      setEditingProduto(produto);
+      setProdutoForm({
+        nome: produto.nome,
+        descricao: produto.descricao || '',
+        preco: produto.preco,
+        imagemUrl: produto.imagemUrl || '',
+        categoria: produto.categoria || '',
+        marca: produto.marca || ''
+      });
+    } else {
+      setEditingProduto(null);
+      setProdutoForm({ nome: '', descricao: '', preco: '', imagemUrl: '', categoria: '', marca: '' });
+    }
+    setShowProdutoForm(true);
   };
 
   const salvarHorarios = async () => {
@@ -441,6 +550,9 @@ const BarbeariaPage = ({ onNavigate }) => {
             className={`tab-btn ${activeTab === 'horarios' ? 'active' : ''}`}
             onClick={() => setActiveTab('horarios')}
           >Horários</button>
+          <button className={`tab-btn ${activeTab === 'produtos' ? 'active' : ''}`} onClick={() => setActiveTab('produtos')}>
+            Produtos
+          </button>
           <button
             className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
             onClick={() => setActiveTab('dashboard')}
@@ -646,22 +758,22 @@ const BarbeariaPage = ({ onNavigate }) => {
                 <div className="modal-overlay2">
                   <div className="modal-content2">
                     <h3>{editingServico ? 'Editar Serviço' : 'Novo Serviço'}</h3>
-                    <form  className="form" onSubmit={handleServicoSubmit}>
+                    <form className="form" onSubmit={handleServicoSubmit}>
                       <div className="form-group">
                         <label className="form-label">Nome do Serviço</label>
                         <input className="form-input" type="text" placeholder="Nome do serviço" value={servicoForm.nome} onChange={e => setServicoForm({ ...servicoForm, nome: e.target.value })} required />
                       </div>
                       <div className="form-group">
                         <label className="form-label">Descrição</label>
-                      <textarea className="form-input" placeholder="Descrição" value={servicoForm.descricao} onChange={e => setServicoForm({ ...servicoForm, descricao: e.target.value })} rows={2} />
-                        </div>
-                        <div className="form-group">
+                        <textarea className="form-input" placeholder="Descrição" value={servicoForm.descricao} onChange={e => setServicoForm({ ...servicoForm, descricao: e.target.value })} rows={2} />
+                      </div>
+                      <div className="form-group">
                         <label className="form-label">Preço</label>
-                      <input className="form-input" type="number" step="0.01" placeholder="Preço (R$)" value={servicoForm.preco} onChange={e => setServicoForm({ ...servicoForm, preco: e.target.value })} required />
+                        <input className="form-input" type="number" step="0.01" placeholder="Preço (R$)" value={servicoForm.preco} onChange={e => setServicoForm({ ...servicoForm, preco: e.target.value })} required />
                       </div>
                       <div className="form-group">
                         <label className="form-label">Duração</label>
-                      <input className="form-input" type="number" placeholder="Duração (minutos)" value={servicoForm.duracaoMinutos} onChange={e => setServicoForm({ ...servicoForm, duracaoMinutos: e.target.value })} required />
+                        <input className="form-input" type="number" placeholder="Duração (minutos)" value={servicoForm.duracaoMinutos} onChange={e => setServicoForm({ ...servicoForm, duracaoMinutos: e.target.value })} required />
                       </div>
                       <div className="modal-actions">
                         <button type="button" className="btn-danger" onClick={() => { setShowServicoForm(false); setEditingServico(null); setServicoForm({ nome: '', descricao: '', preco: '', duracaoMinutos: '' }); }}>Cancelar</button>
@@ -701,22 +813,35 @@ const BarbeariaPage = ({ onNavigate }) => {
               <div className="section-header-actions">
                 <h3>Funcionários</h3>
               </div>
-                <button className="btn-concluir" onClick={() => setShowFuncionarioForm(true)}>
-                  <IconPlus /> Novo Funcionário
-                </button>
+              <button className="btn-concluir" onClick={() => setShowFuncionarioForm(true)}>
+                <IconPlus /> Novo Funcionário
+              </button>
 
               {showFuncionarioForm && (
-                <div className="modal-overlay">
-                  <div className="modal-content">
+                <div className="modal-overlay2">
+                  <div className="modal-content2">
                     <h3>Novo Funcionário</h3>
-                    <form onSubmit={handleFuncionarioSubmit}>
-                      <input type="text" placeholder="Nome completo" value={funcionarioForm.name} onChange={e => setFuncionarioForm({ ...funcionarioForm, name: e.target.value })} required />
-                      <input type="email" placeholder="Email" value={funcionarioForm.email} onChange={e => setFuncionarioForm({ ...funcionarioForm, email: e.target.value })} required />
-                      <input type="tel" placeholder="Telefone" value={funcionarioForm.telefone} onChange={e => setFuncionarioForm({ ...funcionarioForm, telefone: e.target.value })} required />
-                      <input type="password" placeholder="Senha (mínimo 6 caracteres)" value={funcionarioForm.password} onChange={e => setFuncionarioForm({ ...funcionarioForm, password: e.target.value })} required />
+                    <form className="form" onSubmit={handleFuncionarioSubmit}>
+                      <label className="form-label">Nome</label>
+                      <input className='form-input' type="text" placeholder="Nome completo" value={funcionarioForm.name} onChange={e => setFuncionarioForm({ ...funcionarioForm, name: e.target.value })} required />
+
+                      <label className="form-label">Email</label>
+                      <input className='form-input' type="email" placeholder="Email" value={funcionarioForm.email} onChange={e => setFuncionarioForm({ ...funcionarioForm, email: e.target.value })} required />
+
+                      <label className="form-label">Telefone</label>
+                      <input className='form-input' type="tel" placeholder="Telefone" value={funcionarioForm.telefone} onChange={e => setFuncionarioForm({ ...funcionarioForm, telefone: e.target.value })} required />
+
+                      <PasswordInput
+                        name="password"
+                        label="Senha"
+                        placeholder="Mínimo 6 caracteres"
+                        value={funcionarioForm.password}
+                        onChange={e => setFuncionarioForm({ ...funcionarioForm, password: e.target.value })}
+                        required
+                      />
                       <div className="modal-actions">
-                        <button type="button" className="btn-secondary" onClick={() => { setShowFuncionarioForm(false); setFuncionarioForm({ name: '', email: '', telefone: '', password: '' }); }}>Cancelar</button>
-                        <button type="submit" className="btn-primary" disabled={submitting}>{submitting ? 'Criando...' : 'Criar'}</button>
+                        <button type="button" className="btn-danger" onClick={() => { setShowFuncionarioForm(false); setFuncionarioForm({ name: '', email: '', telefone: '', password: '' }); }}>Cancelar</button>
+                        <button type="submit" className="btn-concluir" disabled={submitting}>{submitting ? 'Criando...' : 'Criar'}</button>
                       </div>
                     </form>
                   </div>
@@ -756,9 +881,9 @@ const BarbeariaPage = ({ onNavigate }) => {
               <div className="section-header-actions">
                 <h3>Horários de Funcionamento</h3>
               </div>
-                <button className="btn-concluir" onClick={() => setShowHorarioForm(true)}>
-                  <IconPlus /> Editar Horários
-                </button>
+              <button className="btn-concluir" onClick={() => setShowHorarioForm(true)}>
+                <IconPlus /> Editar Horários
+              </button>
 
               {showHorarioForm && (
                 <div className="modal-overlay2">
@@ -890,6 +1015,155 @@ const BarbeariaPage = ({ onNavigate }) => {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* TAB: PRODUTOS */}
+          {activeTab === 'produtos' && (
+            <div>
+              <div className="section-header-actions">
+                <h3>Catálogo de Produtos</h3><br />
+                <button className="btn-concluir" onClick={() => openProdutoForm()}>
+                  <IconPlus /> Novo Produto
+                </button>
+              </div>
+
+              {/* Modal de formulário */}
+              {showProdutoForm && (
+                <div className="modal-overlay2">
+                  <div className="modal-content2" style={{ maxWidth: '600px' }}>
+                    <h3>{editingProduto ? 'Editar Produto' : 'Novo Produto'}</h3>
+                    <form className="form" onSubmit={handleProdutoSubmit}>
+                      <div className="form-group">
+                        <label className="form-label">Nome *</label>
+                        <input
+                          className="form-input"
+                          type="text"
+                          placeholder="Ex: Shampoo Antiqueda"
+                          value={produtoForm.nome}
+                          onChange={e => setProdutoForm({ ...produtoForm, nome: e.target.value })}
+                          required
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Marca</label>
+                        <input
+                          className="form-input"
+                          type="text"
+                          placeholder="Ex: Nivea, Gillette, etc."
+                          value={produtoForm.marca}
+                          onChange={e => setProdutoForm({ ...produtoForm, marca: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Categoria</label>
+                        <select
+                          className="form-select"
+                          value={produtoForm.categoria}
+                          onChange={e => setProdutoForm({ ...produtoForm, categoria: e.target.value })}
+                        >
+                          <option className='option' value="">Selecione uma categoria</option>
+                          <option className='option' value="Cabelo">Cabelo</option>
+                          <option className='option' value="Barba">Barba</option>
+                          <option className='option' value="Pele">Pele</option>
+                          <option className='option' value="Perfumaria">Perfumaria</option>
+                          <option className='option' value="Acessórios">Acessórios</option>
+                          <option className='option' value="Outros">Outros</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Descrição</label>
+                        <textarea
+                          className="form-input"
+                          placeholder="Descreva o produto..."
+                          value={produtoForm.descricao}
+                          onChange={e => setProdutoForm({ ...produtoForm, descricao: e.target.value })}
+                          rows={3}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Preço (R$)</label>
+                        <input
+                          className="form-input"
+                          type="number"
+                          step="0.01"
+                          placeholder="0,00"
+                          value={produtoForm.preco}
+                          onChange={e => setProdutoForm({ ...produtoForm, preco: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">URL da Imagem</label>
+                        <input
+                          className="form-input"
+                          type="url"
+                          placeholder="https://exemplo.com/imagem.jpg"
+                          value={produtoForm.imagemUrl}
+                          onChange={e => setProdutoForm({ ...produtoForm, imagemUrl: e.target.value })}
+                        />
+                        <small className="text-muted">Link para foto do produto (opcional)</small>
+                      </div>
+
+                      <div className="modal-actions">
+                        <button type="button" className="btn-danger" onClick={() => { setShowProdutoForm(false); setEditingProduto(null); }}>
+                          Cancelar
+                        </button>
+                        <button type="submit" className="btn-primary" disabled={submitting}>
+                          {submitting ? 'Salvando...' : 'Salvar'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* Lista de produtos */}
+              {produtos.length === 0 ? (
+                <div className="empty-state-small">
+                  <p>Nenhum produto cadastrado ainda.</p><br />
+                  <button className="btn-concluir" onClick={() => openProdutoForm()}>
+                    <IconPlus /> Adicionar primeiro produto
+                  </button>
+                </div>
+              ) : (
+                <div className="produtos-grid-admin">
+                  {produtos.map(produto => (
+                    <div key={produto.id} className="produto-admin-card">
+                      {produto.imagemUrl ? (
+                        <img src={produto.imagemUrl} alt={produto.nome} className="produto-admin-imagem" />
+                      ) : (
+                        <div className="produto-admin-imagem-placeholder"><IconProduto/></div>
+                      )}
+                      <div className="produto-admin-info">
+                        <h4>{produto.nome}</h4>
+                        {produto.marca && <span className="produto-admin-marca">{produto.marca}</span>}
+                        {produto.categoria && <span className="produto-admin-categoria">{produto.categoria}</span>}
+                        {produto.descricao && <p className="produto-admin-descricao">{produto.descricao}</p>}
+                        {produto.preco && <p className="produto-admin-preco">R$ {produto.preco.toFixed(2)}</p>}
+                      </div>
+                      <div className="produto-admin-actions">
+                        <button className="btn-primary" onClick={() => openProdutoForm(produto)}>
+                          <IconEdit /> Editar
+                        </button>
+                        {produto.ativo ? (
+                          <button className="btn-danger" onClick={() => handleDesativarProduto(produto.id)}>
+                            <IconTrash /> Desativar
+                          </button>
+                        ) : (
+                          <button className="btn-primary" onClick={() => handleAtivarProduto(produto.id)}>
+                            Ativar
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
