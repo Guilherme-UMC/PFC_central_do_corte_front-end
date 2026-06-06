@@ -32,7 +32,7 @@ const router = createBrowserRouter([
     path: '/',
     element: <RootLayout />,
     children: [
-      
+      { path: 'barbearia/:id', element: <BarbeariaDetalhes /> },
       {
         element: <PublicRoute />,
         children: [
@@ -42,7 +42,7 @@ const router = createBrowserRouter([
           { path: 'signup-barbearia', element: <SignupBarbearia /> },
           { path: 'esqueci-senha', element: <EsqueciSenha /> },
           { path: 'redefinir-senha', element: <RedefinirSenha /> },
-          { path: 'barbearia/:id', element: <BarbeariaDetalhes /> },
+          
         ],
       },
       
@@ -84,7 +84,7 @@ const router = createBrowserRouter([
         element: <PrivateRoute allowedRoles={['ROLE_BARBEARIA_ADM', 'ROLE_ADMIN']} />,
         children: [
           { path: 'barbearia', element: <BarbeariaPage /> },
-          { path: 'dashboard', element: <DashboardPage /> },  // ← ADICIONE ESTA LINHA
+          { path: 'dashboard', element: <DashboardPage /> }, 
           { path: 'cadastro-barbearia', element: <CadastroBarbearia /> },
         ],
       },

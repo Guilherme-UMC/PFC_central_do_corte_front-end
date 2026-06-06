@@ -19,7 +19,6 @@
   min-height: 100vh;
   background: var(--corte-bg);
   color: var(--corte-text);
-  font-family: 'Georgia', 'Times New Roman', serif;
   padding: 0 0 60px;
 }
 
@@ -88,7 +87,6 @@
   font-weight: 700;
   color: var(--corte-text-muted);
   transition: var(--corte-transition);
-  font-family: 'Courier New', monospace;
   z-index: 1;
 }
 
@@ -165,9 +163,9 @@
 }
 
 .card-barbearia:hover {
-  border-color: var(--corte-gold);
+  border-color: var(--blue);
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(201, 168, 76, 0.15);
+  box-shadow: 0 8px 32px rgba(77, 132, 214, 0.15);
 }
 
 .card-barbearia-img {
@@ -259,17 +257,15 @@
   font-size: 16px;
   margin-top: 1px;
   flex-shrink: 0;
-  color: var(--corte-gold);
 }
 
 .servicos-secao h3 {
-  font-size: 16px;
   font-weight: 700;
   margin: 0 0 14px;
   color: var(--corte-text);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-size: 12px;
+  font-size: 0.8rem;
   color: var(--corte-gold);
 }
 
@@ -401,7 +397,6 @@
   border-radius: var(--corte-radius-sm);
   cursor: pointer;
   font-size: 14px;
-  font-family: 'Courier New', monospace;
   font-weight: 600;
   transition: var(--corte-transition);
   letter-spacing: 0.04em;
@@ -440,7 +435,6 @@
   padding: 10px 16px;
   border-radius: var(--corte-radius-sm);
   font-size: 14px;
-  font-family: inherit;
   outline: none;
   transition: var(--corte-transition);
 }
@@ -674,8 +668,8 @@
 }
 
 .btn-ghost:hover {
-  border-color: var(--corte-text-muted);
-  color: var(--corte-text);
+  border-color: var(--red);
+  color: var(--red);
 }
 
 /* ── Loading / erro ─────────────────────────────────────── */
@@ -716,6 +710,45 @@
   margin-top: 32px;
   padding-top: 24px;
   border-top: 1px solid var(--corte-border);
+}
+
+.observacao-row {
+  flex-direction: column;
+  align-items: stretch !important;
+  gap: 8px;
+  padding: 16px 0;
+}
+
+.observacao-row .confirmacao-label {
+  margin-bottom: 4px;
+}
+
+.observacao-field {
+  width: 100%;
+  text-align: left !important;
+}
+
+.observacao-input {
+  width: 100%;
+  padding: 12px;
+  background: var(--corte-surface);
+  border: 1px solid var(--corte-border);
+  border-radius: var(--corte-radius-sm);
+  color: var(--corte-text);
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  transition: var(--corte-transition);
+}
+
+.observacao-input:focus {
+  outline: none;
+  border-color: var(--corte-gold);
+}
+
+.observacao-input::placeholder {
+  color: var(--corte-text-muted);
+  font-size: 13px;
 }
 
 /* ── Responsivo ─────────────────────────────────────────── */

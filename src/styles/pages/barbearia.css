@@ -45,20 +45,13 @@
 }
 .tab-count.today { background: #2e7d32; color: white; }
 
-.agendamento-card {
-  padding: 1.25rem;
-  transition: box-shadow 0.2s;
-  color: var(--white);
-  border-bottom: 3px solid var(--corte-border);
-}
-
 .agendamento-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 2px solid var(--corte-border);
 }
 
 .agendamento-header h3 {
@@ -82,7 +75,7 @@
   display: flex;
   gap: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #f0f0f0;
+  border-top: 2px solid var(--corte-border);
   justify-content: flex-end;
 }
 
@@ -102,10 +95,10 @@
 .today-header {
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 2px solid var(--corte-gold);
+  border-bottom: 2px solid var(--corte-border);
 }
 .today-date { font-size: 16px; font-weight: 600; }
-.today-card { border-left: 4px solid var(--corte-gold); }
+.today-card { border-left: 4px solid var(--corte-border); }
 .agendamento-actions {
   display: flex;
   gap: 10px;
@@ -304,7 +297,6 @@
   padding: 0.6rem 0.9rem;
   font-size: 0.9rem;
   color: var(--corte-text, #ffffff);
-  font-family: monospace;
   cursor: pointer;
   transition: all 0.2s ease;
   width: 110px;
@@ -327,3 +319,120 @@
   font-size: 0.85rem;
   font-weight: 500;
 }
+.produtos-grid-admin {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.produto-admin-card {
+  background: var(--corte-surface);
+  border: 1px solid var(--corte-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.produto-admin-card:hover {
+  border-color: var(--corte-gold);
+  transform: translateY(-2px);
+}
+
+.produto-admin-imagem {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.produto-admin-imagem-placeholder {
+  width: 100%;
+  height: 160px;
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+}
+
+.produto-admin-info {
+  padding: 1rem;
+}
+
+.produto-admin-info h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.produto-admin-marca {
+  display: inline-block;
+  font-size: 0.7rem;
+  color: var(--lightblue);
+  background: var(--corte-surface-2);
+  padding: 5px 8px;
+  border-radius: 12px;
+  margin-right: 0.5rem;
+}
+
+.produto-admin-categoria {
+  display: inline-block;
+  font-size: 0.7rem;
+  color: var(--corte-text-muted);
+  background: var(--corte-surface-2);
+  padding: 5px 8px;
+  border-radius: 12px;
+}
+
+.produto-admin-descricao {
+  font-size: 0.75rem;
+  color: var(--corte-text-muted);
+  margin: 0.5rem 0;
+  line-height: 1.4;
+}
+
+.produto-admin-preco {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--corte-gold);
+  margin: 0.5rem 0 0 0;
+}
+
+.produto-admin-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--corte-border);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.produto-admin-actions button {
+  flex: 1;
+  justify-content: center;
+}
+
+.modal-content2 {
+  max-width: 600px;
+  width: 90%;
+}
+
+.text-muted {
+  font-size: 0.7rem;
+  color: var(--corte-text-muted);
+  margin-top: 4px;
+  display: block;
+}
+
+.form-label{
+  margin-top: 1rem;
+  padding-bottom: 0;
+}
+
+.form-input{
+  margin-top: 0;
+}
+
+.btn{
+  padding: 3rem 0;
+}
+

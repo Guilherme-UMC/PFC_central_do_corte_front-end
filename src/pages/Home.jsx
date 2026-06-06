@@ -51,9 +51,7 @@ const IconChevronRight = () => (
 );
 
 const IconX = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
-    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-  </svg>
+ <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 );
 
 const SERVICOS_LISTA = [
@@ -76,13 +74,11 @@ const ActiveFilters = ({ search, servicoAtivo, onClearSearch, onClearServico }) 
     <div className="active-filters">
       {search.trim() && (
         <span className="filter-chip">
-          Busca: "{search}"
           <button onClick={onClearSearch} aria-label="Remover filtro"><IconX /></button>
         </span>
       )}
       {servicoAtivo && (
         <span className="filter-chip filter-chip--service">
-          Serviço: {SERVICOS_LISTA.find(s => s.key === servicoAtivo)?.nome}
           <button onClick={onClearServico} aria-label="Remover filtro"><IconX /></button>
         </span>
       )}
@@ -157,18 +153,28 @@ const Home = () => {
     .map((b) => {
       if (search.trim()) {
         const termo = search.toLowerCase();
-        const campos = [b.nome, b.cidade, b.bairro, b.logradouro, b.uf]
-          .map(v => (v || '').toLowerCase());
-        const textoMatch = campos.some(c => c.includes(termo));
 
-        const servicosB = servicosPorBarbearia[b.id] || [];
-        const servicoTextoMatch = servicosB.some(s =>
-          (s.nome || '').toLowerCase().includes(termo)
-        );
+        const isCep = /^\d{5}-?\d{3}$/.test(termo);
+        let match = false;
+        if (isCep) {
+          const cepLimpo = termo.replace(/\D/g, '');
+          const cepBarbearia = b.cep?.replace(/\D/g, '');
+          match = cepBarbearia === cepLimpo;
+        } else {
+          const campos = [b.nome, b.cidade, b.bairro, b.logradouro, b.uf]
+            .map(v => (v || '').toLowerCase());
+          match = campos.some(c => c.includes(termo));
 
-        if (!textoMatch && !servicoTextoMatch) return null;
+          if (!match) {
+            const servicosB = servicosPorBarbearia[b.id] || [];
+            match = servicosB.some(s =>
+              (s.nome || '').toLowerCase().includes(termo)
+            );
+          }
+        }
+
+        if (!match) return null;
       }
-
       if (servicoAtivo) {
         const servicosB = servicosPorBarbearia[b.id] || [];
         const matches = servicosB.filter(s =>
