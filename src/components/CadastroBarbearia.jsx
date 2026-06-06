@@ -465,7 +465,7 @@ function CadastroBarbearia({ onSuccess, onCancel, editingData }) {
                             <button
                                 type="button"
                                 onClick={onCancel}
-                                className="btn"
+                                className="btn-barbearia"
                             >
                                 Cancelar
                             </button>

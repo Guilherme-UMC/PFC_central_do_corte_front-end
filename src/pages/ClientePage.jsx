@@ -490,7 +490,7 @@ const ClientePage = () => {
   }
 
   const pageTitles = {
-    home: { title: `Olá, ${user?.name?.split(' ')[0] || 'Cliente'} 👋`, sub: hojeFormatado() },
+    home: { title: `Olá, ${user?.name?.split(' ')[0] || 'Cliente'}`, sub: hojeFormatado() },
     historico: { title: 'Meus Agendamentos', sub: 'Histórico completo dos seus atendimentos' },
     barbearias: { title: 'Barbearias', sub: 'Explore os estabelecimentos cadastrados' },
     perfil: { title: 'Meu Perfil', sub: 'Gerencie suas informações pessoais' },
@@ -559,7 +559,10 @@ const ClientePage = () => {
 
           {abaAtiva === 'historico' && (
             <>
+            <div className='heading'>
               <p className="dc-section-title">Todos os agendamentos</p>
+              <p className='dc-section-title2'>Cancelamentos não são permitidos faltando menos de 24 horas para o agendamento</p>
+              </div>
               <TabelaAgendamentos
                 agendamentos={agendamentos}
                 loading={loadingAg}

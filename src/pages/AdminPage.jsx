@@ -4,6 +4,7 @@ import AdminService from '../services/AdminService';
 import BarbeariaService from '../services/BarbeariaService';
 import Loader from '../components/Loader';
 import '../styles/pages/admin.css';
+import PasswordInput from '../components/PasswordInput';
 
 const IconEdit = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M17 3l4 4-7 7H10v-4l7-7z" /><path d="M4 20h16" /></svg>);
 const IconTrash = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><polyline points="3 6 5 6 21 6" /><path d="M8 6V4h8v2" /><rect x="10" y="11" width="4" height="8" /></svg>);
@@ -250,23 +251,34 @@ const AdminPage = ({ onNavigate }) => {
               </div>
 
               {showUserForm && (
-                <div className="modal-overlay">
-                  <div className="modal-content">
+                <div className="modal-overlay2">
+                  <div className="modal-content2">
                     <h3>Criar Novo Usuário</h3>
-                    <form onSubmit={handleCreateUser}>
-                      <input type="text" placeholder="Nome completo" value={userForm.name} onChange={e => setUserForm({ ...userForm, name: e.target.value })} required />
-                      <input type="email" placeholder="Email" value={userForm.email} onChange={e => setUserForm({ ...userForm, email: e.target.value })} required />
-                      <input type="password" placeholder="Senha (mínimo 6)" value={userForm.password} onChange={e => setUserForm({ ...userForm, password: e.target.value })} required />
-                      <input type="tel" placeholder="Telefone" value={userForm.telefone} onChange={e => setUserForm({ ...userForm, telefone: e.target.value })} />
-                      <select value={userForm.role} onChange={e => setUserForm({ ...userForm, role: e.target.value })}>
+                    <form className="form" onSubmit={handleCreateUser}>
+                      <label className="form-label">Nome Completa</label>
+                      <input className='form-input' type="text" placeholder="Nome completo" value={userForm.name} onChange={e => setUserForm({ ...userForm, name: e.target.value })} required />
+                      <label className="form-label">Email</label>
+                      <input className='form-input' type="email" placeholder="Email" value={userForm.email} onChange={e => setUserForm({ ...userForm, email: e.target.value })} required />
+                      <PasswordInput
+                        name="password"
+                        label="Senha"
+                        placeholder="Mínimo 6 caracteres"
+                        value={userForm.password}
+                        onChange={e => setUserForm({ ...userForm, password: e.target.value })}
+                        required
+                      />
+                      <label className="form-label">Telefone</label>
+                      <input className='form-input' type="tel" placeholder="Telefone" value={userForm.telefone} onChange={e => setUserForm({ ...userForm, telefone: e.target.value })} />
+                      <label className="form-label">função</label>
+                      <select className='form-select' value={userForm.role} onChange={e => setUserForm({ ...userForm, role: e.target.value })}>
                         <option value="ROLE_CLIENTE">Cliente</option>
                         <option value="ROLE_FUNCIONARIO">Funcionário</option>
                         <option value="ROLE_BARBEARIA_ADM">Proprietário de Barbearia</option>
                         <option value="ROLE_ADMIN">Administrador</option>
                       </select>
                       <div className="modal-actions">
-                        <button type="button" className="btn-secondary" onClick={() => { setShowUserForm(false); setUserForm({ name: '', email: '', password: '', telefone: '', role: 'ROLE_CLIENTE' }); }}>Cancelar</button>
-                        <button type="submit" className="btn-primary" disabled={submitting}>{submitting ? 'Criando...' : 'Criar'}</button>
+                        <button type="button" className="btn-danger" onClick={() => { setShowUserForm(false); setUserForm({ name: '', email: '', password: '', telefone: '', role: 'ROLE_CLIENTE' }); }}>Cancelar</button>
+                        <button type="submit" className="btn-concluir" disabled={submitting}>{submitting ? 'Criando...' : 'Criar'}</button>
                       </div>
                     </form>
                   </div>

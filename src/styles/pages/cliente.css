@@ -214,15 +214,25 @@
 .dc-stat-value.green { color: var(--corte-green); }
 
 /* ── Ações rápidas ──────────────────────────────────────── */
+.heading{
+  display: flex;
+  justify-content: space-between;
+}
+
 .dc-section-title {
-  font-size: 11px;
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--corte-text-muted);
   margin-bottom: 14px;
   font-weight: 600;
 }
-
+.dc-section-title2 {
+  font-size: 0.9rem;
+  color: var(--red);
+  margin-bottom: 14px;
+  margin-right: 1rem;
+}
 .dc-actions-row {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
@@ -588,5 +598,9 @@
   .btn-ver-observacao {
     font-size: 10px;
     padding: 2px 6px;
+  }
+
+  .heading{
+    flex-direction: column;
   }
 }
