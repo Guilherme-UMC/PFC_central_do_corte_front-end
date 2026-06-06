@@ -177,12 +177,6 @@ const DashboardPage = ({ onNavigate }) => {
               color="#e67e22"
             />
             <DashboardCard
-              title="Avaliação Média"
-              value={`${metricas.mediaAvaliacao || 0} ★`}
-              icon={<IconStar />}
-              color="#9b59b6"
-            />
-            <DashboardCard
               title="Cancelamentos"
               value={metricas.cancelamentos || 0}
               icon={<IconCancel />}
@@ -236,7 +230,6 @@ const DashboardPage = ({ onNavigate }) => {
                 <li>✓ Mantenha seus horários sempre atualizados</li>
                 <li>✓ Responda rapidamente as confirmações</li>
                 <li>✓ Ofereça serviços variados para atrair mais clientes</li>
-                <li>✓ Colete avaliações dos clientes após o atendimento</li>
               </ul>
             </div>
           </div>

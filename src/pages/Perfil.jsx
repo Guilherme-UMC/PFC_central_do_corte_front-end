@@ -178,6 +178,7 @@ const Perfil = ({ onNavigate }) => {
           {/* Alterar Senha */}
           <div className="perfil-card">
             <h3>Alterar Senha</h3>
+            <br />
             <form onSubmit={handleChangePassword}>
               <PasswordInput
                 id="oldPassword"
@@ -215,13 +216,6 @@ const Perfil = ({ onNavigate }) => {
             </form>
           </div>
 
-          {/* Sair */}
-          <div className="perfil-card logout-card">
-            <h3>Sessão</h3>
-            <button className="btn-danger" onClick={() => { logout(); onNavigate('home'); }}>
-              Sair da Conta
-            </button>
-          </div>
         </div>
       </div>
     </div>

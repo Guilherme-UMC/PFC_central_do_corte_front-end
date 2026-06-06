@@ -6,7 +6,9 @@ import StatusBadge from '../components/StatusBadge';
 import Loader from '../components/Loader';
 import { formatarDataHora } from '../utils/dateUtils';
 import '../styles/pages/funcionario.css';
-
+const IconTelefone = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-icon lucide-phone"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" /></svg>
+)
 const FuncionarioPage = () => {
   const { user, logout } = useAuthContext();
   const [barbearias, setBarbearias] = useState([]);
@@ -31,7 +33,7 @@ const FuncionarioPage = () => {
     setLoading(true);
     try {
       const result = await FuncionarioService.listarMinhasBarbearias();
-      
+
       if (result.success && result.data) {
         setBarbearias(result.data);
         if (result.data.length > 0) {
@@ -49,13 +51,13 @@ const FuncionarioPage = () => {
 
   const carregarAgendamentos = async () => {
     let result;
-    
+
     if (activeTab === 'hoje') {
       result = await AgendamentoService.listarMeusHojeComoFuncionario();
     } else {
       result = await AgendamentoService.listarMeusComoFuncionario();
     }
-    
+
     if (result.success && result.data) {
       const agendamentosFiltrados = result.data.filter(
         ag => ag.barbeariaId === selectedBarbearia?.id || ag.barbeariaNome === selectedBarbearia?.nome
@@ -77,9 +79,9 @@ const FuncionarioPage = () => {
     }
 
     console.log('🔍 Tentando concluir agendamento:', agendamentoId);
-    
+
     setLoadingAction(agendamentoId);
-    
+
     try {
       const result = await AgendamentoService.concluir(agendamentoId);
       console.log('📥 Resposta do servidor:', result);
@@ -133,7 +135,7 @@ const FuncionarioPage = () => {
                 const totalAgendamentos = agendamentos.filter(
                   a => a.barbeariaId === b.id || a.barbeariaNome === b.nome
                 ).length;
-                
+
                 return (
                   <button
                     key={b.id}
@@ -153,14 +155,14 @@ const FuncionarioPage = () => {
                   {selectedBarbearia.logradouro}, {selectedBarbearia.numero} - {selectedBarbearia.bairro}, {selectedBarbearia.cidade} - {selectedBarbearia.uf}
                 </p>
                 {selectedBarbearia.telefone && (
-                  <p className="barbearia-telefone">📞 {selectedBarbearia.telefone}</p>
+                  <p className="barbearia-telefone"><IconTelefone/> {selectedBarbearia.telefone}</p>
                 )}
               </div>
             )}
 
             <div className="page-tabs">
-              <button 
-                className={`tab-btn ${activeTab === 'todos' ? 'active' : ''}`} 
+              <button
+                className={`tab-btn ${activeTab === 'todos' ? 'active' : ''}`}
                 onClick={() => setActiveTab('todos')}
               >
                 Todos os Agendamentos
@@ -168,8 +170,8 @@ const FuncionarioPage = () => {
                   <span className="tab-count">{agendamentos.length}</span>
                 )}
               </button>
-              <button 
-                className={`tab-btn ${activeTab === 'hoje' ? 'active' : ''}`} 
+              <button
+                className={`tab-btn ${activeTab === 'hoje' ? 'active' : ''}`}
                 onClick={() => setActiveTab('hoje')}
               >
                 Agendamentos de Hoje
@@ -178,14 +180,14 @@ const FuncionarioPage = () => {
                   const dataAg = new Date(a.dataHora).toDateString();
                   return dataAg === hoje;
                 }).length > 0 && (
-                  <span className="tab-count today">
-                    {agendamentos.filter(a => {
-                      const hoje = new Date().toDateString();
-                      const dataAg = new Date(a.dataHora).toDateString();
-                      return dataAg === hoje;
-                    }).length}
-                  </span>
-                )}
+                    <span className="tab-count today">
+                      {agendamentos.filter(a => {
+                        const hoje = new Date().toDateString();
+                        const dataAg = new Date(a.dataHora).toDateString();
+                        return dataAg === hoje;
+                      }).length}
+                    </span>
+                  )}
               </button>
             </div>
 
@@ -203,9 +205,9 @@ const FuncionarioPage = () => {
                 agendamentos.map(ag => {
                   const isLoading = loadingAction === ag.id;
                   const isToday = new Date(ag.dataHora).toDateString() === new Date().toDateString();
-                  
+
                   return (
-                    <div key={ag.id} className={`agendamento-card ${isToday ? 'today-card' : ''}`}>
+                    <div key={ag.id} className={`agendamento-card ${isToday ? 'today-card' : ''}`} className="agendamento-card">
                       <div className="agendamento-header">
                         <h3>{ag.clienteNome}</h3>
                         <StatusBadge status={ag.status} />
@@ -216,32 +218,29 @@ const FuncionarioPage = () => {
                         <p><strong>Valor:</strong> R$ {ag.servicoPreco?.toFixed(2) || '0,00'}</p>
                         {ag.observacao && <p><strong>Observações:</strong> {ag.observacao}</p>}
                       </div>
-                      
-                      {/* BOTÃO PARA CONCLUIR - Agendamentos CONFIRMADOS */}
-{ag.status === 'Confirmado' && (
-  <div className="agendamento-actions">
-    <button 
-      className="btn-primary small" 
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        handleConcluirAgendamento(ag.id);
-      }} 
-      disabled={isLoading}
-    >
-      {isLoading ? '...' : '✓ Concluir Atendimento'}
-    </button>
-  </div>
-)}
-                      
-                      {/* Agendamentos AGUARDANDO CONFIRMAÇÃO */}
+
+                      {ag.status === 'Confirmado' && (
+                        <div className="agendamento-actions">
+                          <button
+                            className="btn-concluir"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleConcluirAgendamento(ag.id);
+                            }}
+                            disabled={isLoading}
+                          >
+                            {isLoading ? '...' : '✓ Concluir Atendimento'}
+                          </button>
+                        </div>
+                      )}
+
                       {ag.status === 'Aguardando confirmação' && (
                         <div className="agendamento-actions">
                           <span className="status-pending-msg">Aguardando confirmação da barbearia</span>
                         </div>
                       )}
-                      
-                      {/* Agendamentos CANCELADOS */}
+
                       {(ag.status === 'Cancelado pelo cliente' || ag.status === 'Cancelado pela barbearia') && (
                         <div className="agendamento-actions">
                           <span className="status-cancelled">
@@ -249,8 +248,7 @@ const FuncionarioPage = () => {
                           </span>
                         </div>
                       )}
-                      
-                      {/* Agendamentos CONCLUÍDOS */}
+
                       {ag.status === 'Concluído' && (
                         <div className="agendamento-actions">
                           <span className="status-finished">✓ Atendimento concluído</span>

@@ -1,10 +1,10 @@
 .barbearia-info-card {
+  position: relative;
   background-color: rgba(17, 17, 17, 0.85);
   border-radius: 10px;
   padding: 20px;
-  margin-bottom: 24px;
-  border: 1px solid var(--corte-border);
-  border-left: 3px solid var(--corte-gold);
+  margin-bottom: 3rem;
+  border-left: 6px solid var(--blue);
 }
 .barbearia-info-header {
   display: flex;
@@ -14,6 +14,7 @@
   flex-wrap: wrap;
   gap: 12px;
 }
+
 .barbearia-info-nome { margin: 0 0 8px 0; font-size: 22px; }
 .barbearia-info-desc { margin: 0; color: var(--corte-text-muted); font-size: 14px; }
 .barbearia-info-details {
@@ -23,7 +24,15 @@
   padding-top: 12px;
   border-top: 1px solid var(--corte-border);
 }
-.info-row { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--corte-text-muted); }
+.info{ 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  font-size: 14px; 
+  color: var(--white); 
+  justify-content: flex-start;
+}
+
 .info-icon { font-size: 16px; min-width: 24px; }
 .tab-count {
   background: var(--corte-gold);
@@ -35,6 +44,61 @@
   margin-left: 8px;
 }
 .tab-count.today { background: #2e7d32; color: white; }
+
+.agendamento-card {
+  padding: 1.25rem;
+  transition: box-shadow 0.2s;
+  color: var(--white);
+  border-bottom: 3px solid var(--corte-border);
+}
+
+.agendamento-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.agendamento-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.agendamento-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.agendamento-info p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.agendamento-actions {
+  display: flex;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f0f0f0;
+  justify-content: flex-end;
+}
+
+.btn-concluir{
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+  padding: 0.5rem 1rem;
+}
+
+.btn-concluir:hover { background: var(--lightblue); }
+
 .today-header {
   margin-bottom: 20px;
   padding-bottom: 12px;
@@ -64,7 +128,7 @@
   background: rgba(76, 175, 80, 0.1);
   color: #4caf50;
 }
-.barbearia-selector { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.barbearia-selector { display: flex; gap: 0.75rem; flex-wrap: wrap; margin: 1.5rem 0; }
 .barbearia-btn {
   padding: 0.5rem 1rem;
   background: var(--dark-gray);
@@ -81,4 +145,185 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.section-header-actions{
+  margin-bottom: 1rem;
+}
+
+.servicos-list, .funcionarios-list, .horarios-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: rgba(17, 17, 17, 0.85);
+  border-radius: 10px;
+  padding: 1rem 1rem 2rem;
+}
+
+.servico-item, .funcionario-item, .horario-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border-bottom: 2px solid var(--white);
+}
+
+.servico-info, .funcionario-info, .horario-info {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.servico-desc {
+  color: var(--gray);
+  text-transform: capitalize;
+  font-size: 0.85rem;
+}
+
+.inline-form{
+  display: flex;
+  gap: 1rem;
+  margin-top:1rem ;
+}
+.horarios-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  
+  /* ESCONDER SCROLLBAR */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.horarios-table::-webkit-scrollbar {
+  display: none;
+}
+
+.horario-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
+}
+
+.horario-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.horario-item strong {
+  color: var(--corte-text, #ffffff);
+  font-size: 0.95rem;
+}
+
+.horario-item span {
+  color: var(--corte-text-muted, #a0a0a0);
+  font-size: 0.9rem;
+}
+.text-muted {
+  padding: 0 1.5rem;
+  margin: 0.5rem 0 1rem 0;
+  color: var(--corte-text-muted, #a0a0a0);
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 1rem;
+}
+
+.horarios-edit-list {
+  padding: 0.5rem 1.5rem;
+  max-height: 55vh;
+  overflow-y: auto;
+ scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.horarios-edit-list::-webkit-scrollbar {
+  display: none;
+}
+
+.horario-edit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background-color 0.2s ease;
+}
+
+.horario-edit-row:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.horario-edit-dia {
+  flex: 0 0 120px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--corte-text, #ffffff);
+  letter-spacing: -0.2px;
+}
+
+.horario-edit-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--corte-text-muted, #a0a0a0);
+  transition: color 0.2s ease;
+  flex: 0 0 80px;
+}
+
+.horario-edit-checkbox:hover {
+  color: var(--corte-text, #ffffff);
+}
+
+.horario-edit-checkbox input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--corte-gold, #d4af37);
+}
+
+.horario-time-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.horario-edit-time {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--corte-text, #ffffff);
+  font-family: monospace;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 110px;
+}
+
+.horario-edit-time:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.horario-edit-time:focus {
+  outline: none;
+  border-color: var(--corte-gold, #d4af37);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+.horario-time-group span {
+  color: var(--corte-text-muted, #a0a0a0);
+  font-size: 0.85rem;
+  font-weight: 500;
 }
