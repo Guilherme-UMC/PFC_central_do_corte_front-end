@@ -30,6 +30,14 @@ const IconPlus = () => (
   </svg>
 );
 
+const IconLocal = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-icon lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /><circle cx="12" cy="10" r="3" /></svg>
+)
+
+const IconTelefone = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-icon lucide-phone"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" /></svg>
+)
+
 const BarbeariaPage = ({ onNavigate }) => {
   const { user } = useAuthContext();
   const [barbearias, setBarbearias] = useState([]);
@@ -84,12 +92,12 @@ const BarbeariaPage = ({ onNavigate }) => {
 
   const carregarDadosBarbearia = async (barbeariaId) => {
     console.log('🔄 Recarregando dados da barbearia...');
-    
+
     setAgendamentos([]);
     setAgendamentosHoje([]);
     setServicos([]);
     setFuncionarios([]);
-    
+
     await Promise.all([
       carregarAgendamentos(barbeariaId),
       carregarAgendamentosHoje(barbeariaId),
@@ -97,15 +105,15 @@ const BarbeariaPage = ({ onNavigate }) => {
       carregarFuncionarios(barbeariaId),
       carregarHorarios(barbeariaId)
     ]);
-    
-    console.log('✅ Dados recarregados com sucesso');
+
+    console.log('Dados recarregados com sucesso');
   };
 
   const carregarAgendamentos = async (barbeariaId) => {
     const result = await AgendamentoService.listarPorBarbearia(barbeariaId);
     if (result.success) {
       setAgendamentos(result.data);
-      console.log(`📋 Agendamentos carregados: ${result.data.length}`);
+      console.log(`Agendamentos carregados: ${result.data.length}`);
     }
   };
 
@@ -145,11 +153,11 @@ const BarbeariaPage = ({ onNavigate }) => {
   const handleCancelarAgendamento = async (agendamentoId) => {
     const motivo = prompt('Informe o motivo do cancelamento:');
     if (!motivo || !motivo.trim()) return;
-    
+
     setLoadingAction(agendamentoId);
     const result = await AgendamentoService.cancelar(agendamentoId, motivo);
     setLoadingAction(null);
-    
+
     if (result.success) {
       showMessage('success', 'Agendamento cancelado com sucesso');
       await carregarDadosBarbearia(selectedBarbearia.id);
@@ -162,7 +170,7 @@ const BarbeariaPage = ({ onNavigate }) => {
     setLoadingAction(agendamentoId);
     const result = await AgendamentoService.confirmar(agendamentoId);
     setLoadingAction(null);
-    
+
     if (result.success) {
       showMessage('success', 'Agendamento confirmado com sucesso');
       await carregarDadosBarbearia(selectedBarbearia.id);
@@ -175,7 +183,7 @@ const BarbeariaPage = ({ onNavigate }) => {
     setLoadingAction(agendamentoId);
     const result = await AgendamentoService.concluir(agendamentoId);
     setLoadingAction(null);
-    
+
     if (result.success) {
       showMessage('success', 'Atendimento concluído com sucesso');
       await carregarDadosBarbearia(selectedBarbearia.id);
@@ -286,9 +294,9 @@ const BarbeariaPage = ({ onNavigate }) => {
         horaFechamento: h.fechado ? null : (h.horaFechamento || '18:00'),
         fechado: h.fechado
       }));
-      
+
       const result = await HorarioService.updateHorarios(selectedBarbearia.id, horariosParaEnviar);
-      
+
       if (result.success) {
         showMessage('success', 'Horários salvos com sucesso!');
         setShowHorarioForm(false);
@@ -388,23 +396,23 @@ const BarbeariaPage = ({ onNavigate }) => {
                 <IconEdit /> Editar
               </button>
             </div>
-            
+
             <div className="barbearia-info-details">
-              <div className="info-row">
-                <span className="info-icon">📍</span>
+              <div className="info">
+                <span className="info-icon"><IconLocal /></span>
                 <span>{selectedBarbearia.logradouro}, {selectedBarbearia.numero}</span>
               </div>
-              <div className="info-row">
-                <span className="info-icon">🏘️</span>
+              <div className="info">
+                <span className="info-icon"></span>
                 <span>{selectedBarbearia.bairro}</span>
               </div>
-              <div className="info-row">
-                <span className="info-icon">🏙️</span>
+              <div className="info">
+                <span className="info-icon"></span>
                 <span>{selectedBarbearia.cidade} - {selectedBarbearia.uf} | CEP: {selectedBarbearia.cep}</span>
               </div>
               {selectedBarbearia.telefone && (
-                <div className="info-row">
-                  <span className="info-icon">📞</span>
+                <div className="info">
+                  <span className="info-icon"><IconTelefone /></span>
                   <span>{selectedBarbearia.telefone}</span>
                 </div>
               )}
@@ -421,30 +429,27 @@ const BarbeariaPage = ({ onNavigate }) => {
             Agendamentos de Hoje
             {agendamentosHoje.length > 0 && <span className="tab-count today">{agendamentosHoje.length}</span>}
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'servicos' ? 'active' : ''}`} 
+          <button
+            className={`tab-btn ${activeTab === 'servicos' ? 'active' : ''}`}
             onClick={() => setActiveTab('servicos')}
           >Serviços</button>
-          <button 
-            className={`tab-btn ${activeTab === 'funcionarios' ? 'active' : ''}`} 
+          <button
+            className={`tab-btn ${activeTab === 'funcionarios' ? 'active' : ''}`}
             onClick={() => setActiveTab('funcionarios')}
           >Funcionários</button>
-          <button 
-            className={`tab-btn ${activeTab === 'horarios' ? 'active' : ''}`} 
+          <button
+            className={`tab-btn ${activeTab === 'horarios' ? 'active' : ''}`}
             onClick={() => setActiveTab('horarios')}
           >Horários</button>
-          {/* NOVA TAB: DASHBOARD */}
-          <button 
-            className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`} 
+          <button
+            className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
             onClick={() => setActiveTab('dashboard')}
           >
-            📊 Dashboard
+            Dashboard
           </button>
         </div>
 
         <div className="page-content">
-          
-          {/* TAB: TODOS OS AGENDAMENTOS */}
           {activeTab === 'agendamentos' && (
             <div className="agendamentos-list">
               {agendamentos.length === 0 ? (
@@ -460,54 +465,54 @@ const BarbeariaPage = ({ onNavigate }) => {
                         <h3>{ag.clienteNome}</h3>
                         <StatusBadge status={ag.status} />
                       </div>
+
                       <div className="agendamento-info">
-                        <p><strong>Data:</strong> {formatarDataHora(ag.dataHora)}</p>
-                        <p><strong>Serviço:</strong> {ag.servicoNome}</p>
-                        <p><strong>Valor:</strong> R$ {ag.servicoPreco?.toFixed(2)}</p>
-                        <p><strong>Funcionário:</strong> {ag.funcionarioNome || 'Não definido'}</p>
+                        <p><strong>Data:</strong><br /> {formatarDataHora(ag.dataHora)}</p>
+                        <p><strong>Serviço:</strong> <br />{ag.servicoNome}</p>
+                        <p><strong>Valor:</strong><br /> R$ {ag.servicoPreco?.toFixed(2)}</p>
+                        <p><strong>Funcionário:</strong> <br />{ag.funcionarioNome || 'Não definido'}</p>
                         {ag.observacao && <p><strong>Obs:</strong> {ag.observacao}</p>}
                       </div>
-                      
-                      {/* Botões para agendamentos AGUARDANDO CONFIRMAÇÃO */}
+
                       {ag.status === 'Aguardando confirmação' && (
                         <div className="agendamento-actions">
-                          <button 
-                            className="btn-success small" 
-                            onClick={() => handleConfirmarAgendamento(ag.id)} 
+                          <button
+                            className="btn-concluir"
+                            onClick={() => handleConfirmarAgendamento(ag.id)}
                             disabled={isLoading}
                           >
                             {isLoading ? '...' : '✓ Confirmar'}
                           </button>
-                          <button 
-                            className="btn-danger small" 
-                            onClick={() => handleCancelarAgendamento(ag.id)} 
+                          <button
+                            className="btn-danger"
+                            onClick={() => handleCancelarAgendamento(ag.id)}
                             disabled={isLoading}
                           >
                             {isLoading ? '...' : '✗ Cancelar'}
                           </button>
                         </div>
                       )}
-                      
+
                       {/* Botões para agendamentos CONFIRMADOS */}
                       {ag.status === 'Confirmado' && (
                         <div className="agendamento-actions">
-                          <button 
-                            className="btn-primary small" 
-                            onClick={() => handleConcluirAgendamento(ag.id)} 
+                          <button
+                            className="btn-concluir"
+                            onClick={() => handleConcluirAgendamento(ag.id)}
                             disabled={isLoading}
                           >
                             {isLoading ? '...' : '✓ Concluir Atendimento'}
                           </button>
-                          <button 
-                            className="btn-danger small" 
-                            onClick={() => handleCancelarAgendamento(ag.id)} 
+                          <button
+                            className="btn-danger"
+                            onClick={() => handleCancelarAgendamento(ag.id)}
                             disabled={isLoading}
                           >
                             {isLoading ? '...' : '✗ Cancelar'}
                           </button>
                         </div>
                       )}
-                      
+
                       {/* Status para agendamentos CANCELADOS */}
                       {(ag.status === 'Cancelado pelo cliente' || ag.status === 'Cancelado pela barbearia') && (
                         <div className="agendamento-actions">
@@ -516,7 +521,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                           </span>
                         </div>
                       )}
-                      
+
                       {/* Status para agendamentos CONCLUÍDOS */}
                       {ag.status === 'Concluído' && (
                         <div className="agendamento-actions">
@@ -559,47 +564,47 @@ const BarbeariaPage = ({ onNavigate }) => {
                         <p><strong>Funcionário:</strong> {ag.funcionarioNome || 'Não definido'}</p>
                         {ag.observacao && <p><strong>Obs:</strong> {ag.observacao}</p>}
                       </div>
-                      
+
                       {/* Botões para agendamentos AGUARDANDO CONFIRMAÇÃO */}
                       {ag.status === 'Aguardando confirmação' && (
                         <div className="agendamento-actions">
-                          <button 
-                            className="btn-success small" 
-                            onClick={() => handleConfirmarAgendamento(ag.id)} 
+                          <button
+                            className="btn-success small"
+                            onClick={() => handleConfirmarAgendamento(ag.id)}
                             disabled={isLoading}
                           >
                             {isLoading ? '...' : '✓ Confirmar'}
                           </button>
-                          <button 
-                            className="btn-danger small" 
-                            onClick={() => handleCancelarAgendamento(ag.id)} 
+                          <button
+                            className="btn-danger small"
+                            onClick={() => handleCancelarAgendamento(ag.id)}
                             disabled={isLoading}
                           >
                             {isLoading ? '...' : '✗ Cancelar'}
                           </button>
                         </div>
                       )}
-                      
+
                       {/* Botões para agendamentos CONFIRMADOS */}
                       {ag.status === 'Confirmado' && (
                         <div className="agendamento-actions">
-                          <button 
-                            className="btn-primary small" 
-                            onClick={() => handleConcluirAgendamento(ag.id)} 
+                          <button
+                            className="btn-primary small"
+                            onClick={() => handleConcluirAgendamento(ag.id)}
                             disabled={isLoading}
                           >
                             {isLoading ? '...' : '✓ Concluir Atendimento'}
                           </button>
-                          <button 
-                            className="btn-danger small" 
-                            onClick={() => handleCancelarAgendamento(ag.id)} 
+                          <button
+                            className="btn-danger small"
+                            onClick={() => handleCancelarAgendamento(ag.id)}
                             disabled={isLoading}
                           >
                             {isLoading ? '...' : '✗ Cancelar'}
                           </button>
                         </div>
                       )}
-                      
+
                       {/* Status para agendamentos CANCELADOS */}
                       {(ag.status === 'Cancelado pelo cliente' || ag.status === 'Cancelado pela barbearia') && (
                         <div className="agendamento-actions">
@@ -608,7 +613,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                           </span>
                         </div>
                       )}
-                      
+
                       {/* Status para agendamentos CONCLUÍDOS */}
                       {ag.status === 'Concluído' && (
                         <div className="agendamento-actions">
@@ -632,23 +637,35 @@ const BarbeariaPage = ({ onNavigate }) => {
             <div>
               <div className="section-header-actions">
                 <h3>Serviços Oferecidos</h3>
-                <button className="btn-primary small" onClick={() => setShowServicoForm(true)}>
-                  <IconPlus /> Novo Serviço
-                </button>
               </div>
+              <button className="btn-concluir" onClick={() => setShowServicoForm(true)}>
+                <IconPlus /> Novo Serviço
+              </button>
 
               {showServicoForm && (
-                <div className="modal-overlay">
-                  <div className="modal-content">
+                <div className="modal-overlay2">
+                  <div className="modal-content2">
                     <h3>{editingServico ? 'Editar Serviço' : 'Novo Serviço'}</h3>
-                    <form onSubmit={handleServicoSubmit}>
-                      <input type="text" placeholder="Nome do serviço" value={servicoForm.nome} onChange={e => setServicoForm({ ...servicoForm, nome: e.target.value })} required />
-                      <textarea placeholder="Descrição" value={servicoForm.descricao} onChange={e => setServicoForm({ ...servicoForm, descricao: e.target.value })} rows={2} />
-                      <input type="number" step="0.01" placeholder="Preço (R$)" value={servicoForm.preco} onChange={e => setServicoForm({ ...servicoForm, preco: e.target.value })} required />
-                      <input type="number" placeholder="Duração (minutos)" value={servicoForm.duracaoMinutos} onChange={e => setServicoForm({ ...servicoForm, duracaoMinutos: e.target.value })} required />
+                    <form  className="form" onSubmit={handleServicoSubmit}>
+                      <div className="form-group">
+                        <label className="form-label">Nome do Serviço</label>
+                        <input className="form-input" type="text" placeholder="Nome do serviço" value={servicoForm.nome} onChange={e => setServicoForm({ ...servicoForm, nome: e.target.value })} required />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Descrição</label>
+                      <textarea className="form-input" placeholder="Descrição" value={servicoForm.descricao} onChange={e => setServicoForm({ ...servicoForm, descricao: e.target.value })} rows={2} />
+                        </div>
+                        <div className="form-group">
+                        <label className="form-label">Preço</label>
+                      <input className="form-input" type="number" step="0.01" placeholder="Preço (R$)" value={servicoForm.preco} onChange={e => setServicoForm({ ...servicoForm, preco: e.target.value })} required />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Duração</label>
+                      <input className="form-input" type="number" placeholder="Duração (minutos)" value={servicoForm.duracaoMinutos} onChange={e => setServicoForm({ ...servicoForm, duracaoMinutos: e.target.value })} required />
+                      </div>
                       <div className="modal-actions">
-                        <button type="button" className="btn-secondary" onClick={() => { setShowServicoForm(false); setEditingServico(null); setServicoForm({ nome: '', descricao: '', preco: '', duracaoMinutos: '' }); }}>Cancelar</button>
-                        <button type="submit" className="btn-primary" disabled={submitting}>{submitting ? 'Salvando...' : 'Salvar'}</button>
+                        <button type="button" className="btn-danger" onClick={() => { setShowServicoForm(false); setEditingServico(null); setServicoForm({ nome: '', descricao: '', preco: '', duracaoMinutos: '' }); }}>Cancelar</button>
+                        <button type="submit" className="btn-cancelar" disabled={submitting}>{submitting ? 'Salvando...' : 'Salvar'}</button>
                       </div>
                     </form>
                   </div>
@@ -683,10 +700,10 @@ const BarbeariaPage = ({ onNavigate }) => {
             <div>
               <div className="section-header-actions">
                 <h3>Funcionários</h3>
-                <button className="btn-primary small" onClick={() => setShowFuncionarioForm(true)}>
+              </div>
+                <button className="btn-concluir" onClick={() => setShowFuncionarioForm(true)}>
                   <IconPlus /> Novo Funcionário
                 </button>
-              </div>
 
               {showFuncionarioForm && (
                 <div className="modal-overlay">
@@ -707,10 +724,10 @@ const BarbeariaPage = ({ onNavigate }) => {
               )}
 
               <div className="vinculacao-section">
-                <h4>Vincular funcionário existente</h4>
+                <br /><h4>Vincular funcionário existente</h4>
                 <form onSubmit={handleVincularFuncionario} className="inline-form">
-                  <input type="email" placeholder="Email do funcionário" value={vincularEmail} onChange={e => setVincularEmail(e.target.value)} required />
-                  <button type="submit" className="btn-primary" disabled={submitting}>Vincular</button>
+                  <input type="email" className='form-input' placeholder="Email do funcionário" value={vincularEmail} onChange={e => setVincularEmail(e.target.value)} required />
+                  <button type="submit" className="btn-concluir" disabled={submitting}>Vincular</button>
                 </form>
               </div>
 
@@ -738,28 +755,28 @@ const BarbeariaPage = ({ onNavigate }) => {
             <div>
               <div className="section-header-actions">
                 <h3>Horários de Funcionamento</h3>
-                <button className="btn-primary small" onClick={() => setShowHorarioForm(true)}>
+              </div>
+                <button className="btn-concluir" onClick={() => setShowHorarioForm(true)}>
                   <IconPlus /> Editar Horários
                 </button>
-              </div>
 
               {showHorarioForm && (
-                <div className="modal-overlay">
-                  <div className="modal-content">
+                <div className="modal-overlay2">
+                  <div className="modal-content2">
                     <h3>Editar Horários de Funcionamento</h3>
                     <p className="text-muted">
                       Configure os horários de funcionamento para cada dia da semana
                     </p>
-                    
+
                     <div className="horarios-edit-list">
                       {DIAS_SEMANA.map((dia) => {
-                        const horarioAtual = horarios.find(h => h.dia === dia.value) || { 
-                          dia: dia.value, 
-                          horaAbertura: '09:00', 
-                          horaFechamento: '18:00', 
-                          fechado: false 
+                        const horarioAtual = horarios.find(h => h.dia === dia.value) || {
+                          dia: dia.value,
+                          horaAbertura: '09:00',
+                          horaFechamento: '18:00',
+                          fechado: false
                         };
-                        
+
                         return (
                           <div key={dia.value} className="horario-edit-row">
                             <span className="horario-edit-dia">{dia.label}</span>
@@ -843,10 +860,10 @@ const BarbeariaPage = ({ onNavigate }) => {
                         );
                       })}
                     </div>
-                    
+
                     <div className="modal-actions">
-                      <button type="button" className="btn-secondary" onClick={() => { setShowHorarioForm(false); carregarHorarios(selectedBarbearia.id); }}>Cancelar</button>
-                      <button type="button" className="btn-primary" onClick={salvarHorarios} disabled={submitting}>{submitting ? 'Salvando...' : 'Salvar Horários'}</button>
+                      <button type="button" className="btn-danger" onClick={() => { setShowHorarioForm(false); carregarHorarios(selectedBarbearia.id); }}>Cancelar</button>
+                      <button type="button" className="btn-cancelar" onClick={salvarHorarios} disabled={submitting}>{submitting ? 'Salvando...' : 'Salvar Horários'}</button>
                     </div>
                   </div>
                 </div>

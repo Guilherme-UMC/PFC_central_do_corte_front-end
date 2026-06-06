@@ -1,13 +1,15 @@
 .perfil-page .perfil-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
 }
+
 .perfil-card {
-  background: rgba(17, 17, 17, 0.85);
+  background: var(--card);
   border-radius: 12px;
   padding: 1.5rem;
   border: 1px solid var(--corte-border);
+  margin-top: 1rem;
 }
 .perfil-card .card-header {
   display: flex;
@@ -23,5 +25,5 @@
   background: rgba(255, 255, 255, 0.03);
   border-radius: 6px;
 }
-.logout-card { text-align: center; }
-.logout-card button { width: 100%; }
+.logout-card { width: 20%;text-align: center; }
+.logout-card button {  margin-top: 1rem;}
