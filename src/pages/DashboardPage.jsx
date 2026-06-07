@@ -51,6 +51,14 @@ const IconCancel = () => (
   </svg>
 );
 
+const IconYear = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24">
+    <path d="M3 3h18v18H3z" />
+    <path d="M3 9h18" />
+    <path d="M9 21V9" />
+  </svg>
+);
+
 const DashboardPage = ({ onNavigate }) => {
   const { user } = useAuthContext();
   const [barbearias, setBarbearias] = useState([]);
@@ -110,7 +118,7 @@ const DashboardPage = ({ onNavigate }) => {
   };
 
   const formatarMoeda = (valor) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0);
   };
 
   if (loading) return <Loader />;
@@ -164,18 +172,26 @@ const DashboardPage = ({ onNavigate }) => {
               icon={<IconMoney />}
               color="#2e7d32"
             />
+            {/* NOVO CARD: Faturamento do Ano */}
+            <DashboardCard
+              title="Faturamento do Ano"
+              value={formatarMoeda(metricas.faturamentoAno || 0)}
+              icon={<IconYear />}
+              color="#1e88e5"
+            />
             <DashboardCard
               title="Clientes Atendidos"
               value={metricas.clientesAtendidos || 0}
               icon={<IconUsers />}
-              color="#1e88e5"
+              color="#9b59b6"
             />
             <DashboardCard
-              title="Taxa de Confirmação"
+              title="Taxa de Conclusão"
               value={`${metricas.taxaConfirmacao || 0}%`}
               icon={<IconCheck />}
               color="#e67e22"
             />
+
             <DashboardCard
               title="Cancelamentos"
               value={metricas.cancelamentos || 0}
@@ -187,22 +203,22 @@ const DashboardPage = ({ onNavigate }) => {
           {/* Seletor de Período */}
           <div className="dashboard-periodo">
             <button className={`periodo-btn ${periodo === 'semana' ? 'active' : ''}`} onClick={() => setPeriodo('semana')}>
-              Esta Semana
+              📅 Esta Semana
             </button>
             <button className={`periodo-btn ${periodo === 'mes' ? 'active' : ''}`} onClick={() => setPeriodo('mes')}>
-              Este Mês
+              📆 Este Mês
             </button>
             <button className={`periodo-btn ${periodo === 'ano' ? 'active' : ''}`} onClick={() => setPeriodo('ano')}>
-              Este Ano
+              📈 Este Ano
             </button>
           </div>
 
-          {/* Gráfico de Agendamentos */}
+          {/* Gráfico de Agendamentos Concluídos */}
           <div className="dashboard-chart">
             <ChartBar
               data={dadosGrafico.valores || [12, 19, 15, 25, 22, 23]}
               labels={dadosGrafico.labels || ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun']}
-              title="Agendamentos por Período"
+              title="Agendamentos Concluídos por Período"
               height={300}
             />
           </div>
@@ -223,6 +239,14 @@ const DashboardPage = ({ onNavigate }) => {
                 <span>Média de agendamentos/dia:</span>
                 <strong>{Math.round((metricas.agendamentosMes || 0) / 30)}</strong>
               </div>
+              <div className="info-row">
+                <span>Ticket médio por serviço:</span>
+                <strong>
+                  {metricas.servicosRealizados > 0 
+                    ? formatarMoeda((metricas.faturamentoAno || 0) / metricas.servicosRealizados)
+                    : formatarMoeda(0)}
+                </strong>
+              </div>
             </div>
             <div className="info-card">
               <h3>💡 Dicas para melhorar</h3>
@@ -230,6 +254,7 @@ const DashboardPage = ({ onNavigate }) => {
                 <li>✓ Mantenha seus horários sempre atualizados</li>
                 <li>✓ Responda rapidamente as confirmações</li>
                 <li>✓ Ofereça serviços variados para atrair mais clientes</li>
+                <li>✓ Colete avaliações dos clientes após o atendimento</li>
               </ul>
             </div>
           </div>

@@ -4,27 +4,42 @@ const ChartBar = ({ data, labels, title, height = 300 }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (!canvasRef.current || !data || !labels) return;
+    if (!canvasRef.current || !data || !labels || data.length === 0) {
+      console.log('📊 ChartBar: dados insuficientes', { data, labels });
+      return;
+    }
+    
+    console.log('📊 ChartBar: renderizando gráfico', { data, labels, title });
     
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    const width = canvas.parentElement.clientWidth;
-    const barWidth = (width - 80) / (data.length * 1.5);
+    const container = canvas.parentElement;
+    const width = container.clientWidth - 40;
+    const barWidth = Math.max(30, (width - 60) / (data.length * 1.5));
     const maxValue = Math.max(...data, 1);
     
     canvas.width = width;
     canvas.height = height;
     
+    // Limpar canvas
     ctx.clearRect(0, 0, width, height);
     
+    // Fundo escuro
     ctx.fillStyle = '#1a1a2e';
     ctx.fillRect(0, 0, width, height);
     
+    // Título
+    ctx.fillStyle = '#f0ece4';
+    ctx.font = 'bold 14px DM Sans';
+    ctx.fillText(title, 20, 30);
+    
+    // Desenhar barras
     for (let i = 0; i < data.length; i++) {
-      const x = 40 + i * (barWidth + 20);
+      const x = 40 + i * (barWidth + 15);
       const barHeight = (data[i] / maxValue) * (height - 80);
       const y = height - 40 - barHeight;
       
+      // Gradiente
       const gradient = ctx.createLinearGradient(x, y, x, y + barHeight);
       gradient.addColorStop(0, '#d4af37');
       gradient.addColorStop(1, '#c9a84c');
@@ -32,20 +47,30 @@ const ChartBar = ({ data, labels, title, height = 300 }) => {
       ctx.fillStyle = gradient;
       ctx.fillRect(x, y, barWidth, barHeight);
       
-      ctx.fillStyle = '#f0ece4';
-      ctx.font = '12px DM Sans';
-      ctx.fillText(data[i], x + barWidth / 2 - 10, y - 5);
+      // Valor no topo da barra (se maior que 0)
+      if (data[i] > 0) {
+        ctx.fillStyle = '#f0ece4';
+        ctx.font = '12px DM Sans';
+        ctx.fillText(data[i], x + barWidth / 2 - 8, y - 5);
+      }
       
+      // Label abaixo da barra
       ctx.fillStyle = '#8a8278';
       ctx.font = '11px DM Sans';
-      ctx.fillText(labels[i], x + barWidth / 2 - 15, height - 20);
+      const label = labels[i] || '';
+      ctx.fillText(label.substring(0, 10), x + barWidth / 2 - 15, height - 20);
     }
     
-    ctx.fillStyle = '#f0ece4';
-    ctx.font = 'bold 14px DM Sans';
-    ctx.fillText(title, 20, 25);
-    
   }, [data, labels, title, height]);
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="chart-empty" style={{ textAlign: 'center', padding: '40px', color: '#8a8278' }}>
+        <p>Nenhum dado disponível para o período selecionado</p>
+        <p style={{ fontSize: '12px', marginTop: '8px' }}>Complete agendamentos para ver o gráfico</p>
+      </div>
+    );
+  }
 
   return (
     <div className="chart-container" style={{ width: '100%', overflowX: 'auto' }}>

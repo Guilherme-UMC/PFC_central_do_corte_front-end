@@ -87,9 +87,9 @@ const Login = () => {
         </form>
 
         <div className="auth-link">
-          <p>Não tem conta?
-          <Link to="/signup">Criar Conta</Link></p>
+          <p>Não tem conta?<Link to="/signup">Criar Conta</Link></p>
           <p>Esqueceu sua senha?<Link to="/esqueci-senha">Recuperar</Link></p>
+          <p>Quer criar uma Barbearia?<a href="#" onClick={(e) => { e.preventDefault(); navigate('/signup-barbearia'); }}>Cadastrar Barbearia</a></p>
         </div>
       </div>
     </div>

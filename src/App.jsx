@@ -42,7 +42,7 @@ const router = createBrowserRouter([
           { path: 'signup-barbearia', element: <SignupBarbearia /> },
           { path: 'esqueci-senha', element: <EsqueciSenha /> },
           { path: 'redefinir-senha', element: <RedefinirSenha /> },
-          
+          { path: 'cadastro-barbearia', element: <CadastroBarbearia /> },
         ],
       },
       

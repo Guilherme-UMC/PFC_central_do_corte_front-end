@@ -64,7 +64,7 @@ body {
   border: none;
   font-size: 1rem;
   font-weight: 500;
-  color: var(--white);
+  color: var(--corte-text-muted);
   cursor: pointer;
   transition: all 0.2s;
 }
