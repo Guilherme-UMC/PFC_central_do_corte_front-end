@@ -23,11 +23,11 @@ const AdminLogsPage = () => {
     totalElements: 0
   });
   useEffect(() => {
-  console.log('👤 Usuário logado:', user);
-  console.log('👤 Role do usuário:', user?.role);
-  console.log('👤 Role esperada: ROLE_ADMIN');
-  carregarDadosIniciais();
-}, []);
+    console.log('👤 Usuário logado:', user);
+    console.log('👤 Role do usuário:', user?.role);
+    console.log('👤 Role esperada: ROLE_ADMIN');
+    carregarDadosIniciais();
+  }, []);
 
   useEffect(() => {
     carregarDadosIniciais();
@@ -112,7 +112,7 @@ const AdminLogsPage = () => {
   return (
     <div className="admin-logs-container">
       <div className="admin-logs-header">
-        <h1>📋 Logs do Sistema</h1>
+        <h1>Logs do Sistema</h1>
         <p>Visualize todas as ações realizadas no sistema</p>
       </div>
 
@@ -132,20 +132,21 @@ const AdminLogsPage = () => {
 
       {/* Filtros */}
       <div className="filtros-container">
-        <select name="tipo" value={filtros.tipo} onChange={handleFiltroChange}>
+        <select name="tipo" className="select" value={filtros.tipo} onChange={handleFiltroChange}>
           <option value="">Todos os tipos</option>
           {tipos.map(tipo => (
             <option key={tipo} value={tipo}>{tipo}</option>
           ))}
         </select>
 
-        <select name="acao" value={filtros.acao} onChange={handleFiltroChange}>
+        <select name="acao" className="select" value={filtros.acao} onChange={handleFiltroChange}>
           <option value="">Todas as ações</option>
           {acoes.map(acao => (
             <option key={acao} value={acao}>{acao}</option>
           ))}
         </select>
 
+        <label className="form-label">Data Inicio:</label>
         <input
           type="date"
           name="dataInicio"
@@ -154,6 +155,7 @@ const AdminLogsPage = () => {
           placeholder="Data início"
         />
 
+        <label className="form-label">Data Fim:</label>
         <input
           type="date"
           name="dataFim"

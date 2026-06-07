@@ -58,7 +58,7 @@
   border-radius: 12px;
 }
 
-.filtros-container select,
+.filtros-container .select,
 .filtros-container input {
   padding: 0.5rem 1rem;
   background: rgba(255, 255, 255, 0.08);
@@ -68,7 +68,11 @@
   font-size: 0.9rem;
 }
 
-.filtros-container select:focus,
+.filtros-container .select option {
+  background-color: var(--corte-surface);
+}
+
+.filtros-container .select:focus,
 .filtros-container input:focus {
   outline: none;
   border-color: var(--corte-gold);
@@ -91,7 +95,7 @@
 
 .logs-table-container {
   overflow-x: auto;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--card);
   border-radius: 12px;
   border: 1px solid var(--corte-border);
 }
