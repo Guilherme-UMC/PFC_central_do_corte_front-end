@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../contexts/AuthContext';
 import AdminService from '../services/AdminService';
 import BarbeariaService from '../services/BarbeariaService';
@@ -9,9 +10,11 @@ import PasswordInput from '../components/PasswordInput';
 const IconEdit = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M17 3l4 4-7 7H10v-4l7-7z" /><path d="M4 20h16" /></svg>);
 const IconTrash = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><polyline points="3 6 5 6 21 6" /><path d="M8 6V4h8v2" /><rect x="10" y="11" width="4" height="8" /></svg>);
 const IconPlus = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>);
+const IconLogs = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><path d="M4 4h16v16H4z" /><line x1="8" y1="8" x2="16" y2="8" /><line x1="8" y1="12" x2="16" y2="12" /><line x1="8" y1="16" x2="12" y2="16" /></svg>);
 
 const AdminPage = ({ onNavigate }) => {
   const { user } = useAuthContext();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('usuarios');
   const [userFilter, setUserFilter] = useState('todos');
   const [roleFilter, setRoleFilter] = useState('todos');
@@ -76,7 +79,7 @@ const AdminPage = ({ onNavigate }) => {
     } else {
       carregarBarbearias();
     }
-  }, [activeTab, pagination.page, userFilter, roleFilter, searchTerm]);
+  }, [activeTab, pagination.page, userFilter, roleFilter, searchTerm, carregarUsuarios]);
 
   const handlePageChange = (newPage) => {
     setPagination(prev => ({ ...prev, page: newPage }));
@@ -136,6 +139,10 @@ const AdminPage = ({ onNavigate }) => {
     }
   };
 
+  const handleNavigateToLogs = () => {
+    navigate('/page/admin/logs');
+  };
+
   const showMessage = (type, text) => {
     setMessage({ type, text });
     setTimeout(() => setMessage({ type: '', text: '' }), 3000);
@@ -167,9 +174,25 @@ const AdminPage = ({ onNavigate }) => {
           <p>Bem-vindo, {user?.name}</p>
         </div>
 
+        <div className="admin-actions-bar">
+          <button className="btn-logs" onClick={handleNavigateToLogs}>
+            <IconLogs /> Logs do Sistema
+          </button>
+        </div>
+
         <div className="page-tabs">
-          <button className={`tab-btn ${activeTab === 'usuarios' ? 'active' : ''}`} onClick={() => { setActiveTab('usuarios'); setPagination(prev => ({ ...prev, page: 0 })); }}>Usuários</button>
-          <button className={`tab-btn ${activeTab === 'barbearias' ? 'active' : ''}`} onClick={() => setActiveTab('barbearias')}>Barbearias</button>
+          <button 
+            className={`tab-btn ${activeTab === 'usuarios' ? 'active' : ''}`} 
+            onClick={() => { setActiveTab('usuarios'); setPagination(prev => ({ ...prev, page: 0 })); }}
+          >
+            Usuários
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'barbearias' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('barbearias')}
+          >
+            Barbearias
+          </button>
         </div>
 
         <div className="page-content">
@@ -178,7 +201,6 @@ const AdminPage = ({ onNavigate }) => {
               <div className="section-header-actions">
                 <h3>Gerenciar Usuários</h3>
 
-                {/* Barra de busca */}
                 <div className="search-bar">
                   <input
                     type="text"
@@ -194,7 +216,6 @@ const AdminPage = ({ onNavigate }) => {
                 </div>
               </div>
 
-              {/* Filtros */}
               <div className="filter-buttons">
                 <button
                   className={`filter-btn ${userFilter === 'todos' ? 'active' : ''}`}
@@ -216,7 +237,6 @@ const AdminPage = ({ onNavigate }) => {
                 </button>
               </div>
 
-              {/* Filtro por role */}
               <div className="filter-buttons role-filters">
                 <button
                   className={`filter-btn ${roleFilter === 'todos' ? 'active' : ''}`}
@@ -255,10 +275,12 @@ const AdminPage = ({ onNavigate }) => {
                   <div className="modal-content2">
                     <h3>Criar Novo Usuário</h3>
                     <form className="form" onSubmit={handleCreateUser}>
-                      <label className="form-label">Nome Completa</label>
-                      <input className='form-input' type="text" placeholder="Nome completo" value={userForm.name} onChange={e => setUserForm({ ...userForm, name: e.target.value })} required />
+                      <label className="form-label">Nome Completo</label>
+                      <input className="form-input" type="text" placeholder="Nome completo" value={userForm.name} onChange={e => setUserForm({ ...userForm, name: e.target.value })} required />
+                      
                       <label className="form-label">Email</label>
-                      <input className='form-input' type="email" placeholder="Email" value={userForm.email} onChange={e => setUserForm({ ...userForm, email: e.target.value })} required />
+                      <input className="form-input" type="email" placeholder="Email" value={userForm.email} onChange={e => setUserForm({ ...userForm, email: e.target.value })} required />
+                      
                       <PasswordInput
                         name="password"
                         label="Senha"
@@ -267,15 +289,18 @@ const AdminPage = ({ onNavigate }) => {
                         onChange={e => setUserForm({ ...userForm, password: e.target.value })}
                         required
                       />
+                      
                       <label className="form-label">Telefone</label>
-                      <input className='form-input' type="tel" placeholder="Telefone" value={userForm.telefone} onChange={e => setUserForm({ ...userForm, telefone: e.target.value })} />
-                      <label className="form-label">função</label>
-                      <select className='form-select' value={userForm.role} onChange={e => setUserForm({ ...userForm, role: e.target.value })}>
+                      <input className="form-input" type="tel" placeholder="Telefone" value={userForm.telefone} onChange={e => setUserForm({ ...userForm, telefone: e.target.value })} />
+                      
+                      <label className="form-label">Função</label>
+                      <select className="form-select" value={userForm.role} onChange={e => setUserForm({ ...userForm, role: e.target.value })}>
                         <option value="ROLE_CLIENTE">Cliente</option>
                         <option value="ROLE_FUNCIONARIO">Funcionário</option>
                         <option value="ROLE_BARBEARIA_ADM">Proprietário de Barbearia</option>
                         <option value="ROLE_ADMIN">Administrador</option>
                       </select>
+                      
                       <div className="modal-actions">
                         <button type="button" className="btn-danger" onClick={() => { setShowUserForm(false); setUserForm({ name: '', email: '', password: '', telefone: '', role: 'ROLE_CLIENTE' }); }}>Cancelar</button>
                         <button type="submit" className="btn-concluir" disabled={submitting}>{submitting ? 'Criando...' : 'Criar'}</button>
@@ -286,7 +311,7 @@ const AdminPage = ({ onNavigate }) => {
               )}
 
               <div className="usuarios-table">
-                <table>
+                <table className="admin-table">
                   <thead>
                     <tr>
                       <th>Nome</th>
@@ -333,9 +358,8 @@ const AdminPage = ({ onNavigate }) => {
                                 )}
                               </>
                             )}
-
-                            {isRemovido & (
-                              <span className='badeg-removido'>Removido</span>
+                            {isRemovido && (
+                              <span className="badge-removido">Removido</span>
                             )}
                           </td>
                         </tr>
@@ -345,7 +369,6 @@ const AdminPage = ({ onNavigate }) => {
                 </table>
               </div>
 
-              {/* Paginação */}
               {pagination.totalPages > 1 && (
                 <div className="pagination">
                   <button
@@ -374,7 +397,7 @@ const AdminPage = ({ onNavigate }) => {
             <div>
               <h3>Gerenciar Barbearias</h3>
               <div className="barbearias-table">
-                <table>
+                <table className="admin-table">
                   <thead>
                     <tr>
                       <th>Nome</th>
@@ -415,7 +438,6 @@ const AdminPage = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Modal de Confirmação */}
       {showConfirmModal && selectedUser && (
         <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
           <div className="modal-content confirm-modal" onClick={(e) => e.stopPropagation()}>
@@ -441,7 +463,7 @@ const AdminPage = ({ onNavigate }) => {
                 Cancelar
               </button>
               <button
-                className={actionType === 'delete' ? 'btn-danger' : 'btn-warning'} className="btn-danger"
+                className={actionType === 'delete' ? 'btn-danger' : 'btn-warning'}
                 onClick={handleConfirmAction}
               >
                 {actionType === 'toggle'
@@ -453,6 +475,160 @@ const AdminPage = ({ onNavigate }) => {
           </div>
         </div>
       )}
+
+      <style>{`
+        .admin-actions-bar {
+          display: flex;
+          justify-content: flex-end;
+          margin-bottom: 1.5rem;
+        }
+        
+        .btn-logs {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+          border: 1px solid var(--corte-border);
+          border-radius: 8px;
+          color: var(--corte-text);
+          cursor: pointer;
+          transition: all 0.2s;
+          font-size: 0.9rem;
+        }
+        
+        .btn-logs:hover {
+          border-color: var(--corte-gold);
+          transform: translateY(-1px);
+        }
+        
+        .badge-removido {
+          display: inline-block;
+          padding: 0.25rem 0.5rem;
+          background: #c62828;
+          color: white;
+          border-radius: 4px;
+          font-size: 0.7rem;
+          font-weight: 600;
+        }
+        
+        .admin-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        
+        .admin-table th,
+        .admin-table td {
+          padding: 12px;
+          text-align: left;
+          border-bottom: 1px solid var(--corte-border);
+        }
+        
+        .admin-table th {
+          background: rgba(0, 0, 0, 0.2);
+          font-weight: 600;
+          color: var(--corte-text-muted);
+        }
+        
+        .table-actions {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        
+        .btn-action {
+          padding: 4px 8px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+          transition: all 0.2s;
+        }
+        
+        .btn-warning {
+          background: #e67e22;
+          color: white;
+        }
+        
+        .btn-success {
+          background: #2e7d32;
+          color: white;
+        }
+        
+        .btn-danger {
+          background: #c62828;
+          color: white;
+        }
+        
+        .btn-cancelar {
+          background: #c62828;
+          color: white;
+        }
+        
+        .btn-action:hover {
+          transform: translateY(-1px);
+          opacity: 0.9;
+        }
+        
+        .filter-buttons {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 16px;
+        }
+        
+        .filter-btn {
+          padding: 6px 12px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid var(--corte-border);
+          border-radius: 20px;
+          color: var(--corte-text-muted);
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        
+        .filter-btn.active {
+          background: var(--corte-gold);
+          color: #0f0f0f;
+          border-color: var(--corte-gold);
+        }
+        
+        .search-bar {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+        }
+        
+        .search-input {
+          padding: 6px 12px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid var(--corte-border);
+          border-radius: 6px;
+          color: var(--corte-text);
+        }
+        
+        .pagination {
+          display: flex;
+          justify-content: center;
+          gap: 16px;
+          margin-top: 20px;
+          align-items: center;
+        }
+        
+        .pagination-btn {
+          padding: 6px 12px;
+          background: var(--corte-gold);
+          border: none;
+          border-radius: 6px;
+          color: #0f0f0f;
+          cursor: pointer;
+        }
+        
+        .pagination-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      `}</style>
     </div>
   );
 };

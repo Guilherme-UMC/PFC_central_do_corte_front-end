@@ -143,3 +143,190 @@ background-color: var(--card);
 .barbearias-table{
   margin-top: 16px;
 }
+
+.admin-actions-bar {
+          display: flex;
+          justify-content: flex-end;
+          margin-bottom: 1.5rem;
+        }
+        
+        .btn-logs {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+          border: 1px solid var(--corte-border);
+          border-radius: 8px;
+          color: var(--corte-text);
+          cursor: pointer;
+          transition: all 0.2s;
+          font-size: 0.9rem;
+        }
+        
+        .btn-logs:hover {
+          border-color: var(--corte-gold);
+          transform: translateY(-1px);
+        }
+        
+        .badge-removido {
+          display: inline-block;
+          padding: 0.25rem 0.5rem;
+          background: #c62828;
+          color: white;
+          border-radius: 4px;
+          font-size: 0.7rem;
+          font-weight: 600;
+        }
+        
+        .admin-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        
+        .admin-table th,
+        .admin-table td {
+          padding: 12px;
+          text-align: left;
+          border-bottom: 1px solid var(--corte-border);
+        }
+        
+        .admin-table th {
+          background: rgba(0, 0, 0, 0.2);
+          font-weight: 600;
+          color: var(--corte-text-muted);
+        }
+        
+        .table-actions {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        
+        .btn-action {
+          padding: 4px 8px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+          transition: all 0.2s;
+        }
+        
+        .btn-warning {
+          background: #e67e22;
+          color: white;
+        }
+        
+        .btn-success {
+          background: #2e7d32;
+          color: white;
+        }
+        
+        .btn-danger {
+          background: #c62828;
+          color: white;
+        }
+        
+        .btn-cancelar {
+          background: #c62828;
+          color: white;
+        }
+        
+        .btn-action:hover {
+          transform: translateY(-1px);
+          opacity: 0.9;
+        }
+        
+        .filter-buttons {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 16px;
+        }
+        
+        .filter-btn {
+          padding: 6px 12px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid var(--corte-border);
+          border-radius: 20px;
+          color: var(--corte-text-muted);
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        
+        .filter-btn.active {
+          background: var(--corte-gold);
+          color: #0f0f0f;
+          border-color: var(--corte-gold);
+        }
+        
+        .search-bar {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+        }
+        
+        .search-input {
+          padding: 6px 12px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid var(--corte-border);
+          border-radius: 6px;
+          color: var(--corte-text);
+        }
+        
+        .pagination {
+          display: flex;
+          justify-content: center;
+          gap: 16px;
+          margin-top: 20px;
+          align-items: center;
+        }
+        
+        .pagination-btn {
+          padding: 6px 12px;
+          background: var(--corte-gold);
+          border: none;
+          border-radius: 6px;
+          color: #0f0f0f;
+          cursor: pointer;
+        }
+        
+        .pagination-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+.admin-actions-bar {
+          display: flex;
+          justify-content: flex-end;
+          margin-bottom: 1.5rem;
+        }
+        
+        .btn-logs {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+          border: 1px solid var(--corte-border);
+          border-radius: 8px;
+          color: var(--corte-text);
+          cursor: pointer;
+          transition: all 0.2s;
+          font-size: 0.9rem;
+        }
+        
+        .btn-logs:hover {
+          border-color: var(--corte-gold);
+          transform: translateY(-1px);
+        }
+        
+        .badge-removido {
+          display: inline-block;
+          padding: 0.25rem 0.5rem;
+          background: #c62828;
+          color: white;
+          border-radius: 4px;
+          font-size: 0.7rem;
+          font-weight: 600;
+        }
