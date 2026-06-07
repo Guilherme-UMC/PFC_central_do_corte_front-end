@@ -2,9 +2,7 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 
-
 import RootLayout from './layouts/RootLayout';
-
 
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -14,7 +12,6 @@ import Signup from './pages/Signup';
 import SignupBarbearia from './pages/SignupBarbearia';
 import BarbeariaDetalhes from './pages/BarbeariaDetalhes';
 
-
 import CadastroBarbearia from './components/CadastroBarbearia';
 import ClientePage from './pages/ClientePage';
 import BarbeariaPage from './pages/BarbeariaPage';
@@ -22,7 +19,7 @@ import FuncionarioPage from './pages/FuncionarioPage';
 import AdminPage from './pages/AdminPage';
 import Perfil from './pages/Perfil';
 import DashboardPage from './pages/DashboardPage';
-
+import AdminLogsPage from './pages/AdminLogsPage';
 
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
@@ -32,7 +29,9 @@ const router = createBrowserRouter([
     path: '/',
     element: <RootLayout />,
     children: [
+      // Rotas públicas
       { path: 'barbearia/:id', element: <BarbeariaDetalhes /> },
+      
       {
         element: <PublicRoute />,
         children: [
@@ -46,54 +45,46 @@ const router = createBrowserRouter([
         ],
       },
       
+      // Rotas para CLIENTE
       {
-        path: 'page',
         element: <PrivateRoute allowedRoles={['ROLE_CLIENTE', 'ROLE_ADMIN']} />,
         children: [
-          { path: 'cliente', element: <ClientePage /> },
+          { path: 'page/cliente', element: <ClientePage /> },
         ],
       },
       
+      // Rotas para BARBEARIA_ADM (e ADMIN)
       {
-        path: 'page',
         element: <PrivateRoute allowedRoles={['ROLE_BARBEARIA_ADM', 'ROLE_ADMIN']} />,
         children: [
-          { path: 'barbearia', element: <BarbeariaPage /> },
-          { path: 'cadastro-barbearia', element: <CadastroBarbearia /> },
+          { path: 'page/barbearia', element: <BarbeariaPage /> },
+          { path: 'page/dashboard', element: <DashboardPage /> },
+          { path: 'page/cadastro-barbearia', element: <CadastroBarbearia /> },
         ],
       },
       
+      // Rotas para FUNCIONARIO (e ADMIN)
       {
-        path: 'page',
         element: <PrivateRoute allowedRoles={['ROLE_FUNCIONARIO', 'ROLE_ADMIN']} />,
         children: [
-          { path: 'funcionario', element: <FuncionarioPage /> },
+          { path: 'page/funcionario', element: <FuncionarioPage /> },
         ],
       },
 
+      // Rotas apenas para ADMIN
       {
-        path: 'page',
         element: <PrivateRoute allowedRoles={['ROLE_ADMIN']} />,
         children: [
-          { path: 'admin', element: <AdminPage /> },
+          { path: 'page/admin', element: <AdminPage /> },
+          { path: 'page/admin/logs', element: <AdminLogsPage /> },
         ],
       },
       
+      // Perfil (qualquer usuário logado)
       {
-        path: 'page',
-        element: <PrivateRoute allowedRoles={['ROLE_BARBEARIA_ADM', 'ROLE_ADMIN']} />,
-        children: [
-          { path: 'barbearia', element: <BarbeariaPage /> },
-          { path: 'dashboard', element: <DashboardPage /> }, 
-          { path: 'cadastro-barbearia', element: <CadastroBarbearia /> },
-        ],
-      },
-
-      {
-        path: 'perfil',
         element: <PrivateRoute />,
         children: [
-          { index: true, element: <Perfil /> },
+          { path: 'perfil', element: <Perfil /> },
         ],
       },
     ],

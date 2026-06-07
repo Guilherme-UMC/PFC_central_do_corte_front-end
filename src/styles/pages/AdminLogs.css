@@ -1,0 +1,224 @@
+.admin-logs-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  color: var(--corte-text);
+}
+
+.admin-logs-header {
+  margin-bottom: 2rem;
+}
+
+.admin-logs-header h1 {
+  font-size: 2rem;
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 0.5rem;
+}
+
+.admin-logs-header p {
+  color: var(--corte-text-muted);
+}
+
+.stats-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  min-width: 100px;
+  border-top: 3px solid var(--corte-gold);
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--corte-gold);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--corte-text-muted);
+  text-transform: uppercase;
+}
+
+.filtros-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+}
+
+.filtros-container .select,
+.filtros-container input {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--corte-border);
+  border-radius: 8px;
+  color: var(--corte-text);
+  font-size: 0.9rem;
+}
+
+.filtros-container .select option {
+  background-color: var(--corte-surface);
+}
+
+.filtros-container .select:focus,
+.filtros-container input:focus {
+  outline: none;
+  border-color: var(--corte-gold);
+}
+
+.btn-limpar {
+  padding: 0.5rem 1rem;
+  background: #c62828;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-limpar:hover {
+  background: #b71c1c;
+  transform: translateY(-1px);
+}
+
+.logs-table-container {
+  overflow-x: auto;
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--corte-border);
+}
+
+.logs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.logs-table th {
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--corte-text-muted);
+  border-bottom: 1px solid var(--corte-border);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.logs-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--corte-border);
+  font-size: 0.85rem;
+}
+
+.logs-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tipo-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+}
+
+.acao-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.acao-criado { background: #2e7d32; color: white; }
+.acao-atualizado { background: #1e88e5; color: white; }
+.acao-cancelado { background: #f44336; color: white; }
+.acao-confirmado { background: #d4af37; color: #0f0f0f; }
+.acao-concluido { background: #4caf50; color: white; }
+.acao-deletado { background: #c62828; color: white; }
+.acao-login { background: #00bcd4; color: white; }
+.acao-logout { background: #ff9800; color: white; }
+
+.usuario-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.usuario-info strong {
+  font-size: 0.85rem;
+}
+
+.usuario-info small {
+  font-size: 0.7rem;
+  color: var(--corte-text-muted);
+}
+
+.descricao-cell {
+  max-width: 300px;
+}
+
+.descricao-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.entidade-info {
+  font-size: 0.65rem;
+  color: var(--corte-text-muted);
+  display: block;
+  margin-top: 4px;
+}
+
+.empty-logs {
+  text-align: center;
+  padding: 3rem;
+  color: var(--corte-text-muted);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  background: var(--corte-gold);
+  border: none;
+  border-radius: 8px;
+  color: #0f0f0f;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--corte-gold-light);
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  color: var(--corte-text-muted);
+}
