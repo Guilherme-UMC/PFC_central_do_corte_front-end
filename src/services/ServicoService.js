@@ -14,7 +14,7 @@ class ServicoService {
   }
 
   async listarPorBarbearia(barbeariaId) {
-    try {s
+    try {
       const response = await api.get(`/api/servicos/barbearia/${barbeariaId}`);
       return { success: true, data: response.data };
     } catch (error) {
