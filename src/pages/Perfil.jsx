@@ -117,7 +117,7 @@ const Perfil = ({ onNavigate }) => {
         )}
 
         <div className="perfil-content">
-          {/* Informações do Perfil */}
+         
           <div className="perfil-card">
             <div className="card-header">
               <h3>Informações Pessoais</h3>
@@ -175,7 +175,7 @@ const Perfil = ({ onNavigate }) => {
             )}
           </div>
 
-          {/* Alterar Senha */}
+         
           <div className="perfil-card">
             <h3>Alterar Senha</h3>
             <br />

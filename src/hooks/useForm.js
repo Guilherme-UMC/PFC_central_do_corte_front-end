@@ -10,7 +10,6 @@ export const useForm = (initialState = {}) => {
       ...prev,
       [name]: value
     }));
-    // Limpa o erro do campo quando o usuário começa a digitar
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,

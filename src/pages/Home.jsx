@@ -214,7 +214,7 @@ const Home = () => {
 
   return (
     <div className="home">
-      {/* Hero */}
+   
       <section className="hero">
         <div className="hero__left">
           <h1 className="hero__title">Central do<br />Corte</h1>
@@ -222,7 +222,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Barbearias */}
+     
       <section className="home-section" id="barbearias">
         <SectionHeader title="BARBEARIAS" side="left" />
         <div className="secao">
@@ -293,7 +293,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Serviços */}
+    
       <section className="home-section services-section" id="servicos">
         <SectionHeader title="SERVIÇOS" side="right" />
         <div className="secao">
@@ -318,7 +318,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Agendamentos CTA */}
+      
       <section className="home-section agendamentos-section" id="agendamentos">
         <SectionHeader title="AGENDAMENTOS" side="left" />
         <div className="secao">
@@ -342,7 +342,7 @@ const Home = () => {
         </div>
       </section >
 
-      {/* Cadastro barbearia CTA */}
+     
       < section className="home-section cadastro-section" id="cadastro" >
         <SectionHeader title="CADASTRE SUA BARBEARIA" />
         <div className="secao">

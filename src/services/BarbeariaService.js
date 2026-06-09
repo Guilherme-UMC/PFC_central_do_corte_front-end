@@ -75,7 +75,6 @@ class BarbeariaService {
     }
   }
 
-  // Alias para compatibilidade com CadastroBarbearia que chama updateBarbearia
   async updateBarbearia(id, dados) {
     return this.atualizar(id, dados);
   }

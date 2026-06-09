@@ -143,7 +143,7 @@ const DashboardPage = ({ onNavigate }) => {
         <p>Visualize as métricas e o desempenho da sua barbearia</p>
       </div>
 
-      {/* Seletor de Barbearias */}
+     
       <div className="dashboard-barbearia-selector">
         {barbearias.map(b => (
           <button
@@ -158,7 +158,7 @@ const DashboardPage = ({ onNavigate }) => {
 
       {selectedBarbearia && metricas && (
         <>
-          {/* Cards de Métricas */}
+         
           <div className="dashboard-cards">
             <DashboardCard
               title="Total de Agendamentos"
@@ -172,7 +172,7 @@ const DashboardPage = ({ onNavigate }) => {
               icon={<IconMoney />}
               color="#2e7d32"
             />
-            {/* NOVO CARD: Faturamento do Ano */}
+           
             <DashboardCard
               title="Faturamento do Ano"
               value={formatarMoeda(metricas.faturamentoAno || 0)}
@@ -200,7 +200,7 @@ const DashboardPage = ({ onNavigate }) => {
             />
           </div>
 
-          {/* Seletor de Período */}
+         
           <div className="dashboard-periodo">
             <button className={`periodo-btn ${periodo === 'semana' ? 'active' : ''}`} onClick={() => setPeriodo('semana')}>
               📅 Esta Semana
@@ -213,7 +213,7 @@ const DashboardPage = ({ onNavigate }) => {
             </button>
           </div>
 
-          {/* Gráfico de Agendamentos Concluídos */}
+          
           <div className="dashboard-chart">
             <ChartBar
               data={dadosGrafico.valores || [12, 19, 15, 25, 22, 23]}
@@ -223,7 +223,7 @@ const DashboardPage = ({ onNavigate }) => {
             />
           </div>
 
-          {/* Informações adicionais */}
+          
           <div className="dashboard-info">
             <div className="info-card">
               <h3>📊 Resumo</h3>

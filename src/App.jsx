@@ -29,7 +29,6 @@ const router = createBrowserRouter([
     path: '/',
     element: <RootLayout />,
     children: [
-      // Rotas públicas
       { path: 'barbearia/:id', element: <BarbeariaDetalhes /> },
       
       {
@@ -45,7 +44,6 @@ const router = createBrowserRouter([
         ],
       },
       
-      // Rotas para CLIENTE
       {
         element: <PrivateRoute allowedRoles={['ROLE_CLIENTE', 'ROLE_ADMIN']} />,
         children: [
@@ -53,7 +51,6 @@ const router = createBrowserRouter([
         ],
       },
       
-      // Rotas para BARBEARIA_ADM (e ADMIN)
       {
         element: <PrivateRoute allowedRoles={['ROLE_BARBEARIA_ADM', 'ROLE_ADMIN']} />,
         children: [
@@ -63,7 +60,6 @@ const router = createBrowserRouter([
         ],
       },
       
-      // Rotas para FUNCIONARIO (e ADMIN)
       {
         element: <PrivateRoute allowedRoles={['ROLE_FUNCIONARIO', 'ROLE_ADMIN']} />,
         children: [
@@ -71,7 +67,6 @@ const router = createBrowserRouter([
         ],
       },
 
-      // Rotas apenas para ADMIN
       {
         element: <PrivateRoute allowedRoles={['ROLE_ADMIN']} />,
         children: [
@@ -80,7 +75,6 @@ const router = createBrowserRouter([
         ],
       },
       
-      // Perfil (qualquer usuário logado)
       {
         element: <PrivateRoute />,
         children: [

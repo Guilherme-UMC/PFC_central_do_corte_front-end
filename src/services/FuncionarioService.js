@@ -1,7 +1,6 @@
 import api from './api';
 
 class FuncionarioService {
-  // Criar novo funcionário e vincular à barbearia
   async criar(barbeariaId, funcionarioData) {
     try {
       const response = await api.post(`/api/funcionarios/barbearia/${barbeariaId}`, funcionarioData);
@@ -15,7 +14,6 @@ class FuncionarioService {
     }
   }
 
-  // Vincular funcionário existente à barbearia
   async vincularFuncionarioExistente(barbeariaId, email) {
     try {
       const response = await api.post(`/api/funcionarios/barbearia/${barbeariaId}/vincular`, {
@@ -31,7 +29,6 @@ class FuncionarioService {
     }
   }
 
-  // Listar funcionários de uma barbearia
   async listarPorBarbearia(barbeariaId) {
     try {
       const response = await api.get(`/api/funcionarios/barbearia/${barbeariaId}`);
@@ -42,7 +39,6 @@ class FuncionarioService {
     }
   }
 
-  // Desvincular funcionário da barbearia
   async desvincular(barbeariaId, funcionarioId) {
     try {
       const response = await api.delete(`/api/funcionarios/barbearia/${barbeariaId}/desvincular/${funcionarioId}`);
@@ -56,7 +52,6 @@ class FuncionarioService {
     }
   }
 
-  // Listar funcionários disponíveis (sem vínculo)
   async listarDisponiveis() {
     try {
       const response = await api.get('/api/funcionarios/disponiveis-para-contratacao');
@@ -67,7 +62,6 @@ class FuncionarioService {
     }
   }
 
-  // Verificar disponibilidade do funcionário em um horário
   async verificarDisponibilidade(barbeariaId, funcionarioId, dataHora) {
     try {
       const response = await api.get(`/api/funcionarios/barbearia/${barbeariaId}/disponibilidade`, {
@@ -80,7 +74,6 @@ class FuncionarioService {
     }
   }
 
-  // Listar barbearias onde o funcionário está vinculado
   async listarMinhasBarbearias() {
     try {
       const response = await api.get('/api/funcionarios/barbearias');

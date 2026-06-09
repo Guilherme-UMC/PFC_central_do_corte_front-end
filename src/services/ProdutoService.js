@@ -46,7 +46,6 @@ class ProdutoService {
     }
   }
 
-  // Atualizar produto
   async atualizar(produtoId, produtoData) {
     try {
       const response = await api.put(`/api/produtos/${produtoId}`, produtoData);
@@ -60,7 +59,6 @@ class ProdutoService {
     }
   }
 
-  // Desativar produto
   async desativar(produtoId) {
     try {
       await api.delete(`/api/produtos/${produtoId}`);
@@ -71,7 +69,6 @@ class ProdutoService {
     }
   }
 
-  // Ativar produto
   async ativar(produtoId) {
     try {
       await api.patch(`/api/produtos/${produtoId}/ativar`);

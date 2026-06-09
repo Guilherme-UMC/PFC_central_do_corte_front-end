@@ -116,7 +116,6 @@ const AdminLogsPage = () => {
         <p>Visualize todas as ações realizadas no sistema</p>
       </div>
 
-      {/* Cards de Estatísticas */}
       <div className="stats-cards">
         <div className="stat-card">
           <span className="stat-value">{paginacao.totalElements}</span>
@@ -130,7 +129,7 @@ const AdminLogsPage = () => {
         ))}
       </div>
 
-      {/* Filtros */}
+    
       <div className="filtros-container">
         <select name="tipo" className="select" value={filtros.tipo} onChange={handleFiltroChange}>
           <option value="">Todos os tipos</option>
@@ -169,7 +168,7 @@ const AdminLogsPage = () => {
         </button>
       </div>
 
-      {/* Tabela de Logs */}
+    
       <div className="logs-table-container">
         <table className="logs-table">
           <thead>
@@ -227,7 +226,7 @@ const AdminLogsPage = () => {
         </table>
       </div>
 
-      {/* Paginação */}
+    
       {paginacao.totalPages > 0 && (
         <div className="pagination">
           <button

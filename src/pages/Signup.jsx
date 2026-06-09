@@ -94,7 +94,7 @@ const Signup = () => {
             <input id="email" className="form-input" type="email" name="email" placeholder="seu@email.com" value={formData.email} onChange={handleChange} required />
           </div>
 
-          {/*Password */}
+        
           <PasswordInput
             id="password"
             name="password"
@@ -104,7 +104,7 @@ const Signup = () => {
             onChange={handleChange}
             required
           />
-          {/* Confirm Password */}
+        
           <PasswordInput
             id="confirmPassword"
             name="confirmPassword"

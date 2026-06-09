@@ -133,7 +133,7 @@ const Navbar = ({ search, onSearchChange }) => {
   return (
     <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}>
       <div className="navbar__inner">
-        {/* Logo */}
+       
         <div className="navbar__logo" onClick={() => goTo('/')}>
           <div className="navbar__logo-icon"><IconScissors /></div>
           <div className="navbar__logo-text">
@@ -141,7 +141,7 @@ const Navbar = ({ search, onSearchChange }) => {
           </div>
         </div>
 
-        {/* Busca desktop */}
+      
         <div className={`navbar__search ${searchExpanded ? 'navbar__search--expanded' : ''}`}>
           <IconSearch />
           <input
@@ -157,7 +157,7 @@ const Navbar = ({ search, onSearchChange }) => {
             </button>
           )}
 
-          {/* Dropdown de resultados da busca */}
+         
           <BuscaGlobal
             termo={localSearch}
             isOpen={showBuscaDropdown && localSearch.length >= 2}
@@ -166,7 +166,7 @@ const Navbar = ({ search, onSearchChange }) => {
           />
         </div>
 
-        {/* Links desktop */}
+        
         {isHomePage && (
         <div className="navbar__links">
           <button onClick={() => goToSection('barbearias')} className="navbar__link">Barbearias</button>
@@ -176,7 +176,7 @@ const Navbar = ({ search, onSearchChange }) => {
         </div>
         )}
 
-        {/* Ações desktop */}
+        
         <div className="navbar__actions">
           {isAuthenticated ? (
             <div className="navbar__user-menu">
@@ -200,7 +200,7 @@ const Navbar = ({ search, onSearchChange }) => {
           )}
         </div>
 
-        {/* Botão menu mobile */}
+       
         <button
           className="navbar__menu-btn"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -210,7 +210,7 @@ const Navbar = ({ search, onSearchChange }) => {
         </button>
       </div>
 
-      {/* Busca mobile */}
+     
       <div className="navbar__search-mobile">
         <IconSearch />
         <input
@@ -225,7 +225,7 @@ const Navbar = ({ search, onSearchChange }) => {
         )}
       </div>
 
-      {/* Menu mobile */}
+      
       <div className={`navbar__mobile ${menuOpen ? 'navbar__mobile--open' : ''}`}>
         {isHomePage && (
         <div className="navbar__mobile-links">

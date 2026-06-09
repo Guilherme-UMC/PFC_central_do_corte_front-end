@@ -605,7 +605,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                         </div>
                       )}
 
-                      {/* Botões para agendamentos CONFIRMADOS */}
+                      
                       {ag.status === 'Confirmado' && (
                         <div className="agendamento-actions">
                           <button
@@ -625,7 +625,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                         </div>
                       )}
 
-                      {/* Status para agendamentos CANCELADOS */}
+                      
                       {(ag.status === 'Cancelado pelo cliente' || ag.status === 'Cancelado pela barbearia') && (
                         <div className="agendamento-actions">
                           <span className="status-cancelled">
@@ -634,7 +634,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                         </div>
                       )}
 
-                      {/* Status para agendamentos CONCLUÍDOS */}
+                     
                       {ag.status === 'Concluído' && (
                         <div className="agendamento-actions">
                           <span className="status-finished">✓ Atendimento concluído</span>
@@ -647,7 +647,7 @@ const BarbeariaPage = ({ onNavigate }) => {
             </div>
           )}
 
-          {/* TAB: AGENDAMENTOS DE HOJE */}
+          
           {activeTab === 'hoje' && (
             <div className="agendamentos-list">
               <div className="today-header">
@@ -677,7 +677,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                         {ag.observacao && <p><strong>Obs:</strong> {ag.observacao}</p>}
                       </div>
 
-                      {/* Botões para agendamentos AGUARDANDO CONFIRMAÇÃO */}
+                      
                       {ag.status === 'Aguardando confirmação' && (
                         <div className="agendamento-actions">
                           <button
@@ -697,7 +697,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                         </div>
                       )}
 
-                      {/* Botões para agendamentos CONFIRMADOS */}
+                      
                       {ag.status === 'Confirmado' && (
                         <div className="agendamento-actions">
                           <button
@@ -717,7 +717,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                         </div>
                       )}
 
-                      {/* Status para agendamentos CANCELADOS */}
+                      
                       {(ag.status === 'Cancelado pelo cliente' || ag.status === 'Cancelado pela barbearia') && (
                         <div className="agendamento-actions">
                           <span className="status-cancelled">
@@ -726,7 +726,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                         </div>
                       )}
 
-                      {/* Status para agendamentos CONCLUÍDOS */}
+                    
                       {ag.status === 'Concluído' && (
                         <div className="agendamento-actions">
                           <span className="status-finished">✓ Atendimento concluído</span>
@@ -739,12 +739,12 @@ const BarbeariaPage = ({ onNavigate }) => {
             </div>
           )}
 
-          {/* TAB: DASHBOARD */}
+          
           {activeTab === 'dashboard' && (
             <Dashboard barbeariaId={selectedBarbearia?.id} />
           )}
 
-          {/* TAB: SERVIÇOS */}
+          
           {activeTab === 'servicos' && (
             <div>
               <div className="section-header-actions">
@@ -807,7 +807,7 @@ const BarbeariaPage = ({ onNavigate }) => {
             </div>
           )}
 
-          {/* TAB: FUNCIONÁRIOS */}
+          
           {activeTab === 'funcionarios' && (
             <div>
               <div className="section-header-actions">
@@ -875,7 +875,7 @@ const BarbeariaPage = ({ onNavigate }) => {
             </div>
           )}
 
-          {/* TAB: HORÁRIOS */}
+        
           {activeTab === 'horarios' && (
             <div>
               <div className="section-header-actions">
@@ -1018,7 +1018,7 @@ const BarbeariaPage = ({ onNavigate }) => {
             </div>
           )}
 
-          {/* TAB: PRODUTOS */}
+         
           {activeTab === 'produtos' && (
             <div>
               <div className="section-header-actions">
@@ -1028,7 +1028,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                 </button>
               </div>
 
-              {/* Modal de formulário */}
+             
               {showProdutoForm && (
                 <div className="modal-overlay2">
                   <div className="modal-content2" style={{ maxWidth: '600px' }}>
@@ -1122,7 +1122,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                 </div>
               )}
 
-              {/* Lista de produtos */}
+             
               {produtos.length === 0 ? (
                 <div className="empty-state-small">
                   <p>Nenhum produto cadastrado ainda.</p><br />

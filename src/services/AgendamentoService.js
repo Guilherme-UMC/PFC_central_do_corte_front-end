@@ -1,8 +1,8 @@
-// services/AgendamentoService.js
+
 import api from './api';
 
 class AgendamentoService {
-  // Criar agendamento
+ 
   async criar(dados) {
     try {
       const response = await api.post('/api/agendamentos', dados);
@@ -16,7 +16,7 @@ class AgendamentoService {
     }
   }
 
-  // Listar meus agendamentos (cliente)
+  
   async listarMeus() {
     try {
       const response = await api.get('/api/agendamentos/cliente/meus');
@@ -27,7 +27,7 @@ class AgendamentoService {
     }
   }
 
-  // Listar agendamentos por barbearia (dono)
+  
   async listarPorBarbearia(barbeariaId) {
     try {
       const response = await api.get(`/api/agendamentos/barbearia/${barbeariaId}`);
@@ -38,7 +38,7 @@ class AgendamentoService {
     }
   }
 
-  // Listar agendamentos do dia (dono)
+  
   async listarDoDia(barbeariaId) {
     try {
       const response = await api.get(`/api/agendamentos/barbearia/${barbeariaId}/hoje`);
@@ -49,7 +49,6 @@ class AgendamentoService {
     }
   }
 
-  // Listar meus agendamentos (funcionário)
   async listarMeusComoFuncionario() {
     try {
       const response = await api.get('/api/agendamentos/funcionario/meus');
@@ -60,7 +59,6 @@ class AgendamentoService {
     }
   }
 
-  // Listar meus agendamentos do dia (funcionário)
   async listarMeusHojeComoFuncionario() {
     try {
       const response = await api.get('/api/agendamentos/funcionario/hoje');
@@ -71,7 +69,6 @@ class AgendamentoService {
     }
   }
 
-  // Cancelar agendamento (cliente ou barbearia_adm)
   async cancelar(agendamentoId, motivo) {
     try {
       const response = await api.put(`/api/agendamentos/${agendamentoId}/cancelar`, null, {
@@ -87,7 +84,6 @@ class AgendamentoService {
     }
   }
 
-  // Confirmar agendamento (apenas barbearia_adm)
   async confirmar(agendamentoId) {
     try {
       const response = await api.put(`/api/agendamentos/${agendamentoId}/confirmar`);
@@ -101,7 +97,6 @@ class AgendamentoService {
     }
   }
 
-  // Concluir agendamento (barbearia_adm e funcionario)
   async concluir(agendamentoId) {
     try {
       const response = await api.put(`/api/agendamentos/${agendamentoId}/concluir`);

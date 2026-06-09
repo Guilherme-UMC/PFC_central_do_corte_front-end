@@ -71,7 +71,7 @@ const Login = () => {
             <label className="form-label" htmlFor="email">Email</label>
             <input id="email" className="form-input" type="email" name="email" placeholder="seu@email.com" value={formData.email} onChange={handleChange} required />
           </div>
-          {/* Password */}
+    
           <PasswordInput
             id="password"
             name="password"

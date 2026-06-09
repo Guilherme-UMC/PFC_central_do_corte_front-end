@@ -122,7 +122,7 @@ const BarbeariaDetalhes = () => {
       <div className="barbearia-detalhes-container">
         <button className="btn-voltar" onClick={() => navigate('/')}><IconArrowLeft /></button>
 
-        {/* Cabeçalho */}
+       
         <div className="barbearia-detalhes-header">
           {barbearia.imgUrl ? (
             <img src={barbearia.imgUrl} alt={barbearia.nome} />
@@ -140,7 +140,7 @@ const BarbeariaDetalhes = () => {
           </div>
         </div>
 
-        {/* Tabs */}
+       
         <div className="tabs">
           <button className={activeTab === 'servicos' ? 'active' : ''} onClick={() => setActiveTab('servicos')}>
             Serviços ({servicos.length})
@@ -156,7 +156,7 @@ const BarbeariaDetalhes = () => {
           </button>
         </div>
 
-        {/* Conteúdo das Tabs */}
+      
         <div className="tab-content">
           {activeTab === 'servicos' && (
             <div className="servicos-lista">
@@ -203,7 +203,7 @@ const BarbeariaDetalhes = () => {
 
           {activeTab === 'produtos' && (
             <div className="produtos-container">
-              {/* Filtro por categoria */}
+             
               {produtosCategorias.length > 1 && (
                 <div className="produtos-categorias">
                   {produtosCategorias.map(cat => (
@@ -218,7 +218,7 @@ const BarbeariaDetalhes = () => {
                 </div>
               )}
 
-              {/* Lista de produtos */}
+              
               {loadingProdutos ? (
                 <div className="loading-state">Carregando produtos...</div>
               ) : produtosFiltrados.length === 0 ? (

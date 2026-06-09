@@ -42,24 +42,22 @@ export const listarFuncionarios = async (barbeariaId) => {
 };
 
 /**
- * Buscar horários disponíveis para agendamento
- * @param {string} barbeariaId - ID da barbearia
- * @param {Array} servicoIds - IDs dos serviços (não usado atualmente, mas mantido para compatibilidade)
- * @param {string} data - Data no formato YYYY-MM-DD
- * @param {string|null} funcionarioId - ID do funcionário (opcional)
- * @returns {Promise<Array>} - Lista de horários disponíveis
+
+ * @param {string} barbeariaId 
+ * @param {Array} servicoIds 
+ * @param {string} data 
+ * @param {string|null} funcionarioId 
+ * @returns {Promise<Array>} 
  */
 export const buscarHorariosDisponiveis = async (barbeariaId, servicoIds, data, funcionarioId = null) => {
   try {
     console.log('🔍 Buscando horários disponíveis:', { barbeariaId, data, funcionarioId });
     
-    // Buscar horários disponíveis diretamente do backend
     const result = await horarioService.getHorariosDisponiveis(barbeariaId, data, 30);
     
     console.log('📥 Resposta do backend:', result);
     
     if (result.success && result.data) {
-      // Filtrar apenas horários disponíveis e retornar como array de strings ISO
       const horariosDisponiveis = result.data
         .filter(h => h.disponivel === true)
         .map(h => h.horario);
@@ -88,7 +86,6 @@ export const buscarHorariosDisponiveis = async (barbeariaId, servicoIds, data, f
  */
 export const criarAgendamento = async (payload) => {
   try {
-    // Validação dos dados
     if (!payload.barbeariaId) {
       throw new Error('ID da barbearia é obrigatório');
     }
@@ -101,8 +98,8 @@ export const criarAgendamento = async (payload) => {
     
     const requestBody = {
       barbeariaId: payload.barbeariaId,
-      servicoId: payload.servicoIds[0], // Backend aceita apenas um serviço por vez
-      funcionarioId: payload.funcionarioId || null, // ✅ ADICIONADO: campo do funcionário
+      servicoId: payload.servicoIds[0], 
+      funcionarioId: payload.funcionarioId || null, 
       dataHora: payload.dataHora,
       observacao: payload.observacao || null
     };

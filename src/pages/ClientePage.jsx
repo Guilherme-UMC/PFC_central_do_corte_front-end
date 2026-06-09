@@ -249,7 +249,7 @@ function TabelaAgendamentos({ agendamentos, loading, onNovoAgendamento, onCancel
         </table>
       </div>
 
-      {/* Modal de Cancelamento */}
+      
       {showCancelModal && selectedAgendamento && (
         <div className="modal-overlay2" onClick={() => setShowCancelModal(false)}>
           <div className="modal-content2 cancel-modal" onClick={(e) => e.stopPropagation()}>
@@ -316,7 +316,7 @@ function TelaHome({ user, agendamentos, loadingAg, onNavegar, onCancelarAgendame
 
   return (
     <>
-      {/* Próximo agendamento */}
+      
       {proximo && (
         <>
           <p className="dc-section-title">Próximo agendamento</p>
@@ -345,7 +345,7 @@ function TelaHome({ user, agendamentos, loadingAg, onNavegar, onCancelarAgendame
         </>
       )}
 
-      {/* Ações rápidas */}
+      
       <p className="dc-section-title">Outras ações</p>
       <div className="dc-actions-row">
         <div className="dc-action-card primary" onClick={() => onNavegar('agendar')}>
@@ -364,7 +364,7 @@ function TelaHome({ user, agendamentos, loadingAg, onNavegar, onCancelarAgendame
         </div>
       </div>
 
-      {/* Histórico recente */}
+      
       {agendamentos.length > 0 && (
         <>
           <p className="dc-section-title">Histórico recente</p>
@@ -535,7 +535,7 @@ const ClientePage = () => {
         </nav>
       </aside>
 
-      {/* Área principal */}
+     
       <main className="dc-main">
         <div className="dc-topbar">
           <div>

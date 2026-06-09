@@ -108,7 +108,7 @@ const BuscaGlobal = ({ termo, onClose, isOpen, onNavigate }) => {
                 <div className="busca-loading">Carregando resultados...</div>
             ) : (
                 <>
-                    {/* Seção de informação de CEP */}
+   
                     {resultados?.tipo === 'cep' && resultados.endereco && (
                         <div className="busca-cep-info">
                             <div className="busca-cep-endereco">
@@ -122,7 +122,7 @@ const BuscaGlobal = ({ termo, onClose, isOpen, onNavigate }) => {
                         </div>
                     )}
 
-                    {/* Seção de barbearias */}
+                    
                     {resultados?.barbearias?.length > 0 ? (
                         <div className="busca-section">
                             <h4>Barbearias encontradas</h4>
@@ -130,8 +130,7 @@ const BuscaGlobal = ({ termo, onClose, isOpen, onNavigate }) => {
                                 <div 
                                     key={item.id} 
                                     className="busca-item" 
-                                    onClick={() => handleItemClick({ ...item, link: `/barbearia/${item.id}` })}
-                                >
+                                    onClick={() => handleItemClick({ ...item, link: `/barbearia/${item.id}` })}>
                                     <div className="busca-item-icon"><IconCorte/></div>
                                     <div className="busca-item-content">
                                         <div className="busca-item-title">{item.nome}</div>

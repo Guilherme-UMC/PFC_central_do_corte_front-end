@@ -2,7 +2,6 @@ import api from './api';
 
 class DashboardService {
   
-  // Buscar métricas principais da barbearia
   async getMetricas(barbeariaId) {
     try {
       const response = await api.get(`/api/dashboard/barbearia/${barbeariaId}/metricas`);
@@ -17,7 +16,6 @@ class DashboardService {
     }
   }
 
-  // Buscar agendamentos por período para o gráfico
   async getAgendamentosPorPeriodo(barbeariaId, periodo = 'mes') {
     try {
       const response = await api.get(`/api/dashboard/barbearia/${barbeariaId}/agendamentos-periodo`, {
@@ -30,7 +28,6 @@ class DashboardService {
     }
   }
 
-  // Buscar serviços mais populares
   async getServicosPopulares(barbeariaId) {
     try {
       const response = await api.get(`/api/dashboard/barbearia/${barbeariaId}/servicos-populares`);
@@ -41,7 +38,6 @@ class DashboardService {
     }
   }
 
-  // Dados mockados para teste (caso o backend ainda não tenha os endpoints)
   getDadosMockados() {
     return {
       totalAgendamentos: 47,
