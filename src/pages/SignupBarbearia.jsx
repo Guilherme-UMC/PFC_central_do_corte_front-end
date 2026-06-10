@@ -111,7 +111,7 @@ const SignupBarbearia = () => {
             required
           />
           <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-            {loading ? 'Cadastrando...' : 'Cadastrar Barbearia'}
+            {loading ? 'Cadastrando...' : 'Cadastrar Proprietário'}
           </button>
         </form>
 
