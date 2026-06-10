@@ -131,8 +131,8 @@ const Perfil = ({ onNavigate }) => {
             {editing ? (
               <form onSubmit={handleUpdateProfile}>
                 <div className="form-group">
-                  <label>Nome</label>
-                  <input 
+                  <label className="form-label">Nome</label>
+                  <input className="form-input"
                     type="text" 
                     name="name"
                     value={formData.name} 
@@ -141,8 +141,8 @@ const Perfil = ({ onNavigate }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Email</label>
-                  <input 
+                  <label className="form-label">Email</label>
+                  <input className="form-input"
                     type="email" 
                     name="email"
                     value={formData.email} 
@@ -151,8 +151,8 @@ const Perfil = ({ onNavigate }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Telefone</label>
-                  <input 
+                  <label className="form-label">Telefone</label>
+                  <input className="form-input"
                     type="tel" 
                     name="telefone"
                     value={formData.telefone} 
@@ -160,8 +160,8 @@ const Perfil = ({ onNavigate }) => {
                   />
                 </div>
                 <div className="form-actions">
-                  <button type="button" className="btn-secondary" onClick={() => { setEditing(false); carregarPerfil(); }}>Cancelar</button>
-                  <button type="submit" className="btn-primary" disabled={submitting}>{submitting ? 'Salvando...' : 'Salvar'}</button>
+                  <button type="button" className="btn-danger" onClick={() => { setEditing(false); carregarPerfil(); }}>Cancelar</button>
+                  <button type="submit" className="btn-concluir" disabled={submitting}>{submitting ? 'Salvando...' : 'Salvar'}</button>
                 </div>
               </form>
             ) : (

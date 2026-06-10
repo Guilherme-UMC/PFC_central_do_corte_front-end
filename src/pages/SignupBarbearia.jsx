@@ -70,7 +70,7 @@ const SignupBarbearia = () => {
       </button>
 
       <div className="auth-card">
-        <h2 className="auth-title">Cadastrar Barbearia</h2>
+        <h2 className="auth-title">Cadastrar Proprietário</h2>
         <p className="auth-subtitle">Cadastre-se como proprietario</p>
 
         {error && <div className="alert alert-error">{error}</div>}
@@ -111,7 +111,7 @@ const SignupBarbearia = () => {
             required
           />
           <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-            {loading ? 'Cadastrando...' : 'Cadastrar Proprietário'}
+            {loading ? 'Cadastrando...' : 'Cadastrar'}
           </button>
         </form>
 
