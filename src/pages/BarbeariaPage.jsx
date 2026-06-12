@@ -142,7 +142,7 @@ const BarbeariaPage = ({ onNavigate }) => {
     const result = await AgendamentoService.listarDoDia(barbeariaId);
     if (result.success) {
       setAgendamentosHoje(result.data);
-      console.log(`📅 Agendamentos de hoje: ${result.data.length}`);
+      
     }
   };
 
@@ -170,7 +170,7 @@ const BarbeariaPage = ({ onNavigate }) => {
     const result = await ProdutoService.listarTodosPorBarbearia(barbeariaId);
     if (result.success) {
       setProdutos(result.data || []);
-      console.log(`📦 Produtos carregados: ${result.data?.length || 0}`);
+      
     }
   };
 

@@ -4,6 +4,8 @@ import UsuarioService from '../services/UsuarioService';
 import Loader from '../components/Loader';
 import PasswordInput from '../components/PasswordInput';
 import '../styles/pages/perfil.css';
+import { useNavigate } from 'react-router-dom';
+import AdminService from '../services/AdminService';
 
 const Perfil = ({ onNavigate }) => {
   const { user, logout } = useAuthContext();
@@ -14,6 +16,9 @@ const Perfil = ({ onNavigate }) => {
   const [passwordData, setPasswordData] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
   const [message, setMessage] = useState({ type: '', text: '' });
   const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     carregarPerfil();
@@ -58,29 +63,29 @@ const Perfil = ({ onNavigate }) => {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setMessage({ type: 'error', text: 'As novas senhas não coincidem' });
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
       return;
     }
-    
+
     if (passwordData.newPassword.length < 6) {
       setMessage({ type: 'error', text: 'A nova senha deve ter no mínimo 6 caracteres' });
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
       return;
     }
-    
+
     setSubmitting(true);
     const result = await UsuarioService.changePassword(user?.id, passwordData.oldPassword, passwordData.newPassword);
-    
+
     if (result.success) {
       setMessage({ type: 'success', text: 'Senha alterada com sucesso!' });
       setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
     } else {
       setMessage({ type: 'error', text: result.message });
     }
-    
+
     setSubmitting(false);
     setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   };
@@ -100,6 +105,59 @@ const Perfil = ({ onNavigate }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Função para excluir conta (inativa e depois remove)
+  const handleExcluirConta = async () => {
+    setDeleting(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      // PASSO 1: Verificar se o usuário está ativo
+      if (profile?.active) {
+        setMessage({ type: 'info', text: 'Inativando conta...' });
+
+        // Inativar o usuário primeiro
+        const inativarResult = await AdminService.ativarDesativarUsuario(user?.id);
+
+        if (!inativarResult.success) {
+          throw new Error(inativarResult.message || 'Erro ao inativar conta');
+        }
+
+        setMessage({ type: 'info', text: 'Conta inativada. Removendo permanentemente...' });
+
+        // Pequeno delay para garantir que a inativação foi processada
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      // PASSO 2: Remover permanentemente o usuário
+      const removerResult = await AdminService.deletarUsuario(user?.id);
+
+      if (!removerResult.success) {
+        throw new Error(removerResult.message || 'Erro ao remover conta');
+      }
+
+      // Sucesso - fazer logout e redirecionar
+      setMessage({ type: 'success', text: 'Sua conta foi excluída permanentemente com sucesso!' });
+
+      setTimeout(() => {
+        logout();
+        navigate('/login');
+      }, 3000);
+
+    } catch (error) {
+      console.error('Erro ao excluir conta:', error);
+      setMessage({ type: 'error', text: error.message || 'Erro ao excluir conta. Tente novamente mais tarde.' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 5000);
+    } finally {
+      setDeleting(false);
+      setShowConfirmModal(false);
+    }
+  };
+
+  // Abrir modal de confirmação
+  const openConfirmModal = () => {
+    setShowConfirmModal(true);
+  };
+
   if (loading) return <Loader />;
 
   return (
@@ -117,7 +175,7 @@ const Perfil = ({ onNavigate }) => {
         )}
 
         <div className="perfil-content">
-         
+
           <div className="perfil-card">
             <div className="card-header">
               <h3>Informações Pessoais</h3>
@@ -127,36 +185,36 @@ const Perfil = ({ onNavigate }) => {
                 </button>
               )}
             </div>
-            
+
             {editing ? (
               <form onSubmit={handleUpdateProfile}>
                 <div className="form-group">
                   <label className="form-label">Nome</label>
                   <input className="form-input"
-                    type="text" 
+                    type="text"
                     name="name"
-                    value={formData.name} 
-                    onChange={handleFormChange} 
-                    required 
+                    value={formData.name}
+                    onChange={handleFormChange}
+                    required
                   />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Email</label>
                   <input className="form-input"
-                    type="email" 
+                    type="email"
                     name="email"
-                    value={formData.email} 
-                    onChange={handleFormChange} 
-                    required 
+                    value={formData.email}
+                    onChange={handleFormChange}
+                    required
                   />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Telefone</label>
                   <input className="form-input"
-                    type="tel" 
+                    type="tel"
                     name="telefone"
-                    value={formData.telefone} 
-                    onChange={handleFormChange} 
+                    value={formData.telefone}
+                    onChange={handleFormChange}
                   />
                 </div>
                 <div className="form-actions">
@@ -175,7 +233,7 @@ const Perfil = ({ onNavigate }) => {
             )}
           </div>
 
-         
+
           <div className="perfil-card">
             <h3>Alterar Senha</h3>
             <br />
@@ -189,7 +247,7 @@ const Perfil = ({ onNavigate }) => {
                 onChange={handlePasswordChange}
                 required
               />
-              
+
               <PasswordInput
                 id="newPassword"
                 name="newPassword"
@@ -199,7 +257,7 @@ const Perfil = ({ onNavigate }) => {
                 onChange={handlePasswordChange}
                 required
               />
-              
+
               <PasswordInput
                 id="confirmPassword"
                 name="confirmPassword"
@@ -209,15 +267,63 @@ const Perfil = ({ onNavigate }) => {
                 onChange={handlePasswordChange}
                 required
               />
-              
+
               <button type="submit" className="btn-primary" disabled={submitting}>
                 {submitting ? 'Alterando...' : 'Alterar Senha'}
               </button>
             </form>
           </div>
-
+          {/* Botão de Excluir Conta */}
+          <div className="delete-account-section">
+            <button
+              className="btn-excluir-conta"
+              onClick={openConfirmModal}
+              disabled={deleting}
+            >
+              {deleting ? 'Processando...' : ' Excluir Conta'}
+            </button>
+            <p className="delete-note">
+              Esta ação é irreversível. Sua conta será desativada e todos os seus dados serão anonimizados.
+            </p>
+          </div>
         </div>
       </div>
+      {/* Modal de Confirmação de Exclusão */}
+      {showConfirmModal && (
+        <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
+          <div className="modal-content confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <h3> Atenção!</h3>
+            <p className="confirm-message-delete">
+              <strong>Tem certeza que deseja EXCLUIR PERMANENTEMENTE sua conta?</strong>
+              <br /><br />
+              Esta ação irá:
+              <br />
+              Inativar sua conta imediatamente
+              <br />
+              Anonimizar todos os seus dados pessoais
+              <br />
+              Cancelar todos os seus agendamentos futuros
+              <br />
+              Impedir qualquer acesso futuro à plataforma
+              <br /><br />
+              <strong>Esta ação é IRREVERSÍVEL e não poderá ser desfeita!</strong>
+            </p>
+
+            <div className="modal-actions">
+              <button className="btn-cancelar" onClick={() => setShowConfirmModal(false)} disabled={deleting}>
+                Cancelar
+              </button>
+              <button
+                className="btn-excluir-modal"
+                onClick={handleExcluirConta}
+                disabled={deleting}
+              >
+                {deleting ? 'Processando...' : 'Sim, quero excluir minha conta'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
