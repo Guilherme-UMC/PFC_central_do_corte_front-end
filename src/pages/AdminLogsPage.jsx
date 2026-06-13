@@ -23,9 +23,6 @@ const AdminLogsPage = () => {
     totalElements: 0
   });
   useEffect(() => {
-    console.log('👤 Usuário logado:', user);
-    console.log('👤 Role do usuário:', user?.role);
-    console.log('👤 Role esperada: ROLE_ADMIN');
     carregarDadosIniciais();
   }, []);
 

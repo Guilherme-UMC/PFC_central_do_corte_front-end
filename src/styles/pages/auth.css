@@ -95,3 +95,104 @@
   display: none;
 }
 }
+/* Modal de Termos e Condições */
+.termos-modal {
+  max-width: 700px !important;
+  max-height: 85vh !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.termos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--corte-border);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 20px 20px 0 0;
+}
+
+.termos-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--corte-gold);
+}
+
+.termos-close {
+  background: none;
+  border: none;
+  color: var(--corte-text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.termos-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--red);
+}
+
+.termos-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--corte-text);
+}
+
+.termos-body h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: var(--corte-gold);
+  text-align: center;
+}
+
+.termos-body h4 {
+  font-size: 1rem;
+  margin: 1.2rem 0 0.5rem 0;
+  color: var(--lightblue);
+  border-left: 3px solid var(--corte-gold);
+  padding-left: 10px;
+}
+
+.termos-body p {
+  margin-bottom: 0.5rem;
+  color: var(--corte-text-muted);
+}
+
+.termos-body strong {
+  color: var(--corte-text);
+}
+
+.termos-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--corte-border);
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0 0 20px 20px;
+}
+
+/* Scrollbar customizada para o modal */
+.termos-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.termos-body::-webkit-scrollbar-track {
+  background: var(--corte-surface);
+  border-radius: 4px;
+}
+
+.termos-body::-webkit-scrollbar-thumb {
+  background: var(--corte-border);
+  border-radius: 4px;
+}
+
+.termos-body::-webkit-scrollbar-thumb:hover {
+  background: var(--corte-gold);
+}

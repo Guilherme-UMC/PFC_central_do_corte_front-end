@@ -3,6 +3,7 @@ import { useAuthContext } from '../contexts/AuthContext';
 import { validators } from '../utils/validators';
 import { useNavigate } from 'react-router-dom';
 import PasswordInput from '../components/PasswordInput';
+import TermosModal from '../components/TermosModal';
 
 const IconArrowLeft = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
@@ -17,6 +18,8 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [aceiteTermos, setAceiteTermos] = useState(false);
+  const [showTermosModal, setShowTermosModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '', telefone: '', email: '', password: '', confirmPassword: ''
   });
@@ -28,11 +31,31 @@ const Signup = () => {
     setSuccess('');
   };
 
+  const handleCheckboxChange = (e) => {
+    setAceiteTermos(e.target.checked);
+    setError('');
+  };
+
+  const handleOpenTermos = (e) => {
+    e.preventDefault();
+    setShowTermosModal(true);
+  };
+
+  const handleCloseTermos = () => {
+    setShowTermosModal(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setSuccess('');
+
+    if (!aceiteTermos) {
+      setError('Você precisa aceitar os termos e condições para continuar.');
+      setLoading(false);
+      return;
+    }
 
     if (!formData.name || !formData.email || !formData.password || !formData.telefone || !formData.confirmPassword) {
       setError('Preencha todos os campos.');
@@ -94,7 +117,6 @@ const Signup = () => {
             <input id="email" className="form-input" type="email" name="email" placeholder="seu@email.com" value={formData.email} onChange={handleChange} required />
           </div>
 
-        
           <PasswordInput
             id="password"
             name="password"
@@ -104,7 +126,7 @@ const Signup = () => {
             onChange={handleChange}
             required
           />
-        
+          
           <PasswordInput
             id="confirmPassword"
             name="confirmPassword"
@@ -114,6 +136,20 @@ const Signup = () => {
             onChange={handleChange}
             required
           />
+
+          {/* Termos e Condições */}
+          <div className="form-group termos-group">
+            <label className="checkbox-container">
+              <input
+                type="checkbox"
+                checked={aceiteTermos}
+                onChange={handleCheckboxChange}
+              />
+              <span className="checkmark"></span>
+              Li e aceito os 
+              <a href="#" onClick={handleOpenTermos}> Termos e Condições</a>
+            </label>
+          </div>
 
           <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
             {loading ? 'Cadastrando...' : 'Cadastrar'}
@@ -130,6 +166,13 @@ const Signup = () => {
         </p>
         </div>
       </div>
+
+      {/* Modal de Termos */}
+      <TermosModal 
+        isOpen={showTermosModal} 
+        onClose={handleCloseTermos} 
+        tipo="cliente"
+      />
     </div>
   );
 };

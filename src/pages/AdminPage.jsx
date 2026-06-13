@@ -316,7 +316,6 @@ const AdminPage = ({ onNavigate }) => {
                     <tr>
                       <th>Nome</th>
                       <th>Email</th>
-                      <th>Telefone</th>
                       <th>Role</th>
                       <th>Status</th>
                       <th>Ações</th>
@@ -329,7 +328,6 @@ const AdminPage = ({ onNavigate }) => {
                         <tr key={u.id}>
                           <td>{u.name}</td>
                           <td>{u.email}</td>
-                          <td>{u.telefone || '-'}</td>
                           <td>{getRoleLabel(u.role)}</td>
                           <td>
                             <span className={u.active ? 'status-active' : 'status-inactive'}>
