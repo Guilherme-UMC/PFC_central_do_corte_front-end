@@ -20,6 +20,8 @@ import AdminPage from './pages/AdminPage';
 import Perfil from './pages/Perfil';
 import DashboardPage from './pages/DashboardPage';
 import AdminLogsPage from './pages/AdminLogsPage';
+import ConfirmarEmail from './pages/ConfirmarEmail';
+import ReenviarConfirmacao from './pages/ReenviarConfirmacao';
 
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
@@ -41,6 +43,8 @@ const router = createBrowserRouter([
           { path: 'esqueci-senha', element: <EsqueciSenha /> },
           { path: 'redefinir-senha', element: <RedefinirSenha /> },
           { path: 'cadastro-barbearia', element: <CadastroBarbearia /> },
+          { path: 'confirmar-email', element: <ConfirmarEmail /> },
+          { path: 'reenviar-confirmacao', element: <ReenviarConfirmacao /> },
         ],
       },
       

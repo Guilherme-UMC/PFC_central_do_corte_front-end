@@ -4,10 +4,17 @@ import authService from '../services/AuthService';
 export const useAuth = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState(null);
 
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
     setUser(currentUser);
+    
+    const pendingEmail = localStorage.getItem('pendingConfirmationEmail');
+    if (pendingEmail) {
+      setPendingConfirmationEmail(pendingEmail);
+    }
+    
     setLoading(false);
   }, []);
 
@@ -16,6 +23,10 @@ export const useAuth = () => {
       const data = await authService.login(email, password);
       const currentUser = authService.getCurrentUser();
       setUser(currentUser);
+      if (pendingConfirmationEmail) {
+        setPendingConfirmationEmail(null);
+        localStorage.removeItem('pendingConfirmationEmail');
+      }
       return { success: true, data };
     } catch (error) {
       let errorMessage = 'Erro ao fazer login. Tente novamente';
@@ -23,7 +34,6 @@ export const useAuth = () => {
       if (error.response?.status === 401 || error.response?.status === 422) {
         errorMessage = 'Email ou senha inválidos';
       } else if (error.response?.data?.mensagem) {
-       
         errorMessage = error.response.data.mensagem;
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
@@ -35,20 +45,20 @@ export const useAuth = () => {
 
   const signup = async (userData) => {
     try {
-      const data = await authService.signup(userData);
-      return { success: true, data };
+      const result = await authService.signup(userData);
+      localStorage.setItem('pendingConfirmationEmail', result.email);
+      setPendingConfirmationEmail(result.email);
+      return { success: true, data: result.data, email: result.email };
     } catch (error) {
       let errorMessage = 'Erro ao fazer cadastro. Tente novamente.';
 
       if (error.response?.status === 409) {
-        
         errorMessage = error.response.data?.mensagem || 'Email já cadastrado.';
       } else if (error.response?.data?.mensagem) {
         errorMessage = error.response.data.mensagem;
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error.response?.data?.errosPorCampo) {
-        
         const erros = Object.values(error.response.data.errosPorCampo);
         errorMessage = erros.join('. ');
       }
@@ -59,8 +69,10 @@ export const useAuth = () => {
 
   const signupAdmBarbearia = async (userData) => {
     try {
-      const data = await authService.signup_ADM_BARBEARIA(userData);
-      return { success: true, data };
+      const result = await authService.signup_ADM_BARBEARIA(userData);
+      localStorage.setItem('pendingConfirmationEmail', result.email);
+      setPendingConfirmationEmail(result.email);
+      return { success: true, data: result.data, email: result.email };
     } catch (error) {
       let errorMessage = 'Erro ao fazer cadastro. Tente novamente.';
 
@@ -80,6 +92,12 @@ export const useAuth = () => {
   const logout = () => {
     authService.logout();
     setUser(null);
+    setPendingConfirmationEmail(null);
+  };
+
+  const clearPendingConfirmation = () => {
+    setPendingConfirmationEmail(null);
+    localStorage.removeItem('pendingConfirmationEmail');
   };
 
   return {
@@ -89,6 +107,8 @@ export const useAuth = () => {
     signup,
     signupAdmBarbearia,
     logout,
+    pendingConfirmationEmail,
+    clearPendingConfirmation,
     isAuthenticated: authService.isAuthenticated(),
     isBarbeariaAdm: authService.isBarbeariaAdm(),
     isCliente: authService.isCliente()

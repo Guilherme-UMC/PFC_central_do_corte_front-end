@@ -37,6 +37,35 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
+    if (error.response?.status === 401) {
+      const errorMessage = error.response?.data?.mensagem || error.response?.data?.message || '';
+      
+      if (errorMessage.toLowerCase().includes('não confirmado') || 
+          errorMessage.toLowerCase().includes('verifique seu e-mail') ||
+          errorMessage.toLowerCase().includes('conta não ativada')) {
+        
+        let email = '';
+        try {
+          if (originalRequest.data) {
+            const requestData = JSON.parse(originalRequest.data);
+            email = requestData.email || '';
+          }
+        } catch (e) {
+        }
+        
+        if (email) {
+          localStorage.setItem('pendingConfirmationEmail', email);
+        }
+        
+        if (!window.location.pathname.includes('/reenviar-confirmacao') &&
+            !window.location.pathname.includes('/confirmar-email')) {
+          window.location.href = '/reenviar-confirmacao';
+        }
+        
+        return Promise.reject(error);
+      }
+    }
+    
     if (error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
     }
@@ -80,6 +109,7 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
+      localStorage.removeItem('pendingConfirmationEmail');
       window.location.href = '/login';
       return Promise.reject(refreshError);
     } finally {

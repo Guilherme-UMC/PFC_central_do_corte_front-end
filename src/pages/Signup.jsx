@@ -4,6 +4,7 @@ import { validators } from '../utils/validators';
 import { useNavigate } from 'react-router-dom';
 import PasswordInput from '../components/PasswordInput';
 import TermosModal from '../components/TermosModal';
+import authService from '../services/AuthService';
 
 const IconArrowLeft = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
@@ -14,15 +15,25 @@ const IconArrowLeft = () => (
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { signup } = useAuthContext();
+  const { signup, pendingConfirmationEmail, clearPendingConfirmation } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [aceiteTermos, setAceiteTermos] = useState(false);
   const [showTermosModal, setShowTermosModal] = useState(false);
+  const [pendingConfirmation, setPendingConfirmation] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
+  const [reenviando, setReenviando] = useState(false);
   const [formData, setFormData] = useState({
     name: '', telefone: '', email: '', password: '', confirmPassword: ''
   });
+
+  useState(() => {
+    if (pendingConfirmationEmail) {
+      setRegisteredEmail(pendingConfirmationEmail);
+      setPendingConfirmation(true);
+    }
+  }, [pendingConfirmationEmail]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,6 +56,19 @@ const Signup = () => {
     setShowTermosModal(false);
   };
 
+  const handleReenviarConfirmacao = async () => {
+    setReenviando(true);
+    const result = await authService.reenviarConfirmacao(registeredEmail);
+    if (result.success) {
+      setSuccess('E-mail de confirmação reenviado! Verifique sua caixa de entrada.');
+      setTimeout(() => setSuccess(''), 5000);
+    } else {
+      setError(result.message);
+      setTimeout(() => setError(''), 5000);
+    }
+    setReenviando(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -63,14 +87,30 @@ const Signup = () => {
       return;
     }
     if (formData.password !== formData.confirmPassword) {
-      setError('Senhas nao coincidem.');
+      setError('Senhas não coincidem.');
       setLoading(false);
       return;
     }
-    if (!validators.email(formData.email)) { setError('Email invalido.'); setLoading(false); return; }
-    if (!validators.password(formData.password)) { setError('Senha: minimo 6 caracteres.'); setLoading(false); return; }
-    if (!validators.phone(formData.telefone)) { setError('Telefone invalido.'); setLoading(false); return; }
-    if (!validators.name(formData.name)) { setError('Nome: minimo 3 caracteres.'); setLoading(false); return; }
+    if (!validators.email(formData.email)) { 
+      setError('Email inválido.'); 
+      setLoading(false); 
+      return; 
+    }
+    if (!validators.password(formData.password)) { 
+      setError('Senha: mínimo 6 caracteres.'); 
+      setLoading(false); 
+      return; 
+    }
+    if (!validators.phone(formData.telefone)) { 
+      setError('Telefone inválido.'); 
+      setLoading(false); 
+      return; 
+    }
+    if (!validators.name(formData.name)) { 
+      setError('Nome: mínimo 3 caracteres.'); 
+      setLoading(false); 
+      return; 
+    }
 
     const result = await signup({
       name: formData.name,
@@ -80,15 +120,64 @@ const Signup = () => {
     });
 
     if (result.success) {
-      setSuccess('Cadastro realizado! Redirecionando...');
-      setTimeout(() => { navigate('/login'); }, 2000);
+      setRegisteredEmail(result.email);
+      setPendingConfirmation(true);
+      setSuccess('Cadastro realizado! Enviamos um link de confirmação para seu e-mail.');
     } else {
       setError(result.error || 'Erro ao cadastrar.');
     }
     setLoading(false);
   };
 
-  const handleBackToHome = () => { navigate('/') };
+  const handleBackToHome = () => { 
+    if (pendingConfirmation) {
+      clearPendingConfirmation();
+    }
+    navigate('/');
+  };
+
+  if (pendingConfirmation) {
+    return (
+      <div className="auth-container">
+        <button className="auth-back-btn" onClick={handleBackToHome}>
+          <IconArrowLeft />
+        </button>
+        <div className="auth-card">
+          <h2 className="auth-title">Quase lá!</h2>
+          <div className="alert alert-success">
+            Enviamos um link de confirmação para <strong>{registeredEmail}</strong>
+          </div>
+          <p style={{ marginTop: 16, textAlign: 'center' }}>
+            Verifique sua caixa de entrada (e também a pasta de spam) e clique no link para ativar sua conta.
+          </p>
+          <p style={{ marginTop: 8, textAlign: 'center', fontSize: 13, color: '#8a8278' }}>
+            Não recebeu o e-mail? 
+            <button 
+              onClick={handleReenviarConfirmacao}
+              disabled={reenviando}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                color: '#d4af37', 
+                cursor: 'pointer',
+                marginLeft: 4,
+                textDecoration: 'underline'
+              }}
+            >
+              {reenviando ? 'Enviando...' : 'Reenviar e-mail'}
+            </button>
+          </p>
+          <button 
+            className="btn btn-primary btn-block" 
+            onClick={() => navigate('/login')}
+            style={{ marginTop: 16 }}
+          >
+            Ir para o login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-container">
@@ -121,7 +210,7 @@ const Signup = () => {
             id="password"
             name="password"
             label="Senha"
-            placeholder="Minimo 6 caracteres"
+            placeholder="Mínimo 6 caracteres"
             value={formData.password}
             onChange={handleChange}
             required
@@ -157,11 +246,11 @@ const Signup = () => {
         </form>
 
         <div className="auth-link">
-          <p>Ja tem conta?
+          <p>Já tem conta?
           <a href="#" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>Fazer Login</a>
         </p>
         <p>
-          E proprietario?
+          É proprietário?
           <a href="#" onClick={(e) => { e.preventDefault(); navigate('/signup-barbearia'); }}>Cadastrar Barbearia</a>
         </p>
         </div>
