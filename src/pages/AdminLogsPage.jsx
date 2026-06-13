@@ -281,7 +281,7 @@ const AdminLogsPage = () => {
                     >
                       {formatarDescricao(log)}
                     </div>
-                    {log.entidade && (
+                    {log.entidadeId && (
                       <small className="entidade-info">
                         ID: {log.entidadeId}
                       </small>

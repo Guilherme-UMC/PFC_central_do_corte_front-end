@@ -40,12 +40,19 @@ const AdminPage = ({ onNavigate }) => {
 
       let roleParam = roleFilter !== 'todos' ? roleFilter : null;
 
+      // Verifica se o termo de busca parece ser um ID (número ou UUID)
+      let searchParam = searchTerm || null;
+      if (searchParam && searchParam.trim() !== '') {
+        // Se for um número ou UUID, mantém como está para buscar por ID
+        // O backend deve estar preparado para buscar tanto por nome quanto por ID
+        searchParam = searchParam.trim();
+      }
       const result = await AdminService.listarTodosUsuarios(
         pagination.page,
         pagination.size,
         statusParam,
         roleParam,
-        searchTerm || null
+        searchParam
       );
 
       if (result.success) {
@@ -63,20 +70,20 @@ const AdminPage = ({ onNavigate }) => {
     }
   }, [pagination.page, pagination.size, userFilter, roleFilter, searchTerm]);
 
- const carregarBarbearias = async () => {
-  setLoading(true);
-  const result = await AdminService.listarTodasBarbeariasAdmin(pagination.page, 100);
-  if (result.success) {
-    const data = result.data;
-    setBarbearias(data.content || data || []);
-    setPagination(prev => ({
-      ...prev,
-      totalPages: data.totalPages || 0,
-      totalElements: data.totalElements || 0
-    }));
-  }
-  setLoading(false);
-};
+  const carregarBarbearias = async () => {
+    setLoading(true);
+    const result = await AdminService.listarTodasBarbeariasAdmin(pagination.page, 100);
+    if (result.success) {
+      const data = result.data;
+      setBarbearias(data.content || data || []);
+      setPagination(prev => ({
+        ...prev,
+        totalPages: data.totalPages || 0,
+        totalElements: data.totalElements || 0
+      }));
+    }
+    setLoading(false);
+  };
   useEffect(() => {
     if (activeTab === 'usuarios') {
       carregarUsuarios();
@@ -185,14 +192,14 @@ const AdminPage = ({ onNavigate }) => {
         </div>
 
         <div className="page-tabs">
-          <button 
-            className={`tab-btn ${activeTab === 'usuarios' ? 'active' : ''}`} 
+          <button
+            className={`tab-btn ${activeTab === 'usuarios' ? 'active' : ''}`}
             onClick={() => { setActiveTab('usuarios'); setPagination(prev => ({ ...prev, page: 0 })); }}
           >
             Usuários
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'barbearias' ? 'active' : ''}`} 
+          <button
+            className={`tab-btn ${activeTab === 'barbearias' ? 'active' : ''}`}
             onClick={() => setActiveTab('barbearias')}
           >
             Barbearias
@@ -208,7 +215,7 @@ const AdminPage = ({ onNavigate }) => {
                 <div className="search-bar">
                   <input
                     type="text"
-                    placeholder="Buscar por nome..."
+                    placeholder="Buscar por nome ou ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"
@@ -281,10 +288,10 @@ const AdminPage = ({ onNavigate }) => {
                     <form className="form" onSubmit={handleCreateUser}>
                       <label className="form-label">Nome Completo</label>
                       <input className="form-input" type="text" placeholder="Nome completo" value={userForm.name} onChange={e => setUserForm({ ...userForm, name: e.target.value })} required />
-                      
+
                       <label className="form-label">Email</label>
                       <input className="form-input" type="email" placeholder="Email" value={userForm.email} onChange={e => setUserForm({ ...userForm, email: e.target.value })} required />
-                      
+
                       <PasswordInput
                         name="password"
                         label="Senha"
@@ -293,10 +300,10 @@ const AdminPage = ({ onNavigate }) => {
                         onChange={e => setUserForm({ ...userForm, password: e.target.value })}
                         required
                       />
-                      
+
                       <label className="form-label">Telefone</label>
                       <input className="form-input" type="tel" placeholder="Telefone" value={userForm.telefone} onChange={e => setUserForm({ ...userForm, telefone: e.target.value })} />
-                      
+
                       <label className="form-label">Função</label>
                       <select className="form-select" value={userForm.role} onChange={e => setUserForm({ ...userForm, role: e.target.value })}>
                         <option value="ROLE_CLIENTE">Cliente</option>
@@ -304,7 +311,7 @@ const AdminPage = ({ onNavigate }) => {
                         <option value="ROLE_BARBEARIA_ADM">Proprietário de Barbearia</option>
                         <option value="ROLE_ADMIN">Administrador</option>
                       </select>
-                      
+
                       <div className="modal-actions">
                         <button type="button" className="btn-danger" onClick={() => { setShowUserForm(false); setUserForm({ name: '', email: '', password: '', telefone: '', role: 'ROLE_CLIENTE' }); }}>Cancelar</button>
                         <button type="submit" className="btn-concluir" disabled={submitting}>{submitting ? 'Criando...' : 'Criar'}</button>
@@ -319,7 +326,7 @@ const AdminPage = ({ onNavigate }) => {
                   <thead>
                     <tr>
                       <th>Nome</th>
-                      <th>Email</th>
+                      <th>ID</th>
                       <th>Role</th>
                       <th>Status</th>
                       <th>Ações</th>
@@ -327,11 +334,11 @@ const AdminPage = ({ onNavigate }) => {
                   </thead>
                   <tbody>
                     {usuarios.map(u => {
-                      const isRemovido = u.email?.startsWith('removido_');
+                      const isRemovido = u.id?.startsWith('removido_');
                       return (
                         <tr key={u.id}>
                           <td>{u.name}</td>
-                          <td>{u.email}</td>
+                          <td>{u.id}</td>
                           <td>{getRoleLabel(u.role)}</td>
                           <td>
                             <span className={u.active ? 'status-active' : 'status-inactive'}>

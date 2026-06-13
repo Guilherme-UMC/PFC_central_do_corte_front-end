@@ -305,7 +305,7 @@ const Home = () => {
                 no seu tempo <br />e sem complicação!
               </p>
               <button className="btn-virar" onClick={() => navigate('/login')}>
-                VIRAR CLIENTE
+                FAZER AGENDAMENTO
               </button>
             </div>
           </div>
