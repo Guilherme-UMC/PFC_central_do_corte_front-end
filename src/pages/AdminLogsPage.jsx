@@ -22,9 +22,12 @@ const AdminLogsPage = () => {
     totalPages: 0,
     totalElements: 0
   });
-  useEffect(() => {
-    carregarDadosIniciais();
-  }, []);
+
+  const [expandedId, setExpandedId] = useState(null);
+
+  const toggleExpand = (id) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
 
   useEffect(() => {
     carregarDadosIniciais();
@@ -91,6 +94,81 @@ const AdminLogsPage = () => {
     return new Date(data).toLocaleString('pt-BR');
   };
 
+  // Função para formatar a descrição (versão mais simples)
+  const formatarDescricao = (log) => {
+    if (!log.descricao) return '—';
+
+    let descricao = log.descricao;
+    const usuarioNome = log.usuarioNome;
+
+    // Remove o nome da descrição se ele aparecer (para não repetir)
+    if (usuarioNome && usuarioNome !== 'Sistema') {
+      descricao = descricao.replace(new RegExp(usuarioNome, 'gi'), '');
+      descricao = descricao.replace(/^[\s,]+/, ''); // Remove vírgulas extras no início
+    }
+
+    // Capitalizar primeira letra
+    if (descricao.length > 0) {
+      descricao = descricao.charAt(0).toUpperCase() + descricao.slice(1);
+    }
+
+    return descricao || '—';
+  };
+
+  // Função para obter a ação simplificada
+  const getAcaoSimplificada = (acao, tipo) => {
+    const acoes = {
+      'CRIADO': 'Criou',
+      'ATUALIZADO': 'Atualizou',
+      'CANCELADO': 'Cancelou',
+      'CONFIRMADO': 'Confirmou',
+      'CONCLUIDO': 'Concluiu',
+      'DELETADO': 'Removeu',
+      'LOGIN': 'Login',
+      'LOGOUT': 'Logout',
+      'STATUS_ALTERADO': 'Alterou status',
+      'SENHA_ALTERADA': 'Alterou senha',
+      'ROLE_ALTERADA': 'Alterou permissão',
+      'VINCULADO': 'Vinculou',
+      'DESVINCULADO': 'Desvinculou',
+      'DISponibilidade_ALTERADA': 'Alterou disponibilidade'
+    };
+
+    if (tipo === 'LOGIN') return 'Login';
+    if (tipo === 'LOGOUT') return 'Logout';
+    if (tipo === 'AGENDAMENTO') {
+      const acoesAgendamento = {
+        'CRIADO': 'Criou agendamento',
+        'CANCELADO': 'Cancelou agendamento',
+        'CONFIRMADO': 'Confirmou agendamento',
+        'CONCLUIDO': 'Concluiu atendimento'
+      };
+      return acoesAgendamento[acao] || acoes[acao] || acao;
+    }
+    if (tipo === 'USUARIO') {
+      const acoesUsuario = {
+        'CRIADO': 'Cadastrou usuário',
+        'ATUALIZADO': 'Atualizou dados',
+        'DELETADO': 'Removeu usuário',
+        'STATUS_ALTERADO': 'Alterou status',
+        'SENHA_ALTERADA': 'Alterou senha',
+        'ROLE_ALTERADA': 'Alterou permissão'
+      };
+      return acoesUsuario[acao] || acoes[acao] || acao;
+    }
+    if (tipo === 'FUNCIONARIO') {
+      const acoesFuncionario = {
+        'CRIADO': 'Cadastrou funcionário',
+        'VINCULADO': 'Vinculou funcionário',
+        'DESVINCULADO': 'Desvinculou funcionário',
+        'DISponibilidade_ALTERADA': 'Alterou disponibilidade'
+      };
+      return acoesFuncionario[acao] || acoes[acao] || acao;
+    }
+
+    return acoes[acao] || acao;
+  };
+
   const getCorTipo = (tipo) => {
     const cores = {
       'AGENDAMENTO': '#d4af37',
@@ -126,7 +204,6 @@ const AdminLogsPage = () => {
         ))}
       </div>
 
-    
       <div className="filtros-container">
         <select name="tipo" className="select" value={filtros.tipo} onChange={handleFiltroChange}>
           <option value="">Todos os tipos</option>
@@ -165,7 +242,6 @@ const AdminLogsPage = () => {
         </button>
       </div>
 
-    
       <div className="logs-table-container">
         <table className="logs-table">
           <thead>
@@ -173,16 +249,13 @@ const AdminLogsPage = () => {
               <th>Data/Hora</th>
               <th>Tipo</th>
               <th>Ação</th>
-              <th>Usuário</th>
-              <th>Role</th>
               <th>Descrição</th>
-              <th>IP</th>
             </tr>
           </thead>
           <tbody>
             {logs.length === 0 ? (
               <tr>
-                <td colSpan="7" className="empty-logs">
+                <td colSpan="4" className="empty-logs">
                   Nenhum log encontrado
                 </td>
               </tr>
@@ -197,25 +270,23 @@ const AdminLogsPage = () => {
                   </td>
                   <td>
                     <span className={`acao-badge acao-${log.acao.toLowerCase()}`}>
-                      {log.acao}
+                      {getAcaoSimplificada(log.acao, log.tipo)}
                     </span>
                   </td>
-                  <td>
-                    <div className="usuario-info">
-                      <strong>{log.usuarioNome}</strong>
-                      <small>{log.usuarioEmail}</small>
-                    </div>
-                  </td>
-                  <td>{log.usuarioRole}</td>
                   <td className="descricao-cell">
-                    <div className="descricao-text">{log.descricao}</div>
+                    <div
+                      className={`descricao-text ${expandedId === log.id ? 'expanded' : ''}`}
+                      onClick={() => toggleExpand(log.id)}
+                      title={log.descricao}
+                    >
+                      {formatarDescricao(log)}
+                    </div>
                     {log.entidade && (
                       <small className="entidade-info">
-                        {log.entidade}: {log.entidadeId}
+                        ID: {log.entidadeId}
                       </small>
                     )}
                   </td>
-                  <td>{log.ipOrigem || '-'}</td>
                 </tr>
               ))
             )}
@@ -223,7 +294,6 @@ const AdminLogsPage = () => {
         </table>
       </div>
 
-    
       {paginacao.totalPages > 0 && (
         <div className="pagination">
           <button
