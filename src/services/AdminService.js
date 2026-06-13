@@ -101,13 +101,18 @@ class AdminService {
       };
     }
   }
-
-  async listarTodasBarbeariasAdmin(page = 0, size = 20) {
+  
+async listarTodasBarbeariasAdmin(page = 0, size = 20) {
     try {
-      const response = await api.get('/barbearia', { params: { page, size } });
+      const response = await api.get('/barbearia/admin/todas', { params: { page, size } });
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, message: 'Erro ao listar barbearias', data: [] };
+      console.error('Erro ao listar barbearias:', error);
+      return { 
+        success: false, 
+        message: 'Erro ao listar barbearias',
+        data: { content: [], totalPages: 0, totalElements: 0 }
+      };
     }
   }
 

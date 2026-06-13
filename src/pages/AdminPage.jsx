@@ -63,16 +63,20 @@ const AdminPage = ({ onNavigate }) => {
     }
   }, [pagination.page, pagination.size, userFilter, roleFilter, searchTerm]);
 
-  const carregarBarbearias = async () => {
-    setLoading(true);
-    const result = await BarbeariaService.listarTodas(pagination.page, 100);
-    if (result.success) {
-      const data = result.data;
-      setBarbearias(data.content || data || []);
-    }
-    setLoading(false);
-  };
-
+ const carregarBarbearias = async () => {
+  setLoading(true);
+  const result = await AdminService.listarTodasBarbeariasAdmin(pagination.page, 100);
+  if (result.success) {
+    const data = result.data;
+    setBarbearias(data.content || data || []);
+    setPagination(prev => ({
+      ...prev,
+      totalPages: data.totalPages || 0,
+      totalElements: data.totalElements || 0
+    }));
+  }
+  setLoading(false);
+};
   useEffect(() => {
     if (activeTab === 'usuarios') {
       carregarUsuarios();
