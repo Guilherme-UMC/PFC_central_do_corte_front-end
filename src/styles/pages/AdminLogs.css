@@ -222,3 +222,22 @@
 .pagination span {
   color: var(--corte-text-muted);
 }
+
+.descricao-text {
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  transition: all 0.2s;
+}
+
+.descricao-text.expanded {
+  -webkit-line-clamp: unset;
+  white-space: normal;
+}
+
+.descricao-text:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
