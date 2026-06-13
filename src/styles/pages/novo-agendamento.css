@@ -339,7 +339,6 @@
   color: var(--corte-text-muted);
 }
 
-/* ── Barra inferior de seleção ──────────────────────────── */
 .selecao-bar {
   display: flex;
   align-items: center;
@@ -360,7 +359,6 @@
   color: var(--corte-text);
 }
 
-/* ── Horários ───────────────────────────────────────────── */
 .horarios-secao {
   margin-bottom: 32px;
 }
@@ -419,7 +417,20 @@
   text-decoration: line-through;
 }
 
-/* ── Data picker ────────────────────────────────────────── */
+.horario-btn.passado {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--corte-surface-2);
+  border-color: var(--corte-border);
+  color: var(--corte-text-muted);
+  text-decoration: line-through;
+}
+
+.horario-btn.passado:hover {
+  transform: none;
+  border-color: var(--corte-border);
+}
+
 .data-picker-row {
   display: flex;
   align-items: center;
@@ -443,7 +454,6 @@
   border-color: var(--corte-gold);
 }
 
-/* ── Funcionários ───────────────────────────────────────── */
 .funcionarios-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -530,7 +540,6 @@
   background: rgba(201, 168, 76, 0.05);
 }
 
-/* ── Confirmação ────────────────────────────────────────── */
 .confirmacao-card {
   background: var(--corte-surface);
   border: 1px solid var(--corte-border);
@@ -596,7 +605,6 @@
   color: var(--corte-gold);
 }
 
-/* ── Sucesso ────────────────────────────────────────────── */
 .sucesso-container {
   display: flex;
   flex-direction: column;
@@ -630,7 +638,6 @@
   max-width: 400px;
 }
 
-/* ── Botões gerais ──────────────────────────────────────── */
 .btn-primary {
   background: var(--corte-gold);
   color: #0f0f0f;
@@ -672,7 +679,6 @@
   color: var(--red);
 }
 
-/* ── Loading / erro ─────────────────────────────────────── */
 .loading-state,
 .empty-state {
   text-align: center;
@@ -702,7 +708,6 @@
   margin-bottom: 20px;
 }
 
-/* ── Ações do rodapé ────────────────────────────────────── */
 .step-actions {
   display: flex;
   justify-content: flex-end;
@@ -751,7 +756,6 @@
   font-size: 13px;
 }
 
-/* ── Responsivo ─────────────────────────────────────────── */
 @media (max-width: 700px) {
   .step-content { padding: 0 16px; }
   .agendamento-header { padding: 16px; }

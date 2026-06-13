@@ -562,7 +562,6 @@
   font-size: 12px;
 }
 
-/* Modal de observação */
 .observacao-modal {
   max-width: 500px;
 }
@@ -587,6 +586,141 @@
   word-wrap: break-word;
   font-size: 14px;
   color: var(--corte-text);
+}
+
+/* Filtros de agendamentos */
+.filtros-agendamentos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 1.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--corte-border);
+}
+
+.filtro-btn {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--corte-border);
+  border-radius: 20px;
+  color: var(--corte-text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+}
+
+.filtro-btn:hover {
+  border-color: var(--corte-gold);
+  color: var(--corte-text);
+}
+
+.filtro-btn.active {
+  background: var(--corte-gold);
+  border-color: var(--corte-gold);
+  color: #0f0f0f;
+}
+.servico-filtro-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.servico-filtro-icon svg {
+  width: 100%;
+  height: 100%;
+}
+/* Filtros de barbearias - NOVOS ESTILOS */
+.barbearias-filtros-header {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.busca-barbearias {
+  flex: 1;
+  position: relative;
+}
+
+.busca-barbearias-input {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  background: var(--corte-surface);
+  border: 1px solid var(--corte-border);
+  border-radius: 12px;
+  color: var(--corte-text);
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.busca-barbearias-input:focus {
+  outline: none;
+  border-color: var(--corte-gold);
+}
+
+.busca-barbearias-clear {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--corte-text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+}
+
+.limpar-filtros-btn {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--corte-border);
+  border-radius: 8px;
+  color: var(--corte-text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.limpar-filtros-btn:hover {
+  border-color: var(--corte-gold);
+  color: var(--corte-text);
+}
+
+.servicos-filtro-barbearias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 1.5rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--corte-border);
+}
+
+.servico-filtro-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--corte-border);
+  border-radius: 30px;
+  color: var(--corte-text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+}
+
+.servico-filtro-btn:hover {
+  border-color: var(--corte-gold);
+  color: var(--corte-text);
+}
+
+.servico-filtro-btn.active {
+  background: var(--corte-gold);
+  border-color: var(--corte-gold);
+  color: #0f0f0f;
 }
 
 @media (max-width: 768px) {

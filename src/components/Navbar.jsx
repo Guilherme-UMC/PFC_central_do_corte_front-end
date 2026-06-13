@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthContext } from '../contexts/AuthContext';
-import BuscaGlobal from '../components/BuscaGlobal';
-import BuscaService from '../services/BuscaService';
-import { debounce } from '../utils/helpers';
 import '../styles/components/navbar.css';
 
 const IconUser = () => (
@@ -53,12 +50,10 @@ const IconSearch = () => (
 const Navbar = ({ search, onSearchChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isAuthenticated, isBarbeariaAdm, isCliente, logout } = useAuthContext();
+  const { user, isAuthenticated, isCliente, logout } = useAuthContext();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [searchExpanded, setSearchExpanded] = useState(false);
   const [localSearch, setLocalSearch] = useState(search || '');
-  const [showBuscaDropdown, setShowBuscaDropdown] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -76,25 +71,11 @@ const Navbar = ({ search, onSearchChange }) => {
     const value = e.target.value;
     setLocalSearch(value);
     onSearchChange && onSearchChange(value);
-    setShowBuscaDropdown(true);
-  };
-
-  const handleSearchFocus = () => {
-    if (localSearch && localSearch.length >= 2) {
-      setShowBuscaDropdown(true);
-    }
-  };
-
-  const handleSearchBlur = () => {
-    setTimeout(() => {
-      setShowBuscaDropdown(false);
-    }, 200);
   };
 
   const handleClearSearch = () => {
     setLocalSearch('');
     onSearchChange && onSearchChange('');
-    setShowBuscaDropdown(false);
   };
 
   const handleLogout = () => {
@@ -105,13 +86,11 @@ const Navbar = ({ search, onSearchChange }) => {
 
   const goTo = (path) => {
     setMenuOpen(false);
-    setShowBuscaDropdown(false);
     navigate(path);
   };
 
   const goToSection = (sectionId) => {
     setMenuOpen(false);
-    setShowBuscaDropdown(false);
     if (location.pathname !== '/') {
       navigate('/');
       setTimeout(() => {
@@ -122,18 +101,12 @@ const Navbar = ({ search, onSearchChange }) => {
     }
   };
 
-  const getPagePath = () => {
-    if (isBarbeariaAdm) return '/page/barbearia';
-    if (isCliente) return '/page/cliente';
-    return '/page/funcionario';
-  };
-
   const isHomePage = location.pathname === '/';
+  const shouldShowSearch = isHomePage;
 
   return (
     <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}>
       <div className="navbar__inner">
-       
         <div className="navbar__logo" onClick={() => goTo('/')}>
           <div className="navbar__logo-icon"><IconScissors /></div>
           <div className="navbar__logo-text">
@@ -141,42 +114,31 @@ const Navbar = ({ search, onSearchChange }) => {
           </div>
         </div>
 
-      
-        <div className={`navbar__search ${searchExpanded ? 'navbar__search--expanded' : ''}`}>
-          <IconSearch />
-          <input
-            value={localSearch}
-            onChange={handleSearchChange}
-            onFocus={handleSearchFocus}
-            onBlur={handleSearchBlur}
-            placeholder="Buscar barbearias ou locais..."
-          />
-          {localSearch && (
-            <button className="navbar__search-clear" onClick={handleClearSearch}>
-              ✕
-            </button>
-          )}
-
-         
-          <BuscaGlobal
-            termo={localSearch}
-            isOpen={showBuscaDropdown && localSearch.length >= 2}
-            onClose={() => setShowBuscaDropdown(false)}
-            onNavigate={goTo}
-          />
-        </div>
-
-        
-        {isHomePage && (
-        <div className="navbar__links">
-          <button onClick={() => goToSection('barbearias')} className="navbar__link">Barbearias</button>
-          <button onClick={() => goToSection('servicos')} className="navbar__link">Serviços</button>
-          <button onClick={() => goToSection('agendamentos')} className="navbar__link">Agendamentos</button>
-          <button onClick={() => goToSection('cadastro')} className="navbar__link">Cadastro</button>
-        </div>
+        {shouldShowSearch && (
+          <div className="navbar__search">
+            <IconSearch />
+            <input
+              value={localSearch}
+              onChange={handleSearchChange}
+              placeholder="Buscar por nome, cidade, bairro ou CEP..."
+            />
+            {localSearch && (
+              <button className="navbar__search-clear" onClick={handleClearSearch}>
+                ✕
+              </button>
+            )}
+          </div>
         )}
 
-        
+        {isHomePage && (
+          <div className="navbar__links">
+            <button onClick={() => goToSection('barbearias')} className="navbar__link">Barbearias</button>
+            <button onClick={() => goToSection('servicos')} className="navbar__link">Serviços</button>
+            <button onClick={() => goToSection('agendamentos')} className="navbar__link">Agendamentos</button>
+            <button onClick={() => goToSection('cadastro')} className="navbar__link">Cadastro</button>
+          </div>
+        )}
+
         <div className="navbar__actions">
           {isAuthenticated ? (
             <div className="navbar__user-menu">
@@ -200,7 +162,6 @@ const Navbar = ({ search, onSearchChange }) => {
           )}
         </div>
 
-       
         <button
           className="navbar__menu-btn"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -210,30 +171,30 @@ const Navbar = ({ search, onSearchChange }) => {
         </button>
       </div>
 
-     
-      <div className="navbar__search-mobile">
-        <IconSearch />
-        <input
-          value={localSearch}
-          onChange={handleSearchChange}
-          placeholder="Buscar barbearias ou locais..."
-        />
-        {localSearch && (
-          <button className="navbar__search-clear" onClick={handleClearSearch}>
-            ✕
-          </button>
-        )}
-      </div>
+      {shouldShowSearch && (
+        <div className="navbar__search-mobile">
+          <IconSearch />
+          <input
+            value={localSearch}
+            onChange={handleSearchChange}
+            placeholder="Buscar por nome, cidade, bairro ou CEP..."
+          />
+          {localSearch && (
+            <button className="navbar__search-clear" onClick={handleClearSearch}>
+              ✕
+            </button>
+          )}
+        </div>
+      )}
 
-      
       <div className={`navbar__mobile ${menuOpen ? 'navbar__mobile--open' : ''}`}>
         {isHomePage && (
-        <div className="navbar__mobile-links">
-          <button onClick={() => goToSection('barbearias')} className="navbar__mobile-link">Barbearias</button>
-          <button onClick={() => goToSection('servicos')} className="navbar__mobile-link">Serviços</button>
-          <button onClick={() => goToSection('agendamentos')} className="navbar__mobile-link">Agendamentos</button>
-          <button onClick={() => goToSection('cadastro')} className="navbar__mobile-link">Cadastro</button>
-        </div>
+          <div className="navbar__mobile-links">
+            <button onClick={() => goToSection('barbearias')} className="navbar__mobile-link">Barbearias</button>
+            <button onClick={() => goToSection('servicos')} className="navbar__mobile-link">Serviços</button>
+            <button onClick={() => goToSection('agendamentos')} className="navbar__mobile-link">Agendamentos</button>
+            <button onClick={() => goToSection('cadastro')} className="navbar__mobile-link">Cadastro</button>
+          </div>
         )}
 
         <div className="navbar__mobile-actions">

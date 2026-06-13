@@ -105,17 +105,14 @@ const Perfil = ({ onNavigate }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Função para excluir conta (inativa e depois remove)
   const handleExcluirConta = async () => {
     setDeleting(true);
     setMessage({ type: '', text: '' });
 
     try {
-      // PASSO 1: Verificar se o usuário está ativo
       if (profile?.active) {
         setMessage({ type: 'info', text: 'Inativando conta...' });
 
-        // Inativar o usuário primeiro
         const inativarResult = await AdminService.ativarDesativarUsuario(user?.id);
 
         if (!inativarResult.success) {
@@ -124,18 +121,15 @@ const Perfil = ({ onNavigate }) => {
 
         setMessage({ type: 'info', text: 'Conta inativada. Removendo permanentemente...' });
 
-        // Pequeno delay para garantir que a inativação foi processada
         await new Promise(resolve => setTimeout(resolve, 500));
       }
 
-      // PASSO 2: Remover permanentemente o usuário
       const removerResult = await AdminService.deletarUsuario(user?.id);
 
       if (!removerResult.success) {
         throw new Error(removerResult.message || 'Erro ao remover conta');
       }
 
-      // Sucesso - fazer logout e redirecionar
       setMessage({ type: 'success', text: 'Sua conta foi excluída permanentemente com sucesso!' });
 
       setTimeout(() => {
@@ -153,7 +147,6 @@ const Perfil = ({ onNavigate }) => {
     }
   };
 
-  // Abrir modal de confirmação
   const openConfirmModal = () => {
     setShowConfirmModal(true);
   };

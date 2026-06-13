@@ -1,3 +1,43 @@
+export const parseDataHora = (dataHora) => {
+  if (!dataHora) return null;
+  
+  if (dataHora instanceof Date && !isNaN(dataHora.getTime())) {
+    return dataHora;
+  }
+  
+  try {
+    let data;
+    
+    if (typeof dataHora === 'string' && dataHora.includes('/')) {
+      const partes = dataHora.split(' ');
+      const dataParte = partes[0];
+      const horaParte = partes[1] || '00:00';
+      
+      const [dia, mes, ano] = dataParte.split('/');
+      const [horas, minutos] = horaParte.split(':');
+      
+      data = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia), parseInt(horas), parseInt(minutos));
+    }
+    else if (typeof dataHora === 'string' && dataHora.includes('T')) {
+      data = new Date(dataHora);
+    }
+    else if (typeof dataHora === 'string' && dataHora.includes('-')) {
+      data = new Date(dataHora.replace(' ', 'T'));
+    }
+    else if (typeof dataHora === 'number') {
+      data = new Date(dataHora);
+    }
+    else {
+      data = new Date(dataHora);
+    }
+    
+    return !isNaN(data.getTime()) ? data : null;
+  } catch (error) {
+    console.error('Erro ao parsear data:', error, dataHora);
+    return null;
+  }
+};
+
 export const formatarDataHora = (dataISO) => {
     if (!dataISO) return '—';
 
@@ -11,9 +51,7 @@ export const formatarDataHora = (dataISO) => {
 
         let data;
         if (typeof dataISO === 'string') {
-
             data = new Date(dataISO);
-
             if (isNaN(data.getTime())) {
                 data = new Date(dataISO.replace('T', ' '));
             }
@@ -78,39 +116,29 @@ export const formatarData = (dataISO) => {
     }
 };
 
-export const formatarHora = (dataISO) => {
-    if (!dataISO) return '—';
-
-    try {
-        if (typeof dataISO === 'string' && /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/.test(dataISO)) {
-            return dataISO.split(' ')[1];
-        }
-
-        if (typeof dataISO === 'string' && /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/.test(dataISO)) {
-            return dataISO.split(' ')[1].substring(0, 5);
-        }
-
-        let data;
-        if (typeof dataISO === 'string') {
-            data = new Date(dataISO);
-            if (isNaN(data.getTime())) {
-                data = new Date(dataISO.replace('T', ' '));
-            }
-        } else if (dataISO instanceof Date) {
-            data = dataISO;
-        } else {
-            return '—';
-        }
-
-        if (isNaN(data.getTime())) return '—';
-
-        const hora = String(data.getHours()).padStart(2, '0');
-        const minuto = String(data.getMinutes()).padStart(2, '0');
-        return `${hora}:${minuto}`;
-    } catch (error) {
-        console.error('Erro ao formatar hora:', error, dataISO);
-        return '—';
+export const formatarHora = (dataHora) => {
+  if (!dataHora) return '—';
+  
+  try {
+    let data;
+    
+    if (typeof dataHora === 'string' && dataHora.includes('/')) {
+      const partes = dataHora.split(' ');
+      const dataParte = partes[0];
+      const horaParte = partes[1] || '00:00';
+      const [dia, mes, ano] = dataParte.split('/');
+      const [horas, minutos] = horaParte.split(':');
+      data = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia), parseInt(horas), parseInt(minutos));
+    } else {
+      data = new Date(dataHora);
     }
+    
+    if (isNaN(data.getTime())) return '—';
+    
+    return data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return '—';
+  }
 };
 
 export const formatarDataHoraCurta = (dataISO) => {

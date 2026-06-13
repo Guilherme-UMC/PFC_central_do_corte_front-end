@@ -226,7 +226,6 @@ const Signup = () => {
             required
           />
 
-          {/* Termos e Condições */}
           <div className="form-group termos-group">
             <label className="checkbox-container">
               <input
@@ -256,7 +255,6 @@ const Signup = () => {
         </div>
       </div>
 
-      {/* Modal de Termos */}
       <TermosModal 
         isOpen={showTermosModal} 
         onClose={handleCloseTermos} 

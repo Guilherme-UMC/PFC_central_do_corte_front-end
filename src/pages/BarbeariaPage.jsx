@@ -10,12 +10,13 @@ import StatusBadge from '../components/StatusBadge';
 import Loader from '../components/Loader';
 import CadastroBarbearia from '../components/CadastroBarbearia';
 import Dashboard from './DashboardPage';
-import { formatarDataHora, formatarData, isHoje } from '../utils/dateUtils';
+import { formatarDataHora, formatarData, isHoje, parseDataHora } from '../utils/dateUtils';
 import PasswordInput from '../components/PasswordInput';
+import { CATEGORIAS_SERVICO, getCategoriaLabel } from '../services/categoriaServico';
 import '../styles/pages/barbearia.css';
 
-const IconProduto = () =>(
-  <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" stroke-linejoin="round" class="lucide lucide-shopping-bag-icon lucide-shopping-bag"><path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/></svg>
+const IconProduto = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" stroke-linejoin="round" class="lucide lucide-shopping-bag-icon lucide-shopping-bag"><path d="M16 10a4 4 0 0 1-8 0" /><path d="M3.103 6.034h17.794" /><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z" /></svg>
 )
 
 const IconEdit = () => (
@@ -44,6 +45,67 @@ const IconTelefone = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-phone-icon lucide-phone"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" /></svg>
 )
 
+const FILTRO_OPCOES = {
+  TODOS: 'todos',
+  CONFIRMADOS: 'confirmados',
+  PENDENTES: 'pendentes',
+  CANCELADOS: 'cancelados',
+  CONCLUIDOS: 'concluidos'
+};
+
+const getFiltroLabel = (filtro) => {
+  const labels = {
+    [FILTRO_OPCOES.TODOS]: 'Todos',
+    [FILTRO_OPCOES.CONFIRMADOS]: 'Confirmados',
+    [FILTRO_OPCOES.PENDENTES]: 'Aguardando',
+    [FILTRO_OPCOES.CANCELADOS]: 'Cancelados',
+    [FILTRO_OPCOES.CONCLUIDOS]: 'Concluídos'
+  };
+  return labels[filtro] || 'Todos';
+};
+
+const ordenarAgendamentosPorData = (agendamentos) => {
+  return [...agendamentos].sort((a, b) => {
+    const dataA = parseDataHora(a.dataHora);
+    const dataB = parseDataHora(b.dataHora);
+    if (!dataA && !dataB) return 0;
+    if (!dataA) return 1;
+    if (!dataB) return -1;
+    return dataA - dataB;
+  });
+};
+
+const filtrarAgendamentos = (agendamentos, filtro) => {
+  switch (filtro) {
+    case FILTRO_OPCOES.CONFIRMADOS:
+      return agendamentos.filter(a => a.status === 'Confirmado');
+    case FILTRO_OPCOES.PENDENTES:
+      return agendamentos.filter(a => a.status === 'Aguardando confirmação');
+    case FILTRO_OPCOES.CANCELADOS:
+      return agendamentos.filter(a => a.status === 'Cancelado pelo cliente' || a.status === 'Cancelado pela barbearia');
+    case FILTRO_OPCOES.CONCLUIDOS:
+      return agendamentos.filter(a => a.status === 'Concluído');
+    default:
+      return agendamentos;
+  }
+};
+
+const FiltrosAgendamentos = ({ filtroAtivo, onFiltroChange }) => {
+  return (
+    <div className="filtros-agendamentos">
+      {Object.values(FILTRO_OPCOES).map(filtro => (
+        <button
+          key={filtro}
+          className={`filtro-btn ${filtroAtivo === filtro ? 'active' : ''}`}
+          onClick={() => onFiltroChange(filtro)}
+        >
+          {getFiltroLabel(filtro)}
+        </button>
+      ))}
+    </div>
+  );
+};
+
 const BarbeariaPage = ({ onNavigate }) => {
   const { user } = useAuthContext();
   const [barbearias, setBarbearias] = useState([]);
@@ -52,6 +114,7 @@ const BarbeariaPage = ({ onNavigate }) => {
   const [activeTab, setActiveTab] = useState('agendamentos');
   const [agendamentos, setAgendamentos] = useState([]);
   const [agendamentosHoje, setAgendamentosHoje] = useState([]);
+  const [filtroAgendamentos, setFiltroAgendamentos] = useState(FILTRO_OPCOES.TODOS);
   const [servicos, setServicos] = useState([]);
   const [funcionarios, setFuncionarios] = useState([]);
   const [horarios, setHorarios] = useState([...HORARIOS_PADRAO]);
@@ -59,7 +122,13 @@ const BarbeariaPage = ({ onNavigate }) => {
   const [editingBarbearia, setEditingBarbearia] = useState(null);
   const [showServicoForm, setShowServicoForm] = useState(false);
   const [editingServico, setEditingServico] = useState(null);
-  const [servicoForm, setServicoForm] = useState({ nome: '', descricao: '', preco: '', duracaoMinutos: '' });
+  const [servicoForm, setServicoForm] = useState({
+    nome: '',
+    descricao: '',
+    preco: '',
+    duracaoMinutos: '',
+    categoria: 'OUTROS'
+  });
   const [showFuncionarioForm, setShowFuncionarioForm] = useState(false);
   const [funcionarioForm, setFuncionarioForm] = useState({ name: '', email: '', telefone: '', password: '' });
   const [vincularEmail, setVincularEmail] = useState('');
@@ -109,8 +178,6 @@ const BarbeariaPage = ({ onNavigate }) => {
   };
 
   const carregarDadosBarbearia = async (barbeariaId) => {
-    console.log('Recarregando dados da barbearia...');
-
     setAgendamentos([]);
     setAgendamentosHoje([]);
     setServicos([]);
@@ -126,15 +193,12 @@ const BarbeariaPage = ({ onNavigate }) => {
       carregarProdutos(barbeariaId),
       carregarCategorias(barbeariaId)
     ]);
-
-    console.log('Dados recarregados com sucesso');
   };
 
   const carregarAgendamentos = async (barbeariaId) => {
     const result = await AgendamentoService.listarPorBarbearia(barbeariaId);
     if (result.success) {
       setAgendamentos(result.data);
-      console.log(`Agendamentos carregados: ${result.data.length}`);
     }
   };
 
@@ -142,7 +206,6 @@ const BarbeariaPage = ({ onNavigate }) => {
     const result = await AgendamentoService.listarDoDia(barbeariaId);
     if (result.success) {
       setAgendamentosHoje(result.data);
-      
     }
   };
 
@@ -170,7 +233,6 @@ const BarbeariaPage = ({ onNavigate }) => {
     const result = await ProdutoService.listarTodosPorBarbearia(barbeariaId);
     if (result.success) {
       setProdutos(result.data || []);
-      
     }
   };
 
@@ -184,6 +246,7 @@ const BarbeariaPage = ({ onNavigate }) => {
   const handleSelectBarbearia = async (barbearia) => {
     setSelectedBarbearia(barbearia);
     setActiveTab('agendamentos');
+    setFiltroAgendamentos(FILTRO_OPCOES.TODOS);
   };
 
   const handleCancelarAgendamento = async (agendamentoId) => {
@@ -236,7 +299,8 @@ const BarbeariaPage = ({ onNavigate }) => {
       nome: servicoForm.nome,
       descricao: servicoForm.descricao || null,
       preco: parseFloat(servicoForm.preco),
-      duracaoMinutos: parseInt(servicoForm.duracaoMinutos)
+      duracaoMinutos: parseInt(servicoForm.duracaoMinutos),
+      categoria: servicoForm.categoria
     };
 
     let result;
@@ -250,7 +314,7 @@ const BarbeariaPage = ({ onNavigate }) => {
       showMessage('success', editingServico ? 'Serviço atualizado!' : 'Serviço criado!');
       setShowServicoForm(false);
       setEditingServico(null);
-      setServicoForm({ nome: '', descricao: '', preco: '', duracaoMinutos: '' });
+      setServicoForm({ nome: '', descricao: '', preco: '', duracaoMinutos: '', categoria: 'OUTROS' });
       await carregarServicos(selectedBarbearia.id);
     } else {
       showMessage('error', result.message);
@@ -454,6 +518,10 @@ const BarbeariaPage = ({ onNavigate }) => {
     );
   }
 
+  const agendamentosFiltrados = filtrarAgendamentos(agendamentos, filtroAgendamentos);
+  const agendamentosOrdenados = ordenarAgendamentosPorData(agendamentosFiltrados);
+  const agendamentosHojeOrdenados = ordenarAgendamentosPorData(agendamentosHoje);
+
   return (
     <div className="page-barbearia">
       <div className="page-container">
@@ -538,130 +606,91 @@ const BarbeariaPage = ({ onNavigate }) => {
             Agendamentos de Hoje
             {agendamentosHoje.length > 0 && <span className="tab-count today">{agendamentosHoje.length}</span>}
           </button>
-          <button
-            className={`tab-btn ${activeTab === 'servicos' ? 'active' : ''}`}
-            onClick={() => setActiveTab('servicos')}
-          >Serviços</button>
-          <button
-            className={`tab-btn ${activeTab === 'funcionarios' ? 'active' : ''}`}
-            onClick={() => setActiveTab('funcionarios')}
-          >Funcionários</button>
-          <button
-            className={`tab-btn ${activeTab === 'horarios' ? 'active' : ''}`}
-            onClick={() => setActiveTab('horarios')}
-          >Horários</button>
-          <button className={`tab-btn ${activeTab === 'produtos' ? 'active' : ''}`} onClick={() => setActiveTab('produtos')}>
-            Produtos
-          </button>
-          <button
-            className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
-          >
-            Dashboard
-          </button>
+          <button className={`tab-btn ${activeTab === 'servicos' ? 'active' : ''}`} onClick={() => setActiveTab('servicos')}>Serviços</button>
+          <button className={`tab-btn ${activeTab === 'funcionarios' ? 'active' : ''}`} onClick={() => setActiveTab('funcionarios')}>Funcionários</button>
+          <button className={`tab-btn ${activeTab === 'horarios' ? 'active' : ''}`} onClick={() => setActiveTab('horarios')}>Horários</button>
+          <button className={`tab-btn ${activeTab === 'produtos' ? 'active' : ''}`} onClick={() => setActiveTab('produtos')}>Produtos</button>
+          <button className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>Dashboard</button>
         </div>
 
         <div className="page-content">
           {activeTab === 'agendamentos' && (
-            <div className="agendamentos-list">
-              {agendamentos.length === 0 ? (
-                <div className="empty-state-small">
-                  <p>Nenhum agendamento para esta barbearia.</p>
-                </div>
-              ) : (
-                agendamentos.map(ag => {
-                  const isLoading = loadingAction === ag.id;
-                  return (
-                    <div key={ag.id} className="agendamento-card">
-                      <div className="agendamento-header">
-                        <h3>{ag.clienteNome}</h3>
-                        <StatusBadge status={ag.status} />
+            <>
+              <FiltrosAgendamentos 
+                filtroAtivo={filtroAgendamentos} 
+                onFiltroChange={setFiltroAgendamentos} 
+              />
+              <div className="agendamentos-list">
+                {agendamentosOrdenados.length === 0 ? (
+                  <div className="empty-state-small">
+                    <p>Nenhum agendamento {getFiltroLabel(filtroAgendamentos).toLowerCase()} para esta barbearia.</p>
+                  </div>
+                ) : (
+                  agendamentosOrdenados.map(ag => {
+                    const isLoading = loadingAction === ag.id;
+                    return (
+                      <div key={ag.id} className="agendamento-card">
+                        <div className="agendamento-header">
+                          <h3>{ag.clienteNome}</h3>
+                          <StatusBadge status={ag.status} />
+                        </div>
+                        <div className="agendamento-info">
+                          <p><strong>Data:</strong><br /> {formatarDataHora(ag.dataHora)}</p>
+                          <p><strong>Serviço:</strong> <br />{ag.servicoNome}</p>
+                          <p><strong>Valor:</strong><br /> R$ {ag.servicoPreco?.toFixed(2)}</p>
+                          <p><strong>Funcionário:</strong> <br />{ag.funcionarioNome || 'Não definido'}</p>
+                          {ag.observacao && <p><strong>Obs:</strong> {ag.observacao}</p>}
+                        </div>
+                        {ag.status === 'Aguardando confirmação' && (
+                          <div className="agendamento-actions">
+                            <button className="btn-concluir" onClick={() => handleConfirmarAgendamento(ag.id)} disabled={isLoading}>
+                              {isLoading ? '...' : '✓ Confirmar'}
+                            </button>
+                            <button className="btn-danger" onClick={() => handleCancelarAgendamento(ag.id)} disabled={isLoading}>
+                              {isLoading ? '...' : '✗ Cancelar'}
+                            </button>
+                          </div>
+                        )}
+                        {ag.status === 'Confirmado' && (
+                          <div className="agendamento-actions">
+                            <button className="btn-concluir" onClick={() => handleConcluirAgendamento(ag.id)} disabled={isLoading}>
+                              {isLoading ? '...' : '✓ Concluir Atendimento'}
+                            </button>
+                            <button className="btn-danger" onClick={() => handleCancelarAgendamento(ag.id)} disabled={isLoading}>
+                              {isLoading ? '...' : '✗ Cancelar'}
+                            </button>
+                          </div>
+                        )}
+                        {(ag.status === 'Cancelado pelo cliente' || ag.status === 'Cancelado pela barbearia') && (
+                          <div className="agendamento-actions">
+                            <span className="status-cancelled">{ag.status}</span>
+                          </div>
+                        )}
+                        {ag.status === 'Concluído' && (
+                          <div className="agendamento-actions">
+                            <span className="status-finished">✓ Atendimento concluído</span>
+                          </div>
+                        )}
                       </div>
-
-                      <div className="agendamento-info">
-                        <p><strong>Data:</strong><br /> {formatarDataHora(ag.dataHora)}</p>
-                        <p><strong>Serviço:</strong> <br />{ag.servicoNome}</p>
-                        <p><strong>Valor:</strong><br /> R$ {ag.servicoPreco?.toFixed(2)}</p>
-                        <p><strong>Funcionário:</strong> <br />{ag.funcionarioNome || 'Não definido'}</p>
-                        {ag.observacao && <p><strong>Obs:</strong> {ag.observacao}</p>}
-                      </div>
-
-                      {ag.status === 'Aguardando confirmação' && (
-                        <div className="agendamento-actions">
-                          <button
-                            className="btn-concluir"
-                            onClick={() => handleConfirmarAgendamento(ag.id)}
-                            disabled={isLoading}
-                          >
-                            {isLoading ? '...' : '✓ Confirmar'}
-                          </button>
-                          <button
-                            className="btn-danger"
-                            onClick={() => handleCancelarAgendamento(ag.id)}
-                            disabled={isLoading}
-                          >
-                            {isLoading ? '...' : '✗ Cancelar'}
-                          </button>
-                        </div>
-                      )}
-
-                      
-                      {ag.status === 'Confirmado' && (
-                        <div className="agendamento-actions">
-                          <button
-                            className="btn-concluir"
-                            onClick={() => handleConcluirAgendamento(ag.id)}
-                            disabled={isLoading}
-                          >
-                            {isLoading ? '...' : '✓ Concluir Atendimento'}
-                          </button>
-                          <button
-                            className="btn-danger"
-                            onClick={() => handleCancelarAgendamento(ag.id)}
-                            disabled={isLoading}
-                          >
-                            {isLoading ? '...' : '✗ Cancelar'}
-                          </button>
-                        </div>
-                      )}
-
-                      
-                      {(ag.status === 'Cancelado pelo cliente' || ag.status === 'Cancelado pela barbearia') && (
-                        <div className="agendamento-actions">
-                          <span className="status-cancelled">
-                            {ag.status}
-                          </span>
-                        </div>
-                      )}
-
-                     
-                      {ag.status === 'Concluído' && (
-                        <div className="agendamento-actions">
-                          <span className="status-finished">✓ Atendimento concluído</span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </div>
+                    );
+                  })
+                )}
+              </div>
+            </>
           )}
 
-          
           {activeTab === 'hoje' && (
             <div className="agendamentos-list">
               <div className="today-header">
                 <span className="today-date">{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
               </div>
-              {agendamentosHoje.length === 0 ? (
+              {agendamentosHojeOrdenados.length === 0 ? (
                 <div className="empty-state-small">
                   <p>Nenhum agendamento para hoje.</p>
-                  <p>
-                    Aproveite para organizar a agenda!
-                  </p>
+                  <p>Aproveite para organizar a agenda!</p>
                 </div>
               ) : (
-                agendamentosHoje.map(ag => {
+                agendamentosHojeOrdenados.map(ag => {
                   const isLoading = loadingAction === ag.id;
                   return (
                     <div key={ag.id} className="agendamento-card today-card">
@@ -676,57 +705,31 @@ const BarbeariaPage = ({ onNavigate }) => {
                         <p><strong>Funcionário:</strong> {ag.funcionarioNome || 'Não definido'}</p>
                         {ag.observacao && <p><strong>Obs:</strong> {ag.observacao}</p>}
                       </div>
-
-                      
                       {ag.status === 'Aguardando confirmação' && (
                         <div className="agendamento-actions">
-                          <button
-                            className="btn-success small"
-                            onClick={() => handleConfirmarAgendamento(ag.id)}
-                            disabled={isLoading}
-                          >
+                          <button className="btn-success small" onClick={() => handleConfirmarAgendamento(ag.id)} disabled={isLoading}>
                             {isLoading ? '...' : '✓ Confirmar'}
                           </button>
-                          <button
-                            className="btn-danger small"
-                            onClick={() => handleCancelarAgendamento(ag.id)}
-                            disabled={isLoading}
-                          >
+                          <button className="btn-danger small" onClick={() => handleCancelarAgendamento(ag.id)} disabled={isLoading}>
                             {isLoading ? '...' : '✗ Cancelar'}
                           </button>
                         </div>
                       )}
-
-                      
                       {ag.status === 'Confirmado' && (
                         <div className="agendamento-actions">
-                          <button
-                            className="btn-concluir"
-                            onClick={() => handleConcluirAgendamento(ag.id)}
-                            disabled={isLoading}
-                          >
+                          <button className="btn-concluir" onClick={() => handleConcluirAgendamento(ag.id)} disabled={isLoading}>
                             {isLoading ? '...' : '✓ Concluir Atendimento'}
                           </button>
-                          <button
-                            className="btn-danger small"
-                            onClick={() => handleCancelarAgendamento(ag.id)}
-                            disabled={isLoading}
-                          >
+                          <button className="btn-danger small" onClick={() => handleCancelarAgendamento(ag.id)} disabled={isLoading}>
                             {isLoading ? '...' : '✗ Cancelar'}
                           </button>
                         </div>
                       )}
-
-                      
                       {(ag.status === 'Cancelado pelo cliente' || ag.status === 'Cancelado pela barbearia') && (
                         <div className="agendamento-actions">
-                          <span className="status-cancelled">
-                            {ag.status}
-                          </span>
+                          <span className="status-cancelled">{ag.status}</span>
                         </div>
                       )}
-
-                    
                       {ag.status === 'Concluído' && (
                         <div className="agendamento-actions">
                           <span className="status-finished">✓ Atendimento concluído</span>
@@ -739,12 +742,10 @@ const BarbeariaPage = ({ onNavigate }) => {
             </div>
           )}
 
-          
           {activeTab === 'dashboard' && (
             <Dashboard barbeariaId={selectedBarbearia?.id} />
           )}
 
-          
           {activeTab === 'servicos' && (
             <div>
               <div className="section-header-actions">
@@ -775,8 +776,18 @@ const BarbeariaPage = ({ onNavigate }) => {
                         <label className="form-label">Duração</label>
                         <input className="form-input" type="number" placeholder="Duração (minutos)" value={servicoForm.duracaoMinutos} onChange={e => setServicoForm({ ...servicoForm, duracaoMinutos: e.target.value })} required />
                       </div>
+                      <div className="form-group">
+                        <label className="form-label">Categoria</label>
+                        <select className="form-select" value={servicoForm.categoria} onChange={e => setServicoForm({ ...servicoForm, categoria: e.target.value })} required>
+                          {CATEGORIAS_SERVICO.map(cat => (
+                            <option key={cat.value} value={cat.value}>{cat.label}</option>
+                          ))}
+                        </select>
+                      </div>
                       <div className="modal-actions">
-                        <button type="button" className="btn-danger" onClick={() => { setShowServicoForm(false); setEditingServico(null); setServicoForm({ nome: '', descricao: '', preco: '', duracaoMinutos: '' }); }}>Cancelar</button>
+                        <button type="button" className="btn-danger" onClick={() => {
+                          setShowServicoForm(false); setEditingServico(null); setServicoForm({ nome: '', descricao: '', preco: '', duracaoMinutos: '', categoria: 'OUTROS' });
+                        }}>Cancelar</button>
                         <button type="submit" className="btn-cancelar" disabled={submitting}>{submitting ? 'Salvando...' : 'Salvar'}</button>
                       </div>
                     </form>
@@ -792,12 +803,23 @@ const BarbeariaPage = ({ onNavigate }) => {
                     <div key={s.id} className="servico-item">
                       <div className="servico-info">
                         <strong>{s.nome}</strong>
+                        <span className="servico-categoria">{getCategoriaLabel(s.categoria)}</span>
                         <span>R$ {s.preco?.toFixed(2)}</span>
                         <span>{s.duracaoMinutos} min</span>
                         {s.descricao && <span className="servico-desc">{s.descricao}</span>}
                       </div>
                       <div className="servico-actions">
-                        <button className="btn-secondary small" onClick={() => { setEditingServico(s); setServicoForm({ nome: s.nome, descricao: s.descricao || '', preco: s.preco, duracaoMinutos: s.duracaoMinutos }); setShowServicoForm(true); }}><IconEdit /></button>
+                        <button className="btn-secondary small" onClick={() => {
+                          setEditingServico(s);
+                          setServicoForm({
+                            nome: s.nome,
+                            descricao: s.descricao || '',
+                            preco: s.preco,
+                            duracaoMinutos: s.duracaoMinutos,
+                            categoria: s.categoria || 'OUTROS'
+                          });
+                          setShowServicoForm(true);
+                        }}><IconEdit /></button>
                         <button className="btn-danger small" onClick={() => handleDesativarServico(s.id)}><IconTrash /></button>
                       </div>
                     </div>
@@ -807,7 +829,6 @@ const BarbeariaPage = ({ onNavigate }) => {
             </div>
           )}
 
-          
           {activeTab === 'funcionarios' && (
             <div>
               <div className="section-header-actions">
@@ -824,21 +845,11 @@ const BarbeariaPage = ({ onNavigate }) => {
                     <form className="form" onSubmit={handleFuncionarioSubmit}>
                       <label className="form-label">Nome</label>
                       <input className='form-input' type="text" placeholder="Nome completo" value={funcionarioForm.name} onChange={e => setFuncionarioForm({ ...funcionarioForm, name: e.target.value })} required />
-
                       <label className="form-label">Email</label>
                       <input className='form-input' type="email" placeholder="Email" value={funcionarioForm.email} onChange={e => setFuncionarioForm({ ...funcionarioForm, email: e.target.value })} required />
-
                       <label className="form-label">Telefone</label>
                       <input className='form-input' type="tel" placeholder="Telefone" value={funcionarioForm.telefone} onChange={e => setFuncionarioForm({ ...funcionarioForm, telefone: e.target.value })} required />
-
-                      <PasswordInput
-                        name="password"
-                        label="Senha"
-                        placeholder="Mínimo 6 caracteres"
-                        value={funcionarioForm.password}
-                        onChange={e => setFuncionarioForm({ ...funcionarioForm, password: e.target.value })}
-                        required
-                      />
+                      <PasswordInput name="password" label="Senha" placeholder="Mínimo 6 caracteres" value={funcionarioForm.password} onChange={e => setFuncionarioForm({ ...funcionarioForm, password: e.target.value })} required />
                       <div className="modal-actions">
                         <button type="button" className="btn-danger" onClick={() => { setShowFuncionarioForm(false); setFuncionarioForm({ name: '', email: '', telefone: '', password: '' }); }}>Cancelar</button>
                         <button type="submit" className="btn-concluir" disabled={submitting}>{submitting ? 'Criando...' : 'Criar'}</button>
@@ -875,7 +886,6 @@ const BarbeariaPage = ({ onNavigate }) => {
             </div>
           )}
 
-        
           {activeTab === 'horarios' && (
             <div>
               <div className="section-header-actions">
@@ -889,10 +899,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                 <div className="modal-overlay2">
                   <div className="modal-content2">
                     <h3>Editar Horários de Funcionamento</h3>
-                    <p className="text-muted">
-                      Configure os horários de funcionamento para cada dia da semana
-                    </p>
-
+                    <p className="text-muted">Configure os horários de funcionamento para cada dia da semana</p>
                     <div className="horarios-edit-list">
                       {DIAS_SEMANA.map((dia) => {
                         const horarioAtual = horarios.find(h => h.dia === dia.value) || {
@@ -901,91 +908,51 @@ const BarbeariaPage = ({ onNavigate }) => {
                           horaFechamento: '18:00',
                           fechado: false
                         };
-
                         return (
                           <div key={dia.value} className="horario-edit-row">
                             <span className="horario-edit-dia">{dia.label}</span>
                             <label className="horario-edit-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={horarioAtual.fechado}
-                                onChange={(e) => {
-                                  const novosHorarios = [...horarios];
-                                  const index = novosHorarios.findIndex(h => h.dia === dia.value);
-                                  if (index >= 0) {
-                                    novosHorarios[index] = {
-                                      ...novosHorarios[index],
-                                      fechado: e.target.checked
-                                    };
-                                  } else {
-                                    novosHorarios.push({
-                                      dia: dia.value,
-                                      horaAbertura: '09:00',
-                                      horaFechamento: '18:00',
-                                      fechado: e.target.checked
-                                    });
-                                  }
-                                  setHorarios(novosHorarios);
-                                }}
-                              />
+                              <input type="checkbox" checked={horarioAtual.fechado} onChange={(e) => {
+                                const novosHorarios = [...horarios];
+                                const index = novosHorarios.findIndex(h => h.dia === dia.value);
+                                if (index >= 0) {
+                                  novosHorarios[index] = { ...novosHorarios[index], fechado: e.target.checked };
+                                } else {
+                                  novosHorarios.push({ dia: dia.value, horaAbertura: '09:00', horaFechamento: '18:00', fechado: e.target.checked });
+                                }
+                                setHorarios(novosHorarios);
+                              }} />
                               Fechado
                             </label>
                             {!horarioAtual.fechado && (
                               <div className="horario-time-group">
-                                <input
-                                  type="time"
-                                  className="horario-edit-time"
-                                  value={horarioAtual.horaAbertura || '09:00'}
-                                  onChange={(e) => {
-                                    const novosHorarios = [...horarios];
-                                    const index = novosHorarios.findIndex(h => h.dia === dia.value);
-                                    if (index >= 0) {
-                                      novosHorarios[index] = {
-                                        ...novosHorarios[index],
-                                        horaAbertura: e.target.value
-                                      };
-                                    } else {
-                                      novosHorarios.push({
-                                        dia: dia.value,
-                                        horaAbertura: e.target.value,
-                                        horaFechamento: '18:00',
-                                        fechado: false
-                                      });
-                                    }
-                                    setHorarios(novosHorarios);
-                                  }}
-                                />
+                                <input type="time" className="horario-edit-time" value={horarioAtual.horaAbertura || '09:00'} onChange={(e) => {
+                                  const novosHorarios = [...horarios];
+                                  const index = novosHorarios.findIndex(h => h.dia === dia.value);
+                                  if (index >= 0) {
+                                    novosHorarios[index] = { ...novosHorarios[index], horaAbertura: e.target.value };
+                                  } else {
+                                    novosHorarios.push({ dia: dia.value, horaAbertura: e.target.value, horaFechamento: '18:00', fechado: false });
+                                  }
+                                  setHorarios(novosHorarios);
+                                }} />
                                 <span>às</span>
-                                <input
-                                  type="time"
-                                  className="horario-edit-time"
-                                  value={horarioAtual.horaFechamento || '18:00'}
-                                  onChange={(e) => {
-                                    const novosHorarios = [...horarios];
-                                    const index = novosHorarios.findIndex(h => h.dia === dia.value);
-                                    if (index >= 0) {
-                                      novosHorarios[index] = {
-                                        ...novosHorarios[index],
-                                        horaFechamento: e.target.value
-                                      };
-                                    } else {
-                                      novosHorarios.push({
-                                        dia: dia.value,
-                                        horaAbertura: '09:00',
-                                        horaFechamento: e.target.value,
-                                        fechado: false
-                                      });
-                                    }
-                                    setHorarios(novosHorarios);
-                                  }}
-                                />
+                                <input type="time" className="horario-edit-time" value={horarioAtual.horaFechamento || '18:00'} onChange={(e) => {
+                                  const novosHorarios = [...horarios];
+                                  const index = novosHorarios.findIndex(h => h.dia === dia.value);
+                                  if (index >= 0) {
+                                    novosHorarios[index] = { ...novosHorarios[index], horaFechamento: e.target.value };
+                                  } else {
+                                    novosHorarios.push({ dia: dia.value, horaAbertura: '09:00', horaFechamento: e.target.value, fechado: false });
+                                  }
+                                  setHorarios(novosHorarios);
+                                }} />
                               </div>
                             )}
                           </div>
                         );
                       })}
                     </div>
-
                     <div className="modal-actions">
                       <button type="button" className="btn-danger" onClick={() => { setShowHorarioForm(false); carregarHorarios(selectedBarbearia.id); }}>Cancelar</button>
                       <button type="button" className="btn-cancelar" onClick={salvarHorarios} disabled={submitting}>{submitting ? 'Salvando...' : 'Salvar Horários'}</button>
@@ -1018,7 +985,6 @@ const BarbeariaPage = ({ onNavigate }) => {
             </div>
           )}
 
-         
           {activeTab === 'produtos' && (
             <div>
               <div className="section-header-actions">
@@ -1028,7 +994,6 @@ const BarbeariaPage = ({ onNavigate }) => {
                 </button>
               </div>
 
-             
               {showProdutoForm && (
                 <div className="modal-overlay2">
                   <div className="modal-content2" style={{ maxWidth: '600px' }}>
@@ -1036,93 +1001,46 @@ const BarbeariaPage = ({ onNavigate }) => {
                     <form className="form" onSubmit={handleProdutoSubmit}>
                       <div className="form-group">
                         <label className="form-label">Nome *</label>
-                        <input
-                          className="form-input"
-                          type="text"
-                          placeholder="Ex: Shampoo Antiqueda"
-                          value={produtoForm.nome}
-                          onChange={e => setProdutoForm({ ...produtoForm, nome: e.target.value })}
-                          required
-                        />
+                        <input className="form-input" type="text" placeholder="Ex: Shampoo Antiqueda" value={produtoForm.nome} onChange={e => setProdutoForm({ ...produtoForm, nome: e.target.value })} required />
                       </div>
-
                       <div className="form-group">
                         <label className="form-label">Marca</label>
-                        <input
-                          className="form-input"
-                          type="text"
-                          placeholder="Ex: Nivea, Gillette, etc."
-                          value={produtoForm.marca}
-                          onChange={e => setProdutoForm({ ...produtoForm, marca: e.target.value })}
-                        />
+                        <input className="form-input" type="text" placeholder="Ex: Nivea, Gillette, etc." value={produtoForm.marca} onChange={e => setProdutoForm({ ...produtoForm, marca: e.target.value })} />
                       </div>
-
                       <div className="form-group">
                         <label className="form-label">Categoria</label>
-                        <select
-                          className="form-select"
-                          value={produtoForm.categoria}
-                          onChange={e => setProdutoForm({ ...produtoForm, categoria: e.target.value })}
-                        >
-                          <option className='option' value="">Selecione uma categoria</option>
-                          <option className='option' value="Cabelo">Cabelo</option>
-                          <option className='option' value="Barba">Barba</option>
-                          <option className='option' value="Pele">Pele</option>
-                          <option className='option' value="Perfumaria">Perfumaria</option>
-                          <option className='option' value="Acessórios">Acessórios</option>
-                          <option className='option' value="Outros">Outros</option>
+                        <select className="form-select" value={produtoForm.categoria} onChange={e => setProdutoForm({ ...produtoForm, categoria: e.target.value })}>
+                          <option value="">Selecione uma categoria</option>
+                          <option value="Cabelo">Cabelo</option>
+                          <option value="Barba">Barba</option>
+                          <option value="Pele">Pele</option>
+                          <option value="Perfumaria">Perfumaria</option>
+                          <option value="Acessórios">Acessórios</option>
+                          <option value="Outros">Outros</option>
                         </select>
                       </div>
-
                       <div className="form-group">
                         <label className="form-label">Descrição</label>
-                        <textarea
-                          className="form-input"
-                          placeholder="Descreva o produto..."
-                          value={produtoForm.descricao}
-                          onChange={e => setProdutoForm({ ...produtoForm, descricao: e.target.value })}
-                          rows={3}
-                        />
+                        <textarea className="form-input" placeholder="Descreva o produto..." value={produtoForm.descricao} onChange={e => setProdutoForm({ ...produtoForm, descricao: e.target.value })} rows={3} />
                       </div>
-
                       <div className="form-group">
                         <label className="form-label">Preço (R$)</label>
-                        <input
-                          className="form-input"
-                          type="number"
-                          step="0.01"
-                          placeholder="0,00"
-                          value={produtoForm.preco}
-                          onChange={e => setProdutoForm({ ...produtoForm, preco: e.target.value })}
-                        />
+                        <input className="form-input" type="number" step="0.01" placeholder="0,00" value={produtoForm.preco} onChange={e => setProdutoForm({ ...produtoForm, preco: e.target.value })} />
                       </div>
-
                       <div className="form-group">
                         <label className="form-label">URL da Imagem</label>
-                        <input
-                          className="form-input"
-                          type="url"
-                          placeholder="https://exemplo.com/imagem.jpg"
-                          value={produtoForm.imagemUrl}
-                          onChange={e => setProdutoForm({ ...produtoForm, imagemUrl: e.target.value })}
-                        />
+                        <input className="form-input" type="url" placeholder="https://exemplo.com/imagem.jpg" value={produtoForm.imagemUrl} onChange={e => setProdutoForm({ ...produtoForm, imagemUrl: e.target.value })} />
                         <small className="text-muted">Link para foto do produto (opcional)</small>
                       </div>
-
                       <div className="modal-actions">
-                        <button type="button" className="btn-danger" onClick={() => { setShowProdutoForm(false); setEditingProduto(null); }}>
-                          Cancelar
-                        </button>
-                        <button type="submit" className="btn-primary" disabled={submitting}>
-                          {submitting ? 'Salvando...' : 'Salvar'}
-                        </button>
+                        <button type="button" className="btn-danger" onClick={() => { setShowProdutoForm(false); setEditingProduto(null); }}>Cancelar</button>
+                        <button type="submit" className="btn-primary" disabled={submitting}>{submitting ? 'Salvando...' : 'Salvar'}</button>
                       </div>
                     </form>
                   </div>
                 </div>
               )}
 
-             
               {produtos.length === 0 ? (
                 <div className="empty-state-small">
                   <p>Nenhum produto cadastrado ainda.</p><br />
@@ -1137,7 +1055,7 @@ const BarbeariaPage = ({ onNavigate }) => {
                       {produto.imagemUrl ? (
                         <img src={produto.imagemUrl} alt={produto.nome} className="produto-admin-imagem" />
                       ) : (
-                        <div className="produto-admin-imagem-placeholder"><IconProduto/></div>
+                        <div className="produto-admin-imagem-placeholder"><IconProduto /></div>
                       )}
                       <div className="produto-admin-info">
                         <h4>{produto.nome}</h4>
@@ -1147,17 +1065,11 @@ const BarbeariaPage = ({ onNavigate }) => {
                         {produto.preco && <p className="produto-admin-preco">R$ {produto.preco.toFixed(2)}</p>}
                       </div>
                       <div className="produto-admin-actions">
-                        <button className="btn-primary" onClick={() => openProdutoForm(produto)}>
-                          <IconEdit /> Editar
-                        </button>
+                        <button className="btn-primary" onClick={() => openProdutoForm(produto)}><IconEdit /> Editar</button>
                         {produto.ativo ? (
-                          <button className="btn-danger" onClick={() => handleDesativarProduto(produto.id)}>
-                            <IconTrash /> Desativar
-                          </button>
+                          <button className="btn-danger" onClick={() => handleDesativarProduto(produto.id)}><IconTrash /> Desativar</button>
                         ) : (
-                          <button className="btn-primary" onClick={() => handleAtivarProduto(produto.id)}>
-                            Ativar
-                          </button>
+                          <button className="btn-primary" onClick={() => handleAtivarProduto(produto.id)}>Ativar</button>
                         )}
                       </div>
                     </div>

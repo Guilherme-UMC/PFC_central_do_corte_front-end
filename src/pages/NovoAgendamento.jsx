@@ -176,7 +176,6 @@ function StepServicos({ barbearia, servicosSelecionados, onToggleServico, onAvan
           )}
         </div>
       </div>
-
       <div>
         <div className="servicos-secao">
           <h3>Selecione os serviços</h3>
@@ -243,13 +242,38 @@ function StepHorario({ barbearia, servicosSelecionados, horarioSelecionado, onSe
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState(null);
 
+  const isHorarioPassado = (horarioStr, dataSelecionada) => {
+  if (!horarioStr) return true;
+  
+  let horarioDate;
+  
+  if (horarioStr.includes('T')) {
+    horarioDate = new Date(horarioStr);
+  } else {
+    const [ano, mes, dia] = dataSelecionada.split('-');
+    const [hora, minuto] = horarioStr.split(':');
+    horarioDate = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia), parseInt(hora), parseInt(minuto));
+  }
+  
+  const agora = new Date();
+  
+  return horarioDate <= agora;
+};
+
   const carregarHorarios = useCallback(async () => {
     if (!data) return;
     setLoading(true);
     setErro(null);
     try {
       const lista = await buscarHorariosDisponiveis(barbearia.id, [], data);
-      setHorarios(lista || []);
+      
+      const horariosValidos = (lista || []).filter(item => {
+        const horarioStr = typeof item === 'object' ? item.horario : item;
+        const disponivel = typeof item === 'object' ? item.disponivel !== false : true;
+        return disponivel && !isHorarioPassado(horarioStr, data);
+      });
+      
+      setHorarios(horariosValidos);
     } catch (err) {
       console.error('Erro ao carregar horários:', err);
       setErro('Não foi possível carregar os horários.');
@@ -262,7 +286,30 @@ function StepHorario({ barbearia, servicosSelecionados, horarioSelecionado, onSe
     carregarHorarios();
   }, [carregarHorarios]);
 
-  const grupos = agruparHorarios(horarios);
+  const agruparHorariosFiltrados = (horariosLista) => {
+    const grupos = { Manhã: [], Tarde: [], Noite: [] };
+    if (!horariosLista || !Array.isArray(horariosLista)) return grupos;
+    
+    horariosLista.forEach((item) => {
+      const horarioStr = typeof item === 'object' ? item.horario : item;
+      if (!horarioStr) return;
+      
+      let hora = 0;
+      if (horarioStr.includes('T')) {
+        hora = new Date(horarioStr).getHours();
+      } else if (horarioStr.includes(':')) {
+        hora = parseInt(horarioStr.split(':')[0]);
+      }
+      
+      if (hora < 12) grupos['Manhã'].push(item);
+      else if (hora < 18) grupos['Tarde'].push(item);
+      else grupos['Noite'].push(item);
+    });
+    
+    return grupos;
+  };
+
+  const grupos = agruparHorariosFiltrados(horarios);
 
   return (
     <div>
@@ -289,10 +336,10 @@ function StepHorario({ barbearia, servicosSelecionados, horarioSelecionado, onSe
                 <p className="horario-periodo-titulo">{periodo}</p>
                 <div className="horarios-grid">
                   {slots.map((slot, idx) => {
-                    const horarioObj = typeof slot === 'object' ? slot : { horario: slot, disponivel: true };
-                    const horarioStr = horarioObj.horario;
+                    const horarioStr = typeof slot === 'object' ? slot.horario : slot;
                     const isSelected = horarioSelecionado === horarioStr;
-                    const disponivel = horarioObj.disponivel !== false;
+                    const disponivel = typeof slot === 'object' ? slot.disponivel !== false : true;
+                    
                     return (
                       <button
                         key={`${periodo}-${idx}`}

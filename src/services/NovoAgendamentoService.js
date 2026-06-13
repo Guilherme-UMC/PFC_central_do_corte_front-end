@@ -41,49 +41,26 @@ export const listarFuncionarios = async (barbeariaId) => {
   }
 };
 
-/**
-
- * @param {string} barbeariaId 
- * @param {Array} servicoIds 
- * @param {string} data 
- * @param {string|null} funcionarioId 
- * @returns {Promise<Array>} 
- */
 export const buscarHorariosDisponiveis = async (barbeariaId, servicoIds, data, funcionarioId = null) => {
-  try {
-    console.log('🔍 Buscando horários disponíveis:', { barbeariaId, data, funcionarioId });
-    
+  try {    
     const result = await horarioService.getHorariosDisponiveis(barbeariaId, data, 30);
-    
-    console.log('📥 Resposta do backend:', result);
-    
+        
     if (result.success && result.data) {
       const horariosDisponiveis = result.data
         .filter(h => h.disponivel === true)
         .map(h => h.horario);
       
-      console.log('✅ Horários disponíveis encontrados:', horariosDisponiveis.length, horariosDisponiveis);
       return horariosDisponiveis;
     }
     
-    console.warn('⚠️ Nenhum horário disponível encontrado ou erro na resposta');
+    console.warn('Nenhum horário disponível encontrado ou erro na resposta');
     return [];
   } catch (error) {
-    console.error('❌ Erro ao buscar horários disponíveis:', error);
+    console.error('Erro ao buscar horários disponíveis:', error);
     return [];
   }
 };
 
-/**
- * Criar um novo agendamento
- * @param {Object} payload - Dados do agendamento
- * @param {string} payload.barbeariaId - ID da barbearia
- * @param {Array} payload.servicoIds - IDs dos serviços
- * @param {string} payload.dataHora - Data e hora no formato ISO
- * @param {string|null} payload.funcionarioId - ID do funcionário (opcional)
- * @param {string|null} payload.observacao - Observação (opcional)
- * @returns {Promise<Object>} - Dados do agendamento criado
- */
 export const criarAgendamento = async (payload) => {
   try {
     if (!payload.barbeariaId) {
@@ -104,10 +81,10 @@ export const criarAgendamento = async (payload) => {
       observacao: payload.observacao || null
     };
     
-    console.log('📤 Enviando requisição de agendamento:', requestBody);
+    console.log('Enviando requisição de agendamento:', requestBody);
     
     const response = await api.post('/api/agendamentos', requestBody);
-    console.log('✅ Agendamento criado com sucesso:', response.data);
+    console.log('Agendamento criado com sucesso:', response.data);
     return response.data;
   } catch (error) {
     console.error(' Erro ao criar agendamento:', error.response?.data || error.message);

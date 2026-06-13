@@ -180,7 +180,6 @@ const BarbeariaDetalhes = () => {
                   <div className="avatar"><IconAvatar /></div>
                   <div>
                     <h4>{f.name}</h4>
-                    {f.telefone && <p>{f.telefone}</p>}
                   </div>
                 </div>
               ))}
