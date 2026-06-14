@@ -40,11 +40,10 @@ const AdminPage = ({ onNavigate }) => {
 
       let roleParam = roleFilter !== 'todos' ? roleFilter : null;
 
-      // Verifica se o termo de busca parece ser um ID (número ou UUID)
+
       let searchParam = searchTerm || null;
       if (searchParam && searchParam.trim() !== '') {
-        // Se for um número ou UUID, mantém como está para buscar por ID
-        // O backend deve estar preparado para buscar tanto por nome quanto por ID
+
         searchParam = searchParam.trim();
       }
       const result = await AdminService.listarTodosUsuarios(
@@ -215,7 +214,7 @@ const AdminPage = ({ onNavigate }) => {
                 <div className="search-bar">
                   <input
                     type="text"
-                    placeholder="Buscar por nome ou ID..."
+                    placeholder="Buscar por nome"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"
@@ -326,7 +325,7 @@ const AdminPage = ({ onNavigate }) => {
                   <thead>
                     <tr>
                       <th>Nome</th>
-                      <th>ID</th>
+
                       <th>Role</th>
                       <th>Status</th>
                       <th>Ações</th>
@@ -338,7 +337,7 @@ const AdminPage = ({ onNavigate }) => {
                       return (
                         <tr key={u.id}>
                           <td>{u.name}</td>
-                          <td>{u.id}</td>
+
                           <td>{getRoleLabel(u.role)}</td>
                           <td>
                             <span className={u.active ? 'status-active' : 'status-inactive'}>
