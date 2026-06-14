@@ -16,7 +16,7 @@ import { CATEGORIAS_SERVICO, getCategoriaLabel } from '../services/categoriaServ
 import '../styles/pages/barbearia.css';
 
 const IconProduto = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" stroke-linejoin="round" class="lucide lucide-shopping-bag-icon lucide-shopping-bag"><path d="M16 10a4 4 0 0 1-8 0" /><path d="M3.103 6.034h17.794" /><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" stroke-linejoin="round" className="lucide lucide-shopping-bag-icon lucide-shopping-bag"><path d="M16 10a4 4 0 0 1-8 0" /><path d="M3.103 6.034h17.794" /><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z" /></svg>
 )
 
 const IconEdit = () => (
@@ -73,6 +73,39 @@ const ordenarAgendamentosPorData = (agendamentos) => {
     if (!dataB) return -1;
     return dataA - dataB;
   });
+};
+
+
+// Função para mascarar o email (mostra primeira e última letra antes do @)
+const maskEmail = (email) => {
+  if (!email) return '-';
+  const [localPart, domain] = email.split('@');
+  if (!localPart || localPart.length <= 2) {
+    // Se o email for muito curto, mostra apenas o primeiro caractere
+    return `${localPart[0] || ''}***@${domain}`;
+  }
+  const firstChar = localPart[0];
+  const lastChar = localPart[localPart.length - 1];
+  return `${firstChar}***${lastChar}@${domain}`;
+};
+
+// Função para mascarar o telefone (não mostra os 4 últimos dígitos)
+const maskPhone = (phone) => {
+  if (!phone) return '-';
+  // Remove tudo que não for número
+  const cleanPhone = phone.replace(/\D/g, '');
+  if (cleanPhone.length <= 4) {
+    return '****';
+  }
+  const visiblePart = cleanPhone.slice(0, -4);
+  const maskedPart = '****';
+  // Formata mantendo a estrutura original (opcional)
+  // Se quiser preservar a formatação original (ex: (11) 91234-****)
+  if (phone.includes('-')) {
+    const lastHyphenIndex = phone.lastIndexOf('-');
+    return phone.substring(0, lastHyphenIndex + 1) + '****';
+  }
+  return `${visiblePart}${maskedPart}`;
 };
 
 const filtrarAgendamentos = (agendamentos, filtro) => {
@@ -616,9 +649,9 @@ const BarbeariaPage = ({ onNavigate }) => {
         <div className="page-content">
           {activeTab === 'agendamentos' && (
             <>
-              <FiltrosAgendamentos 
-                filtroAtivo={filtroAgendamentos} 
-                onFiltroChange={setFiltroAgendamentos} 
+              <FiltrosAgendamentos
+                filtroAtivo={filtroAgendamentos}
+                onFiltroChange={setFiltroAgendamentos}
               />
               <div className="agendamentos-list">
                 {agendamentosOrdenados.length === 0 ? (
@@ -875,8 +908,8 @@ const BarbeariaPage = ({ onNavigate }) => {
                     <div key={f.id} className="funcionario-item">
                       <div className="funcionario-info">
                         <strong>{f.name}</strong>
-                        <span>{f.email}</span>
-                        <span>{f.telefone}</span>
+                        <span className="masked-email">{maskEmail(f.email)}</span>
+                        <span className="masked-phone">{maskPhone(f.telefone)}</span>
                       </div>
                       <button className="btn-danger small" onClick={() => handleDesvincularFuncionario(f.id, f.name)}>Desvincular</button>
                     </div>

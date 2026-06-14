@@ -436,3 +436,26 @@
   padding: 3rem 0;
 }
 
+/* Adicione no arquivo barbearia.css */
+.masked-email,
+.masked-phone {
+  font-family: monospace;
+  font-size: 0.9em;
+  color: var(--corte-text-muted);
+  letter-spacing: 0.5px;
+}
+
+.funcionario-info {
+  display: flex;
+  flex-direction: row;
+  gap: 100px;
+}
+
+.funcionario-info strong {
+  font-size: 1.1em;
+  color: var(--corte-text);
+}
+
+.funcionario-info span {
+  font-size: 0.9em;
+}

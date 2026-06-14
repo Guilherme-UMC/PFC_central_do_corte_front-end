@@ -124,7 +124,7 @@ const AdminLogsPage = () => {
       'CONFIRMADO': 'Confirmou',
       'CONCLUIDO': 'Concluiu',
       'DELETADO': 'Removeu',
-      'LOGIN': 'Login',
+      'ACESSO': 'Acesso',
       'LOGOUT': 'Logout',
       'STATUS_ALTERADO': 'Alterou status',
       'SENHA_ALTERADA': 'Alterou senha',
@@ -134,7 +134,7 @@ const AdminLogsPage = () => {
       'DISponibilidade_ALTERADA': 'Alterou disponibilidade'
     };
 
-    if (tipo === 'LOGIN') return 'Login';
+    if (tipo === 'ACESSO') return 'Acesso';
     if (tipo === 'LOGOUT') return 'Logout';
     if (tipo === 'AGENDAMENTO') {
       const acoesAgendamento = {
@@ -176,7 +176,7 @@ const AdminLogsPage = () => {
       'BARBEARIA': '#1e88e5',
       'SERVICO': '#e67e22',
       'FUNCIONARIO': '#9b59b6',
-      'LOGIN': '#00bcd4',
+      'ACESSO': '#00bcd4',
       'LOGOUT': '#f44336'
     };
     return cores[tipo] || '#757575';

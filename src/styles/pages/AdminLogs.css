@@ -149,7 +149,7 @@
 .acao-confirmado { background: #d4af37; color: #0f0f0f; }
 .acao-concluido { background: #4caf50; color: white; }
 .acao-deletado { background: #c62828; color: white; }
-.acao-login { background: #00bcd4; color: white; }
+.acao-acesso { background: #00bcd4; color: white; }
 .acao-logout { background: #ff9800; color: white; }
 
 .usuario-info {
