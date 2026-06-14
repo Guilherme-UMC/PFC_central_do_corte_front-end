@@ -94,20 +94,20 @@ const AdminLogsPage = () => {
     return new Date(data).toLocaleString('pt-BR');
   };
 
-  // Função para formatar a descrição (versão mais simples)
+
   const formatarDescricao = (log) => {
     if (!log.descricao) return '—';
 
     let descricao = log.descricao;
     const usuarioNome = log.usuarioNome;
 
-    // Remove o nome da descrição se ele aparecer (para não repetir)
+
     if (usuarioNome && usuarioNome !== 'Sistema') {
       descricao = descricao.replace(new RegExp(usuarioNome, 'gi'), '');
-      descricao = descricao.replace(/^[\s,]+/, ''); // Remove vírgulas extras no início
+      descricao = descricao.replace(/^[\s,]+/, ''); 
     }
 
-    // Capitalizar primeira letra
+
     if (descricao.length > 0) {
       descricao = descricao.charAt(0).toUpperCase() + descricao.slice(1);
     }
@@ -115,7 +115,7 @@ const AdminLogsPage = () => {
     return descricao || '—';
   };
 
-  // Função para obter a ação simplificada
+
   const getAcaoSimplificada = (acao, tipo) => {
     const acoes = {
       'CRIADO': 'Criou',
@@ -281,11 +281,6 @@ const AdminLogsPage = () => {
                     >
                       {formatarDescricao(log)}
                     </div>
-                    {log.entidadeId && (
-                      <small className="entidade-info">
-                        ID: {log.entidadeId}
-                      </small>
-                    )}
                   </td>
                 </tr>
               ))
